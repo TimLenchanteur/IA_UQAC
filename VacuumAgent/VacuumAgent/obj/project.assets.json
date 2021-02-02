@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projet\\Prog\\C#\\VacuumAgent\\VacuumAgent\\VacuumAgent.csproj",
+      "projectUniqueName": "D:\\Projet\\Prog\\C#\\IA_UQAC\\VacuumAgent\\VacuumAgent\\VacuumAgent.csproj",
       "projectName": "VacuumAgent",
-      "projectPath": "D:\\Projet\\Prog\\C#\\VacuumAgent\\VacuumAgent\\VacuumAgent.csproj",
+      "projectPath": "D:\\Projet\\Prog\\C#\\IA_UQAC\\VacuumAgent\\VacuumAgent\\VacuumAgent.csproj",
       "packagesPath": "C:\\Users\\timot\\.nuget\\packages\\",
-      "outputPath": "D:\\Projet\\Prog\\C#\\VacuumAgent\\VacuumAgent\\obj\\",
+      "outputPath": "D:\\Projet\\Prog\\C#\\IA_UQAC\\VacuumAgent\\VacuumAgent\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\timot\\AppData\\Roaming\\NuGet\\NuGet.Config",
