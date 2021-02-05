@@ -51,6 +51,7 @@ namespace VacuumAgentWPF
             _gridState = previousState._gridState;
             _nbOfDirtyRoom = previousState._nbOfDirtyRoom;
             _agentPos = previousState._agentPos;
+            _markedState = previousState._markedState;
 
             ExecuteNewAction(newAction);
         }

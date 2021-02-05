@@ -10,13 +10,13 @@ namespace VacuumAgentWPF
     {
         public enum VacuumAction
         {
-            None,
-            GoRight,
-            GoLeft,
-            GoUp,
-            GoDown,
-            Clean,
-            Grab
+            None = 0,
+            GoRight = 1,
+            GoLeft = 2,
+            GoUp = 3,
+            GoDown = 4,
+            Clean = 5,
+            Grab = 6
         }
 
         public enum Algorithm
@@ -54,8 +54,7 @@ namespace VacuumAgentWPF
             {
                 if (intent.Count == 0)
                 {
-                    // Get environment state
-                    // Here we define the state of the environment as the number of dirty room it contains
+                    // Get environment current state
                     CustomEnvState currentState = new CustomEnvState(Environment._grid, _pos);
                     // The agent only move if at least one room is dirty
                     if (currentState.NbOfDirtyRoom > 0)
@@ -98,9 +97,10 @@ namespace VacuumAgentWPF
             return newintent;
         }
 
-        public List<VacuumAction> possibleActionFromThere()
+        public List<VacuumAction> possibleActionFromThere(CustomEnvState state)
         {
             List<VacuumAction> actions = new List<VacuumAction>();
+            // TO DEFINE
             return actions;
         }
 
