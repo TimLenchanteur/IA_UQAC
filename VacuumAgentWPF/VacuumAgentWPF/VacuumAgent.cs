@@ -98,7 +98,29 @@ namespace VacuumAgentWPF
         public List<VacuumAction> PossibleActionFromThere(CustomEnvState state)
         {
             List<VacuumAction> actions = new List<VacuumAction>();
-            // TO DEFINE
+            int[,] currentGrid = state.Grid_State;
+            Vector2 posAgent = state.Agent_Pos;
+            if (currentGrid[posAgent.X, posAgent.Y] == Environment.DIRT) {
+                actions.Add(VacuumAction.Clean);
+            }
+            if (currentGrid[posAgent.X, posAgent.Y] == Environment.JEWEL) {
+                actions.Add(VacuumAction.Grab);
+            }
+            if ((posAgent.X - 1) >=  0) {
+                actions.Add(VacuumAction.GoLeft);
+            }
+            if ((posAgent.X + 1) < Environment._gridDim.X)
+            {
+                actions.Add(VacuumAction.GoRight);
+            }
+            if ((posAgent.Y - 1) >= 0)
+            {
+                actions.Add(VacuumAction.GoDown);
+            }
+            if ((posAgent.Y + 1) < Environment._gridDim.Y)
+            {
+                actions.Add(VacuumAction.GoUp);
+            }
             return actions;
         }
 

@@ -13,7 +13,7 @@ namespace VacuumAgentWPF
         public const int AGENT_STATE = 3;
 
         int[,] _gridState;
-        int[,] Grid_State
+        public int[,] Grid_State
         {
             get => _gridState;
         }
@@ -23,7 +23,7 @@ namespace VacuumAgentWPF
             get => _nbOfDirtyRoom;
         }
         Vector2 _agentPos;
-        Vector2 Agent_Pos
+        public Vector2 Agent_Pos
         {
             get => _agentPos;
         }
