@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VacuumAgent", "VacuumAgent\VacuumAgent.csproj", "{EF652F32-5258-4B4C-9369-87305B3A0C19}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VacuumAgentWPF", "VacuumAgentWPF\VacuumAgentWPF.csproj", "{7FDAEFF9-EB2E-4861-8359-F3DB48620420}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EF652F32-5258-4B4C-9369-87305B3A0C19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF652F32-5258-4B4C-9369-87305B3A0C19}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF652F32-5258-4B4C-9369-87305B3A0C19}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF652F32-5258-4B4C-9369-87305B3A0C19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FDAEFF9-EB2E-4861-8359-F3DB48620420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FDAEFF9-EB2E-4861-8359-F3DB48620420}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FDAEFF9-EB2E-4861-8359-F3DB48620420}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FDAEFF9-EB2E-4861-8359-F3DB48620420}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {E5298BE8-81E8-4088-A5AF-EAA9E3EA092E}
+		SolutionGuid = {A4982EA6-8FCB-40DC-AC51-B14AD4BB84BF}
 	EndGlobalSection
 EndGlobal
