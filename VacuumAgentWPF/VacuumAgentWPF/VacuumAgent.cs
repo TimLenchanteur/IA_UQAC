@@ -87,9 +87,7 @@ namespace VacuumAgentWPF
             Stack<VacuumAction> newintent = new Stack<VacuumAction>();
             switch (algorithm) {
                 case Algorithm.BFS:
-                    BFSAlgo.ExecuteFor(problem);
-                    break;
-
+                    return BFSAlgo.ExecuteFor(problem);
                 default:
                     break;
             }
@@ -97,7 +95,7 @@ namespace VacuumAgentWPF
             return newintent;
         }
 
-        public List<VacuumAction> possibleActionFromThere(CustomEnvState state)
+        public List<VacuumAction> PossibleActionFromThere(CustomEnvState state)
         {
             List<VacuumAction> actions = new List<VacuumAction>();
             // TO DEFINE

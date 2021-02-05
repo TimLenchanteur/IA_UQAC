@@ -24,7 +24,7 @@ namespace VacuumAgentWPF
         public static bool _init = false;
 
         // Environenment dimensions
-        public static Vector2 _gridDim;
+        public static Vector2 _gridDim = new Vector2(0, 0);
         // Environment modelisation
         public static int[,] _grid;
 
