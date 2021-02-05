@@ -31,6 +31,17 @@ namespace VacuumAgentWPF
             _y = y;
         }
 
-
+        public override bool Equals(Object obj)
+        {
+            Vector2 vector2 = obj as Vector2;
+            if (vector2 == null)
+            {
+                return false;
+            }
+            else
+            {
+                return _x == vector2.X && _y == vector2.Y;
+            }
+        }
     }
 }

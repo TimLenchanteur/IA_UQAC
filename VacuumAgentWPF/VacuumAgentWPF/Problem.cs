@@ -8,20 +8,16 @@ namespace VacuumAgentWPF
 {
     class Problem
     {
-        EnvState _initialState;
-        EnvState InitialState
-        {
-            get => _initialState;
-        }
+        public CustomEnvState _initialState { get; }
 
-        EnvState _wishedState;
+        CustomEnvState _wishedState;
 
-        public Problem(EnvState initialState, EnvState wishedState) {
+        public Problem(CustomEnvState initialState, CustomEnvState wishedState) {
             _initialState = initialState;
             _wishedState = wishedState;
         }
 
-        public bool HasBeenSolved(EnvState resultState) {
+        public bool HasBeenSolved(CustomEnvState resultState) {
             return _wishedState.IsEqual(resultState);
         }
     }

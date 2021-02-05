@@ -95,7 +95,7 @@ namespace VacuumAgentWPF
             return newintent;
         }
 
-        public List<VacuumAction> PossibleActionFromThere(CustomEnvState state)
+        public static List<VacuumAction> PossibleActionFromThere(CustomEnvState state)
         {
             List<VacuumAction> actions = new List<VacuumAction>();
             int[,] currentGrid = state.Grid_State;
