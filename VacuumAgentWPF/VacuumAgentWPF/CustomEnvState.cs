@@ -67,7 +67,6 @@ namespace VacuumAgentWPF
                     case ROOM_STATE:
                         // This is the only one we will use, don't need any other
                         return otherCustomState._nbOfDirtyRoom == _nbOfDirtyRoom;
-                        break;
                     case AGENT_STATE:
                         break;
                     default:

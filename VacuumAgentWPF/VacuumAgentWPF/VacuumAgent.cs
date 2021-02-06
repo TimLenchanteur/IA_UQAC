@@ -61,7 +61,7 @@ namespace VacuumAgentWPF
                     {
                         // Formulate Goal
                         // We define the goal for this agent as cleaning one dirty room
-                        CustomEnvState wishedState = currentState;
+                        CustomEnvState wishedState = new CustomEnvState(Environment._grid, _pos);
                         wishedState.DefineWishedRoomDirtyAs(currentState.NbOfDirtyRoom - 1);
                         wishedState.MarkStateForEquality(CustomEnvState.ROOM_STATE);
                         // Formulate problem
