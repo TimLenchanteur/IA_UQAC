@@ -52,6 +52,9 @@ namespace VacuumAgentWPF
 
         private static BFSNode RunAlgo(Problem problem)
         {
+            // Closed set of agent position for memory optimisation
+            List<Vector2> closed = new List<Vector2>();
+            // Fringe of nodes
             Queue<BFSNode> fringe = new Queue<BFSNode>();
             fringe.Enqueue(new BFSNode(problem._initialState));
 
@@ -60,14 +63,19 @@ namespace VacuumAgentWPF
                 if (fringe.Count == 0) return null;
                 BFSNode currentNode = fringe.Dequeue();
                 if (problem.HasBeenSolved(currentNode._state)) return currentNode;
-                // Insert following nodes
-                List<VacuumAgent.VacuumAction> vacuumActions = VacuumAgent.PossibleActionFromThere(currentNode._state);
-                foreach(var action in vacuumActions)
+                // Check if state in closed set
+                if(!closed.Contains(currentNode._state.Agent_Pos))
                 {
-                    BFSNode newNode = new BFSNode(currentNode._state, action);
-                    newNode._parentNode = currentNode;
-                    newNode._depth = currentNode._depth + 1;
-                    fringe.Enqueue(newNode);
+                    closed.Add(currentNode._state.Agent_Pos);
+                    // Insert following nodes
+                    List<VacuumAgent.VacuumAction> vacuumActions = VacuumAgent.PossibleActionFromThere(currentNode._state);
+                    foreach (var action in vacuumActions)
+                    {
+                        BFSNode newNode = new BFSNode(currentNode._state, action);
+                        newNode._parentNode = currentNode;
+                        newNode._depth = currentNode._depth + 1;
+                        fringe.Enqueue(newNode);
+                    }
                 }
             }
         }
