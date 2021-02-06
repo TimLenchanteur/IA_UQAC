@@ -37,7 +37,7 @@ namespace VacuumAgentWPF
                 for (int y = 0; y < Environment._gridDim.Y; y++)
                 {
                     _gridState[x, y] = envGridState[x, y];
-                    if ((_gridState[x, y] & Environment.DIRT) == 1)
+                    if ((envGridState[x, y] & Environment.DIRT) == 1)
                     {
                         _nbOfDirtyRoom++;
                     }
@@ -107,7 +107,7 @@ namespace VacuumAgentWPF
                     Environment.MoveAgent();
                     break;
                 case VacuumAgent.VacuumAction.GoLeft:
-                    _agentPos.Y -= 1;
+                    _agentPos.X -= 1;
                     Environment.MoveAgent();
                     break;
                 case VacuumAgent.VacuumAction.Clean:

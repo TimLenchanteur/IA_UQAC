@@ -35,7 +35,7 @@ namespace VacuumAgentWPF
 
         public static void Init() {
             // Choose random location in the grid as  starting point
-            Random rand = new Random();
+            Random rand = new Random(5051);
             _pos = new Vector2(rand.Next(Environment._gridDim.X), rand.Next(Environment._gridDim.Y));
 
             _init = true;
@@ -49,6 +49,8 @@ namespace VacuumAgentWPF
             while (!Environment._init) { }
             Init();
 
+            Console.WriteLine(3 & Environment.DIRT);
+
             Stack<VacuumAction> intent = new Stack<VacuumAction>();
             while (true)
             {
@@ -61,7 +63,7 @@ namespace VacuumAgentWPF
                     {
                         // Formulate Goal
                         // We define the goal for this agent as cleaning one dirty room
-                        CustomEnvState wishedState = new CustomEnvState(Environment._grid, _pos);
+                        CustomEnvState wishedState = new CustomEnvState(currentState.Grid_State, _pos);
                         wishedState.DefineWishedRoomDirtyAs(currentState.NbOfDirtyRoom - 1);
                         wishedState.MarkStateForEquality(CustomEnvState.ROOM_STATE);
                         // Formulate problem
@@ -100,11 +102,12 @@ namespace VacuumAgentWPF
             List<VacuumAction> actions = new List<VacuumAction>();
             int[,] currentGrid = state.Grid_State;
             Vector2 posAgent = state.Agent_Pos;
-            if (currentGrid[posAgent.X, posAgent.Y] == Environment.DIRT) {
-                actions.Add(VacuumAction.Clean);
-            }
-            if (currentGrid[posAgent.X, posAgent.Y] == Environment.JEWEL) {
+            if ((currentGrid[posAgent.X, posAgent.Y] & Environment.JEWEL) == 1)
+            {
                 actions.Add(VacuumAction.Grab);
+            }
+            if ((currentGrid[posAgent.X, posAgent.Y] & Environment.DIRT) == 1) {
+                actions.Add(VacuumAction.Clean);
             }
             if ((posAgent.X - 1) >=  0) {
                 actions.Add(VacuumAction.GoLeft);
@@ -139,7 +142,7 @@ namespace VacuumAgentWPF
                     Environment.MoveAgent();
                     break;
                 case VacuumAction.GoLeft:
-                    _pos.Y -= 1;
+                    _pos.X -= 1;
                     Environment.MoveAgent();
                     break;
                 case VacuumAction.Clean:
