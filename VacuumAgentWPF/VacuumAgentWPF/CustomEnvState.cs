@@ -28,29 +28,32 @@ namespace VacuumAgentWPF
             get => _agentPos;
         }
 
-        public CustomEnvState(int[,] envGridState, Vector2 agentPos)
-        {
-            _gridState = envGridState;
-            _agentPos = agentPos;
 
+        private void InitState(int[,] envGridState, Vector2 agentPos) {
+            _gridState = new int[Environment._gridDim.X, Environment._gridDim.Y];
             _nbOfDirtyRoom = 0;
             for (int x = 0; x < Environment._gridDim.X; x++)
             {
                 for (int y = 0; y < Environment._gridDim.Y; y++)
                 {
+                    _gridState[x, y] = envGridState[x, y];
                     if ((_gridState[x, y] & Environment.DIRT) == 1)
                     {
                         _nbOfDirtyRoom++;
                     }
                 }
             }
+            _agentPos = new Vector2(agentPos.X, agentPos.Y);
+        }
+
+        public CustomEnvState(int[,] envGridState, Vector2 agentPos)
+        {
+            InitState(envGridState, agentPos);
         }
 
         public CustomEnvState(CustomEnvState previousState, VacuumAgent.VacuumAction newAction)
         {
-            _gridState = previousState._gridState;
-            _nbOfDirtyRoom = previousState._nbOfDirtyRoom;
-            _agentPos = previousState._agentPos;
+            InitState(previousState._gridState, previousState._agentPos);
             _markedState = previousState._markedState;
 
             ExecuteNewAction(newAction);
