@@ -123,5 +123,38 @@ namespace VacuumAgentWPF
             AddToPerf(ACTION_COST*costMultiplier);
             return true;
         }
+
+        public static void Print()
+        {
+            Console.WriteLine("--------------------------------------------");
+            for (int x = 0; x < _gridDim.X; x++)
+            {
+                for (int y = 0; y < _gridDim.Y; y++)
+                {
+                    if(VacuumAgent._pos.Equals(new Vector2(x, y)))
+                    {
+                        Console.Write("R");
+                        continue;
+                    }
+                    if(_grid[x, y] == NONE)
+                    {
+                        Console.Write("0");
+                    }
+                    else if (_grid[x, y] == DIRT)
+                    {
+                        Console.Write("%");
+                    }
+                    else if (_grid[x, y] == JEWEL)
+                    {
+                        Console.Write("$");
+                    }
+                    else if (_grid[x, y] == 3)
+                    {
+                        Console.Write("*");
+                    }
+                }
+                Console.WriteLine();
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace VacuumAgentWPF
 {
@@ -43,7 +43,7 @@ namespace VacuumAgentWPF
             _currentAlgorithm = Algorithm.BFS;
         }
 
-        public static void VaccumProc()
+        public static void VacuumProc()
         {
             // Wait for the environment to be ready
             while (!Environment._init) { }
@@ -74,8 +74,10 @@ namespace VacuumAgentWPF
                 }
                 else
                 {
-                    // Execute and remove one step of the action's plan  
+                    // Execute and remove one step of the action's plan
+                    Environment.Print();
                     Execute(intent.Pop());
+                    Thread.Sleep(1000);
                 }
             }
         }

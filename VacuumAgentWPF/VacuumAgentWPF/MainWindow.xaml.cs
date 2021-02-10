@@ -25,10 +25,10 @@ namespace VacuumAgentWPF
         {
             InitializeComponent();
 
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Program started");
 
             // Create two the two thread here but wait for start agent thread in environment thread
-            Thread agent = new Thread(new ThreadStart(VacuumAgent.VaccumProc));
+            Thread agent = new Thread(new ThreadStart(VacuumAgent.VacuumProc));
             Thread environment = new Thread(Environment.EnvironmentProc);
 
             environment.Start();
