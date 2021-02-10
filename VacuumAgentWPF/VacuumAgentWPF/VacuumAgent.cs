@@ -76,7 +76,9 @@ namespace VacuumAgentWPF
                 {
                     // Execute and remove one step of the action's plan
                     Environment.Print();
-                    Execute(intent.Pop());
+                    VacuumAction action = intent.Pop();
+                    Console.WriteLine("Next Action = " + action);
+                    Execute(action);
                     Thread.Sleep(1000);
                 }
             }

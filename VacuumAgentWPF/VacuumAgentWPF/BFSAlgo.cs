@@ -46,7 +46,6 @@ namespace VacuumAgentWPF
                 vacuumActions.Push(lastNode._action);
                 lastNode = lastNode._parentNode;
             }
-            vacuumActions.Push(lastNode._action);
             return vacuumActions;
         }
 
