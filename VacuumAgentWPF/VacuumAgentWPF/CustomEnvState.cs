@@ -12,11 +12,8 @@ namespace VacuumAgentWPF
         public const int ROOM_STATE = 2;
         public const int AGENT_STATE = 3;
 
-        int[,] _gridState;
-        public int[,] Grid_State
-        {
-            get => _gridState;
-        }
+        List<Vector2> _dirtyRoom;
+        List<Vector2> _dirtyRoomWithJewel;
         int _nbOfDirtyRoom;
         public int NbOfDirtyRoom
         {
@@ -30,19 +27,21 @@ namespace VacuumAgentWPF
 
 
         private void InitState(int[,] envGridState, Vector2 agentPos) {
-            _gridState = new int[Environment._gridDim.X, Environment._gridDim.Y];
-            _nbOfDirtyRoom = 0;
+            _dirtyRoom = new List<Vector2>();
+            _dirtyRoomWithJewel = new List<Vector2>();
             for (int x = 0; x < Environment._gridDim.X; x++)
             {
                 for (int y = 0; y < Environment._gridDim.Y; y++)
                 {
-                    _gridState[x, y] = envGridState[x, y];
                     if ((envGridState[x, y] & Environment.DIRT) == 1)
                     {
-                        _nbOfDirtyRoom++;
+                        Vector2 currentPos = new Vector2(x, y);
+                        if ((envGridState[x, y] & Environment.JEWEL) == 1) _dirtyRoomWithJewel.Add(currentPos);
+                        else _dirtyRoom.Add(currentPos);
                     }
                 }
             }
+            _nbOfDirtyRoom = _dirtyRoom.Count + _dirtyRoomWithJewel.Count;
             _agentPos = new Vector2(agentPos.X, agentPos.Y);
         }
 
@@ -53,7 +52,16 @@ namespace VacuumAgentWPF
 
         public CustomEnvState(CustomEnvState previousState, VacuumAgent.VacuumAction newAction)
         {
-            InitState(previousState._gridState, previousState._agentPos);
+            _dirtyRoom = new List<Vector2>();
+            _dirtyRoomWithJewel = new List<Vector2>();
+            foreach (Vector2 dirtyRoom in previousState._dirtyRoom) {
+                _dirtyRoom.Add(dirtyRoom);
+            }
+            foreach (Vector2 dirtyJewelRoom in previousState._dirtyRoomWithJewel) {
+                _dirtyRoomWithJewel.Add(dirtyJewelRoom);
+            }
+            _nbOfDirtyRoom = previousState._nbOfDirtyRoom;
+            _agentPos = new Vector2(previousState._agentPos.X, previousState._agentPos.Y);
             _markedState = previousState._markedState;
 
             ExecuteNewAction(newAction);
@@ -79,8 +87,9 @@ namespace VacuumAgentWPF
             return base.IsEqual(otherState);
         }
 
-        public void DefineWishedGridStateAs(int[,] wishedGrid) {
-            _gridState = wishedGrid;
+        public void DefineWishedGridStateAs(List<Vector2> dirtyRoom, List<Vector2> dirtyRoomWithJewel) {
+            _dirtyRoom = dirtyRoom;
+            _dirtyRoomWithJewel = dirtyRoomWithJewel;
         }
 
         public void DefineWishedRoomDirtyAs(int wishedNumber) {
@@ -90,6 +99,14 @@ namespace VacuumAgentWPF
         public void DefineWishedAgentPosition(Vector2 wishedPos)
         {
             _agentPos = wishedPos;
+        }
+
+        public bool IsDirty() {
+            return _dirtyRoom.Contains(_agentPos) || _dirtyRoomWithJewel.Contains(_agentPos);
+        }
+
+        public bool ContainJewel() {
+            return _dirtyRoomWithJewel.Contains(_agentPos);
         }
 
         public void ExecuteNewAction(VacuumAgent.VacuumAction action) {
@@ -111,16 +128,35 @@ namespace VacuumAgentWPF
                     Environment.MoveAgent();
                     break;
                 case VacuumAgent.VacuumAction.Clean:
-                    _gridState[_agentPos.X, _agentPos.Y] = Environment.NONE;
+                    if (_dirtyRoom.Contains(_agentPos)) _dirtyRoom.Remove(_agentPos);
+                    else if (_dirtyRoomWithJewel.Contains(_agentPos)) _dirtyRoomWithJewel.Remove(_agentPos);
                     // This imply that the agent execute this action only when he is on a dirty room
                     _nbOfDirtyRoom -= 1;
                     break;
                 case VacuumAgent.VacuumAction.Grab:
-                    _gridState[_agentPos.X, _agentPos.Y] -= Environment.JEWEL;
+                    bool grabbed = _dirtyRoomWithJewel.Remove(_agentPos);
+                    if (grabbed) _dirtyRoom.Add(_agentPos);
                     break;
                 default:
                     break;
             }
+            return;
+        }
+
+        public float EuclidianActionHeuristic() {
+            float minDistance = float.MaxValue;
+
+            float tempCost = 0;
+            foreach (Vector2 dirtyRoom in _dirtyRoom) {
+                tempCost = (dirtyRoom - _agentPos).Magnitude();
+                if (minDistance >= tempCost)  minDistance = tempCost;
+            }
+            foreach (Vector2 dirtyJewelRoom in _dirtyRoomWithJewel)
+            {
+                tempCost = (dirtyJewelRoom - _agentPos).Magnitude() + 1;
+                if (minDistance >= tempCost) minDistance = tempCost;
+            }
+            return minDistance;
         }
     }
 }

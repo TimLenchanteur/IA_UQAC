@@ -43,5 +43,11 @@ namespace VacuumAgentWPF
                 return _x == vector2.X && _y == vector2.Y;
             }
         }
+
+        public static Vector2 operator -(Vector2 v1, Vector2 v2) => new Vector2(v1._x - v2._x, v1._y - v2._y);
+
+        public float Magnitude() {
+            return (float)Math.Sqrt(_x*_x + _y*_y);
+        }
     }
 }

@@ -40,7 +40,7 @@ namespace VacuumAgentWPF
 
             _init = true;
 
-            _currentAlgorithm = Algorithm.BFS;
+            _currentAlgorithm = Algorithm.ASTAR;
         }
 
         public static void VacuumProc()
@@ -57,13 +57,14 @@ namespace VacuumAgentWPF
                 if (intent.Count == 0)
                 {
                     // Get environment current state
-                    CustomEnvState currentState = new CustomEnvState(Environment._grid, _pos);
+                    int[,] belief = Environment._grid;
+                    CustomEnvState currentState = new CustomEnvState(belief, _pos);
                     // The agent only move if at least one room is dirty
                     if (currentState.NbOfDirtyRoom > 0)
                     {
                         // Formulate Goal
                         // We define the goal for this agent as cleaning one dirty room
-                        CustomEnvState wishedState = new CustomEnvState(currentState.Grid_State, _pos);
+                        CustomEnvState wishedState = new CustomEnvState(belief, _pos);
                         wishedState.DefineWishedRoomDirtyAs(currentState.NbOfDirtyRoom - 1);
                         wishedState.MarkStateForEquality(CustomEnvState.ROOM_STATE);
                         // Formulate problem
@@ -94,6 +95,8 @@ namespace VacuumAgentWPF
             switch (algorithm) {
                 case Algorithm.BFS:
                     return BFSAlgo.ExecuteFor(problem);
+                case Algorithm.ASTAR:
+                    return AStarAlgo.ExecuteFor(problem);
                 default:
                     break;
             }
@@ -104,13 +107,12 @@ namespace VacuumAgentWPF
         public static List<VacuumAction> PossibleActionFromThere(CustomEnvState state)
         {
             List<VacuumAction> actions = new List<VacuumAction>();
-            int[,] currentGrid = state.Grid_State;
             Vector2 posAgent = state.Agent_Pos;
-            if ((currentGrid[posAgent.X, posAgent.Y] & Environment.JEWEL) == 1)
+            if (state.ContainJewel())
             {
                 actions.Add(VacuumAction.Grab);
             }
-            if ((currentGrid[posAgent.X, posAgent.Y] & Environment.DIRT) == 1) {
+            if (state.IsDirty()) {
                 actions.Add(VacuumAction.Clean);
             }
             if ((posAgent.X - 1) >=  0) {
