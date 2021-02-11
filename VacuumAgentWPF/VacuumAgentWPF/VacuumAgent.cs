@@ -27,11 +27,21 @@ namespace VacuumAgentWPF
             RBFS = 3
         }
 
+        const int LEARNING_ROUND = 3;
+
         public static bool _init = false;
 
         public static Vector2 _pos;
 
         public static Algorithm _currentAlgorithm;
+
+        public static int _actionsCount;
+
+        public static int _learningCount;
+
+        public static int _optimalActionCycle;
+
+        public static List<KeyValuePair<int, float>> _lastActionsCycleTrack;
 
         public static void Init() {
             // Choose random location in the grid as  starting point
@@ -41,6 +51,11 @@ namespace VacuumAgentWPF
             _init = true;
 
             _currentAlgorithm = Algorithm.ASTAR;
+
+            _optimalActionCycle = 0;
+            _lastActionsCycleTrack = new List<KeyValuePair<int, float>>();
+            _actionsCount = 0;
+            _learningCount = 0;
         }
 
         public static void VacuumProc()
@@ -52,9 +67,12 @@ namespace VacuumAgentWPF
             Console.WriteLine(3 & Environment.DIRT);
 
             Stack<VacuumAction> intent = new Stack<VacuumAction>();
+
+            Random rand = new Random(8138);
+            int _actionCycle = 0;
             while (true)
             {
-                if (intent.Count == 0)
+                if (intent.Count == 0 || _actionsCount>=_actionCycle)
                 {
                     // Get environment current state
                     int[,] belief = Environment._grid;
@@ -62,6 +80,14 @@ namespace VacuumAgentWPF
                     // The agent only move if at least one room is dirty
                     if (currentState.NbOfDirtyRoom > 0)
                     {
+                        if (_actionsCount != 0) {
+                            _lastActionsCycleTrack.Add(new KeyValuePair<int, float>(_actionsCount, Environment.GivePerf()));
+                            Environment.ResetPerf();
+                            _actionsCount = 0;
+                            if (_learningCount >= LEARNING_ROUND-1) _optimalActionCycle = ComputeOptimalActionCycle();
+                            else _learningCount++;
+                        }
+
                         // Formulate Goal
                         // We define the goal for this agent as cleaning one dirty room
                         CustomEnvState wishedState = new CustomEnvState(belief, _pos);
@@ -71,18 +97,33 @@ namespace VacuumAgentWPF
                         Problem problem = new Problem(currentState, wishedState);
                         // Explore
                         intent = Explore(problem,_currentAlgorithm);
+                        _actionCycle = _actionCycle == 0 ? intent.Count : _optimalActionCycle + rand.Next(0, Math.Max(intent.Count - _optimalActionCycle,0));
+                        Console.WriteLine("Next Action Cycle = " + _actionCycle);
                     }
                 }
-                else
+                else if(_actionsCount<_actionCycle)
                 {
+                    _actionsCount++;
                     // Execute and remove one step of the action's plan
                     Environment.Print();
                     VacuumAction action = intent.Pop();
                     Console.WriteLine("Next Action = " + action);
+                    Console.WriteLine("Optimal Action Cycle = " + _optimalActionCycle);
                     Execute(action);
                     Thread.Sleep(1000);
                 }
             }
+        }
+
+        static int ComputeOptimalActionCycle() {
+            float result = 0;
+            float coeff = 0;
+            foreach (KeyValuePair<int, float> pair in _lastActionsCycleTrack) {
+                result += pair.Key * pair.Value;
+                coeff += pair.Value;
+            }
+            if (coeff != 0) result /= coeff;
+            return (int)result;
         }
 
         static void ChangeExplorationAlgo(int newAlgo) {
@@ -136,20 +177,20 @@ namespace VacuumAgentWPF
         static void Execute(VacuumAction action) {
             switch (action) {
                 case VacuumAction.GoUp:
+                    Environment.MoveAgent(_pos);
                     _pos.Y += 1;
-                    Environment.MoveAgent();
                     break;
                 case VacuumAction.GoDown:
+                    Environment.MoveAgent(_pos);
                     _pos.Y -= 1;
-                    Environment.MoveAgent();
                     break;
                 case VacuumAction.GoRight:
+                    Environment.MoveAgent(_pos);
                     _pos.X += 1;
-                    Environment.MoveAgent();
                     break;
                 case VacuumAction.GoLeft:
+                    Environment.MoveAgent(_pos);
                     _pos.X -= 1;
-                    Environment.MoveAgent();
                     break;
                 case VacuumAction.Clean:
                     Environment.CleanCell(_pos);

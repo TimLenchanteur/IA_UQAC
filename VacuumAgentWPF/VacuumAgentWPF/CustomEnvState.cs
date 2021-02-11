@@ -113,19 +113,15 @@ namespace VacuumAgentWPF
             switch (action) {
                 case VacuumAgent.VacuumAction.GoUp:
                     _agentPos.Y += 1;
-                    Environment.MoveAgent();
                     break;
                 case VacuumAgent.VacuumAction.GoDown:
                     _agentPos.Y -= 1;
-                    Environment.MoveAgent();
                     break;
                 case VacuumAgent.VacuumAction.GoRight:
                     _agentPos.X += 1;
-                    Environment.MoveAgent();
                     break;
                 case VacuumAgent.VacuumAction.GoLeft:
                     _agentPos.X -= 1;
-                    Environment.MoveAgent();
                     break;
                 case VacuumAgent.VacuumAction.Clean:
                     if (_dirtyRoom.Contains(_agentPos)) _dirtyRoom.Remove(_agentPos);

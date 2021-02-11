@@ -17,6 +17,9 @@ namespace VacuumAgentWPF
 
         // Cost for every action taken by the agent
         const int ACTION_COST = 1;
+        const float PENALTY = 1.2f;
+        const float BONUS = 0.95f; 
+
         // Performance score for the last time the agent executed his goal
         private static float _perfScore;
 
@@ -87,7 +90,7 @@ namespace VacuumAgentWPF
 
         public static float GivePerf()
         {
-            return _perfScore;
+            return 1/_perfScore;
         }
 
         /// <summary>
@@ -95,8 +98,10 @@ namespace VacuumAgentWPF
         /// 
         /// No new obstacle appear and the grid bound stay the same so the agent should always be able to move if he plan to
         /// </summary>
-        public static void MoveAgent() {
-            AddToPerf(ACTION_COST);
+        public static void MoveAgent(in Vector2 pos) {
+            float perf = ACTION_COST;
+            if ((_grid[pos.X, pos.Y]& DIRT) == 1) perf *= PENALTY;
+            AddToPerf(perf);
         }
 
         public static bool TryGrabbing(in Vector2 pos) {
@@ -108,19 +113,19 @@ namespace VacuumAgentWPF
                 return true;
             }
             return false;
-            
         }
 
         public static bool CleanCell(in Vector2 pos)
         {
-            float costMultiplier = 1.0f;
+            float perf = ACTION_COST;
             if ((_grid[pos.X, pos.Y] & JEWEL) == 1) {
                 // Add penalty because the agent is about to suck a jewel
-                costMultiplier += 0.5f;
+                perf *= PENALTY;
             }
+            perf *= BONUS;
             //Clean cell
             _grid[pos.X, pos.Y] = NONE;
-            AddToPerf(ACTION_COST*costMultiplier);
+            AddToPerf(perf);
             return true;
         }
 

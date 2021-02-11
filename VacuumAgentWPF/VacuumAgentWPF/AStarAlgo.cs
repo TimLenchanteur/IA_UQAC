@@ -35,8 +35,7 @@ namespace VacuumAgentWPF
 
             public int CompareTo(AStarNode other)
             {
-                int value = (int)((_cost - other._cost) / Math.Abs(_cost - other._cost));
-                return value;
+                return _cost.CompareTo(other._cost);
             }
         }
 
