@@ -123,5 +123,15 @@ namespace VacuumAgentWPF
             agent.Abort();
             environment.Abort();
         }
+
+        private void ToBFSAlgo(object sender, RoutedEventArgs e)
+        {
+            VacuumAgent.ChangeExplorationAlgo(VacuumAgent.Algorithm.BFS);
+        }
+
+        private void ToAStarAlgo(object sender, RoutedEventArgs e)
+        {
+            VacuumAgent.ChangeExplorationAlgo(VacuumAgent.Algorithm.ASTAR);
+        }
     }
 }

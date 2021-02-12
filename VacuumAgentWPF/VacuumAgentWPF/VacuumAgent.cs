@@ -132,8 +132,9 @@ namespace VacuumAgentWPF
             return (int)result;
         }
 
-        static void ChangeExplorationAlgo(int newAlgo) {
-            if(newAlgo>0 && newAlgo < 4) _currentAlgorithm = (Algorithm)newAlgo;
+        public static void ChangeExplorationAlgo(Algorithm newAlgo)
+        {
+            _currentAlgorithm = newAlgo;
         }
 
         static Stack<VacuumAction> Explore(in Problem problem, in Algorithm algorithm)

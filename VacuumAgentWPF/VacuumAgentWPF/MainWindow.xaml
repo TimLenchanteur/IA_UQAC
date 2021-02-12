@@ -6,23 +6,35 @@
         xmlns:local="clr-namespace:VacuumAgentWPF"
         mc:Ignorable="d"
         Title="VacuumAgent" Height="300" Width="250">
-    <!-- I set the window so that each cell can be 10unit and that there is still 50*250 of space to display button or other control widget-->
-    <Grid ShowGridLines="True" x:Name="GridRoot">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
-        </Grid.RowDefinitions>
-        <Image Name="RobotImage" Stretch="fill" Source="Images\Robot.png" 
+    <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Menu>
+                    <MenuItem Header="Algorithm">
+                        <MenuItem Header="BFS" Click="ToBFSAlgo"/>
+                        <MenuItem Header="AStar" Click="ToAStarAlgo"/>
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
+        </ToolBarTray>
+        <!-- I set the window so that each cell can be 10unit and that there is still 50*250 of space to display button or other control widget-->
+        <Grid ShowGridLines="True" x:Name="GridRoot">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Image Name="RobotImage" Stretch="fill" Source="Images\Robot.png" 
             VerticalAlignment = "Center" Visibility="Collapsed"/>
-    </Grid>
+        </Grid>
+    </DockPanel>
 </Window>
