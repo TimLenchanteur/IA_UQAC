@@ -46,6 +46,7 @@ namespace VacuumAgentWPF
                 }
             }
 
+            MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.InitializeEnvironmentImage());
             _init = true;
         }
 
@@ -75,6 +76,7 @@ namespace VacuumAgentWPF
 
                 // Choose a random amount of time to fill the grid again then wait
                 int randTimeToWait = rand.Next(1000) + 2000;
+                MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateEnvironment());
                 Thread.Sleep(randTimeToWait);
             }
         }

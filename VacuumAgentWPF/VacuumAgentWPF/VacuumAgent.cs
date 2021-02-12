@@ -209,6 +209,7 @@ namespace VacuumAgentWPF
             }
             Console.WriteLine(_pos);
             MainWindow.Instance.Dispatcher.Invoke(()=>MainWindow.Instance.UpdateRobotPosition(_pos.X, _pos.Y));
+            MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateEnvironment());
         }
 
     }

@@ -24,6 +24,9 @@ namespace VacuumAgentWPF
         Thread agent;
         Thread environment;
 
+        Image[,] _dustImages;
+        Image[,] _jewelImages;
+
         public static MainWindow Instance;
         public MainWindow()
         {
@@ -41,9 +44,6 @@ namespace VacuumAgentWPF
             environment.Start();
             agent.Start();
 
-            // Wait for both thread to join back main thread
-            //agent.Join();
-            //environment.Join();
         }
 
         public void UpdateRobotPosition(int x, int y)
@@ -54,6 +54,68 @@ namespace VacuumAgentWPF
             }
             Grid.SetRow(RobotImage, x);
             Grid.SetColumn(RobotImage, y);
+            Grid.SetZIndex(RobotImage, 100);
+        }
+
+        public void UpdateEnvironment()
+        {
+            for (int x = 0; x < Environment._gridDim.X; x++)
+            {
+                for (int y = 0; y < Environment._gridDim.Y; y++)
+                {
+                    _dustImages[x, y].Visibility = Visibility.Collapsed;
+                    _jewelImages[x, y].Visibility = Visibility.Collapsed;
+                    if(Environment._grid[x, y] == Environment.DIRT)
+                    {
+                        _dustImages[x, y].Visibility = Visibility.Visible;
+                    }
+                    else if (Environment._grid[x, y] == Environment.JEWEL)
+                    {
+                        _jewelImages[x, y].Visibility = Visibility.Visible;
+                    }
+                    else if (Environment._grid[x, y] == 3)
+                    {
+                        _dustImages[x, y].Visibility = Visibility.Visible;
+                        _jewelImages[x, y].Visibility = Visibility.Visible;
+                    }
+                }
+            }
+        }
+
+        public void InitializeEnvironmentImage()
+        {
+            _dustImages = new Image[Environment._gridDim.X, Environment._gridDim.Y];
+            _jewelImages = new Image[Environment._gridDim.X, Environment._gridDim.Y];
+            for (int x = 0; x < Environment._gridDim.X; x++)
+            {
+                for (int y = 0; y < Environment._gridDim.Y; y++)
+                {
+                    // Dust
+                    Image dust = CreateImage("dust.png");
+                    GridRoot.Children.Add(dust);
+                    _dustImages[x, y] = dust;
+                    Grid.SetRow(dust, x);
+                    Grid.SetColumn(dust, y);
+
+                    // Jewel
+                    Image jewel = CreateImage("jewel.png");
+                    GridRoot.Children.Add(jewel);
+                    _jewelImages[x, y] = jewel;
+                    Grid.SetRow(jewel, x);
+                    Grid.SetColumn(jewel, y);
+                }
+            }
+        }
+
+        private Image CreateImage(string imageName)
+        {
+            Image image = new Image();
+            image.Stretch = Stretch.Fill;
+            image.Visibility = Visibility.Collapsed;
+            image.VerticalAlignment = VerticalAlignment.Center;
+            image.Source = new BitmapImage(new Uri("Images/" + imageName, UriKind.Relative));
+
+            return image;
         }
 
         private void OnClose(object sender, System.EventArgs e)
