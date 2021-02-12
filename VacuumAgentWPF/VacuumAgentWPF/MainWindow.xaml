@@ -36,6 +36,10 @@
             </Grid.RowDefinitions>
             <Image Name="RobotImage" Stretch="fill" Source="Images\Robot.png" 
             VerticalAlignment = "Center" Visibility="Collapsed"/>
+            <Image Name="CleanImage" Stretch="fill" Source="Images\clean.png" 
+            VerticalAlignment = "Center" Visibility="Collapsed"/>
+            <Image Name="GrabImage" Stretch="fill" Source="Images\grab.png" 
+            VerticalAlignment = "Center" Visibility="Collapsed"/>
         </Grid>
     </DockPanel>
 </Window>

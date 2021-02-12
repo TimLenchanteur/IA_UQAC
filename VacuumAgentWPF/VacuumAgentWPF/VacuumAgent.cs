@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
 
 namespace VacuumAgentWPF
 {
@@ -203,10 +198,12 @@ namespace VacuumAgentWPF
                     break;
                 case VacuumAction.Clean:
                     Environment.CleanCell(_pos);
+                    MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.DisplayClean());
                     break;
                 case VacuumAction.GrabClean:
                     Environment.TryGrabbing(_pos);
                     Environment.CleanCell(_pos);
+                    MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.DisplayGrab());
                     break;
                 default:
                     break;

@@ -1,18 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace VacuumAgentWPF
 {
@@ -110,6 +102,37 @@ namespace VacuumAgentWPF
         public void UpdateOptimalActions()
         {
             OptimalActions.Text = "Optimal Actions Move = " + VacuumAgent._optimalActionCycle;
+        }
+
+        public void DisplayClean()
+        {
+            Grid.SetRow(CleanImage, VacuumAgent._pos.X);
+            Grid.SetColumn(CleanImage, VacuumAgent._pos.Y);
+            Grid.SetZIndex(CleanImage, 101);
+            CleanImage.Visibility = Visibility.Visible;
+            DelayRemoveImage(2000, CleanImage);
+        }
+
+        public void DisplayGrab()
+        {
+            Grid.SetRow(GrabImage, VacuumAgent._pos.X);
+            Grid.SetColumn(GrabImage, VacuumAgent._pos.Y);
+            Grid.SetZIndex(GrabImage, 101);
+            GrabImage.Visibility = Visibility.Visible;
+            DelayRemoveImage(2000, GrabImage);
+        }
+
+        public void DelayRemoveImage(int milliseconds, Image image)
+        {
+            var timer = new DispatcherTimer();
+            timer.Tick += delegate
+            {
+                image.Visibility = Visibility.Collapsed;
+                timer.Stop();
+            };
+
+            timer.Interval = TimeSpan.FromMilliseconds(milliseconds);
+            timer.Start();
         }
 
         private Image CreateImage(string imageName)
