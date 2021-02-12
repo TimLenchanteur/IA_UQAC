@@ -16,7 +16,7 @@ namespace VacuumAgentWPF
             GoUp = 3,
             GoDown = 4,
             Clean = 5,
-            Grab = 6
+            GrabClean = 6
         }
 
         public enum Algorithm
@@ -80,6 +80,9 @@ namespace VacuumAgentWPF
                     // The agent only move if at least one room is dirty
                     if (currentState.NbOfDirtyRoom > 0)
                     {
+                        Console.WriteLine("Initial State");
+                        Environment.Print();
+
                         if (_actionsCount != 0) {
                             _lastActionsCycleTrack.Add(new KeyValuePair<int, float>(_actionsCount, Environment.GivePerf()));
                             Environment.ResetPerf();
@@ -97,7 +100,8 @@ namespace VacuumAgentWPF
                         Problem problem = new Problem(currentState, wishedState);
                         // Explore
                         intent = Explore(problem,_currentAlgorithm);
-                        _actionCycle = _actionCycle == 0 ? intent.Count : _optimalActionCycle + rand.Next(0, Math.Max(intent.Count - _optimalActionCycle,0));
+                        _actionCycle = _optimalActionCycle == 0 ? intent.Count : _optimalActionCycle + rand.Next(0, Math.Max(intent.Count - _optimalActionCycle,0));
+                        Console.WriteLine("Optimal Action Cycle = " + _optimalActionCycle);
                         Console.WriteLine("Next Action Cycle = " + _actionCycle);
                     }
                 }
@@ -108,7 +112,6 @@ namespace VacuumAgentWPF
                     Environment.Print();
                     VacuumAction action = intent.Pop();
                     Console.WriteLine("Next Action = " + action);
-                    Console.WriteLine("Optimal Action Cycle = " + _optimalActionCycle);
                     Execute(action);
                     Thread.Sleep(1000);
                 }
@@ -149,13 +152,12 @@ namespace VacuumAgentWPF
         {
             List<VacuumAction> actions = new List<VacuumAction>();
             Vector2 posAgent = state.Agent_Pos;
-            if (state.ContainJewel())
+            if (state.IsDirty())
             {
-                actions.Add(VacuumAction.Grab);
+                if (state.ContainJewel()) actions.Add(VacuumAction.GrabClean);
+                else actions.Add(VacuumAction.Clean);
             }
-            if (state.IsDirty()) {
-                actions.Add(VacuumAction.Clean);
-            }
+           
             if ((posAgent.X - 1) >=  0) {
                 actions.Add(VacuumAction.GoLeft);
             }
@@ -195,8 +197,9 @@ namespace VacuumAgentWPF
                 case VacuumAction.Clean:
                     Environment.CleanCell(_pos);
                     break;
-                case VacuumAction.Grab:
+                case VacuumAction.GrabClean:
                     Environment.TryGrabbing(_pos);
+                    Environment.CleanCell(_pos);
                     break;
                 default:
                     break;

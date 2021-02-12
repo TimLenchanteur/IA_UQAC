@@ -53,7 +53,7 @@ namespace VacuumAgentWPF
         {
             Init();
 
-            int[] possibleGeneratedObject = { NONE, NONE, NONE, DIRT, DIRT, JEWEL };
+            int[] possibleGeneratedObject = { NONE, DIRT, NONE, JEWEL, NONE,  DIRT, DIRT};
 
             Random rand = new Random(5181);
             while (true)
@@ -100,14 +100,14 @@ namespace VacuumAgentWPF
         /// </summary>
         public static void MoveAgent(in Vector2 pos) {
             float perf = ACTION_COST;
-            if ((_grid[pos.X, pos.Y]& DIRT) == 1) perf *= PENALTY;
+            if ((_grid[pos.X, pos.Y]& DIRT) == DIRT) perf *= PENALTY;
             AddToPerf(perf);
         }
 
         public static bool TryGrabbing(in Vector2 pos) {
             // Add cost either way
             AddToPerf(ACTION_COST);
-            if ((_grid[pos.X, pos.Y] & JEWEL) == 1) {
+            if ((_grid[pos.X, pos.Y] & JEWEL) == JEWEL) {
                 // If there is indeed a jewel, grab it 
                 _grid[pos.X, pos.Y] -= JEWEL;
                 return true;
@@ -118,7 +118,7 @@ namespace VacuumAgentWPF
         public static bool CleanCell(in Vector2 pos)
         {
             float perf = ACTION_COST;
-            if ((_grid[pos.X, pos.Y] & JEWEL) == 1) {
+            if ((_grid[pos.X, pos.Y] & JEWEL) == JEWEL) {
                 // Add penalty because the agent is about to suck a jewel
                 perf *= PENALTY;
             }

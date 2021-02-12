@@ -33,11 +33,18 @@ namespace VacuumAgentWPF
             {
                 for (int y = 0; y < Environment._gridDim.Y; y++)
                 {
-                    if ((envGridState[x, y] & Environment.DIRT) == 1)
+                    if ((envGridState[x, y] & Environment.DIRT) == Environment.DIRT)
                     {
                         Vector2 currentPos = new Vector2(x, y);
-                        if ((envGridState[x, y] & Environment.JEWEL) == 1) _dirtyRoomWithJewel.Add(currentPos);
-                        else _dirtyRoom.Add(currentPos);
+                        int state = envGridState[x, y];
+                        if ((state & Environment.JEWEL) == Environment.JEWEL)
+                        {
+                            _dirtyRoomWithJewel.Add(currentPos);
+                        }
+                        else {
+                            _dirtyRoom.Add(currentPos);
+                        } 
+                        
                     }
                 }
             }
@@ -129,9 +136,10 @@ namespace VacuumAgentWPF
                     // This imply that the agent execute this action only when he is on a dirty room
                     _nbOfDirtyRoom -= 1;
                     break;
-                case VacuumAgent.VacuumAction.Grab:
-                    bool grabbed = _dirtyRoomWithJewel.Remove(_agentPos);
-                    if (grabbed) _dirtyRoom.Add(_agentPos);
+                case VacuumAgent.VacuumAction.GrabClean:
+                    if (_dirtyRoomWithJewel.Contains(_agentPos)) _dirtyRoomWithJewel.Remove(_agentPos);
+                    // This imply that the agent execute this action only when he is on a dirty room
+                    _nbOfDirtyRoom -= 1;
                     break;
                 default:
                     break;

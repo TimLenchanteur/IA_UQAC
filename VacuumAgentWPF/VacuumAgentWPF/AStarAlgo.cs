@@ -25,12 +25,13 @@ namespace VacuumAgentWPF
                 _cost = _state.EuclidianActionHeuristic();
             }
 
-            public AStarNode(CustomEnvState previousState, VacuumAgent.VacuumAction action)
+            public AStarNode(AStarNode previousNode, VacuumAgent.VacuumAction action)
             {
                 _action = action;
-                _state = new CustomEnvState(previousState, action);
+                _state = new CustomEnvState(previousNode._state, action);
                 // 1 is the cost of Manhattan to attain this node from previous node or cost of the action, either way it is the same cost
-                _cost = 1 + (action == VacuumAgent.VacuumAction.Clean ? 0 : _state.EuclidianActionHeuristic());
+                // Cost is at 0.25 to Clean just so that if the Robot need to grab he does it
+                _cost = 1 + (action == VacuumAgent.VacuumAction.Clean? (previousNode._action == VacuumAgent.VacuumAction.GrabClean? 1 : 0) : _state.EuclidianActionHeuristic());
             }
 
             public int CompareTo(AStarNode other)
@@ -80,7 +81,7 @@ namespace VacuumAgentWPF
                     List<VacuumAgent.VacuumAction> vacuumActions = VacuumAgent.PossibleActionFromThere(currentNode._state);
                     foreach (var action in vacuumActions)
                     {
-                        AStarNode newNode = new AStarNode(currentNode._state, action);
+                        AStarNode newNode = new AStarNode(currentNode, action);
                         newNode._parentNode = currentNode;
                         fringe.Enqueue(newNode);
                     }
