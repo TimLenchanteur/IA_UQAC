@@ -14,6 +14,7 @@
                         <MenuItem Header="BFS" Click="ToBFSAlgo"/>
                         <MenuItem Header="AStar" Click="ToAStarAlgo"/>
                     </MenuItem>
+                    <TextBox x:Name="OptimalActions" IsReadOnly="True"></TextBox>
                 </Menu>
             </ToolBar>
         </ToolBarTray>

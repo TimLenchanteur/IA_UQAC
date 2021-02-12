@@ -107,6 +107,11 @@ namespace VacuumAgentWPF
             }
         }
 
+        public void UpdateOptimalActions()
+        {
+            OptimalActions.Text = "Optimal Actions Move = " + VacuumAgent._optimalActionCycle;
+        }
+
         private Image CreateImage(string imageName)
         {
             Image image = new Image();

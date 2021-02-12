@@ -86,6 +86,7 @@ namespace VacuumAgentWPF
                         Console.WriteLine("Initial State");
                         Environment.Print();
 
+                        // Keep track of performances
                         if (_actionsCount != 0) {
                             _lastActionsCycleTrack.Add(new KeyValuePair<int, float>(_actionsCount, Environment.GivePerf()));
                             Environment.ResetPerf();
@@ -103,7 +104,10 @@ namespace VacuumAgentWPF
                         Problem problem = new Problem(currentState, wishedState);
                         // Explore
                         intent = Explore(problem,_currentAlgorithm);
+                        // Update optimal action cycle
                         _actionCycle = _optimalActionCycle == 0 ? intent.Count : _optimalActionCycle + rand.Next(0, Math.Max(intent.Count - _optimalActionCycle,0));
+
+                        MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateOptimalActions());
                         Console.WriteLine("Optimal Action Cycle = " + _optimalActionCycle);
                         Console.WriteLine("Next Action Cycle = " + _actionCycle);
                     }
@@ -112,11 +116,10 @@ namespace VacuumAgentWPF
                 {
                     _actionsCount++;
                     // Execute and remove one step of the action's plan
-                    //Environment.Print();
                     VacuumAction action = intent.Pop();
                     Console.WriteLine("Next Action = " + action);
                     Execute(action);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(700);
                 }
             }
         }
