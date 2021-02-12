@@ -21,22 +21,45 @@ namespace VacuumAgentWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        Thread agent;
+        Thread environment;
+
+        public static MainWindow Instance;
         public MainWindow()
         {
             InitializeComponent();
+            Instance = this;
 
             Console.WriteLine("Program started");
+            this.Show();
 
             // Create two the two thread here but wait for start agent thread in environment thread
-            Thread agent = new Thread(new ThreadStart(VacuumAgent.VacuumProc));
-            Thread environment = new Thread(Environment.EnvironmentProc);
+            this.agent = new Thread(new ThreadStart(VacuumAgent.VacuumProc));
+            this.environment = new Thread(Environment.EnvironmentProc);
+            this.Closed += OnClose;
 
             environment.Start();
             agent.Start();
 
             // Wait for both thread to join back main thread
-            agent.Join();
-            environment.Join();
+            //agent.Join();
+            //environment.Join();
+        }
+
+        public void UpdateRobotPosition(int x, int y)
+        {
+            if(RobotImage.Visibility == Visibility.Collapsed)
+            {
+                RobotImage.Visibility = Visibility.Visible;
+            }
+            Grid.SetRow(RobotImage, x);
+            Grid.SetColumn(RobotImage, y);
+        }
+
+        private void OnClose(object sender, System.EventArgs e)
+        {
+            agent.Abort();
+            environment.Abort();
         }
     }
 }

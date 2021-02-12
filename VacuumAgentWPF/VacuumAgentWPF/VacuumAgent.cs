@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace VacuumAgentWPF
 {
@@ -109,7 +112,7 @@ namespace VacuumAgentWPF
                 {
                     _actionsCount++;
                     // Execute and remove one step of the action's plan
-                    Environment.Print();
+                    //Environment.Print();
                     VacuumAction action = intent.Pop();
                     Console.WriteLine("Next Action = " + action);
                     Execute(action);
@@ -204,7 +207,8 @@ namespace VacuumAgentWPF
                 default:
                     break;
             }
-        
+            Console.WriteLine(_pos);
+            MainWindow.Instance.Dispatcher.Invoke(()=>MainWindow.Instance.UpdateRobotPosition(_pos.X, _pos.Y));
         }
 
     }
