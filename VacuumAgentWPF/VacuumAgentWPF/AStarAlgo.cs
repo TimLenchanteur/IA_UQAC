@@ -11,8 +11,6 @@ namespace VacuumAgentWPF
 
         class AStarNode : IComparable<AStarNode>
         {
-
-            // Would have probably been best to find a way to deal with this with polymorphism but overkill for this tp
             public CustomEnvState _state;
             public VacuumAgent.VacuumAction _action;
             public AStarNode _parentNode = null;
@@ -21,7 +19,6 @@ namespace VacuumAgentWPF
             public AStarNode(CustomEnvState initialState)
             {
                 _state = initialState;
-                // 0 + Heuristique car noeud racine
                 _cost = _state.EuclidianActionHeuristic();
             }
 
@@ -44,14 +41,14 @@ namespace VacuumAgentWPF
         {
             Stack<VacuumAgent.VacuumAction> vacuumActions = new Stack<VacuumAgent.VacuumAction>();
 
-            // Run the algorithm to find solution node
+            // Lancement de l'algorithme pour trouver un noeud solution du problème
             AStarNode lastNode = RunAlgo(problem);
             if (lastNode == null)
             {
                 return vacuumActions;
             }
 
-            // Get all actions leading to this node
+            // Récupération de toutes les actions conduisant à ce noeud
             while (lastNode._parentNode != null)
             {
                 vacuumActions.Push(lastNode._action);
