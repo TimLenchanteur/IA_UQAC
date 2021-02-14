@@ -103,7 +103,8 @@ namespace VacuumAgentWPF
             }
             else
             {
-                return _agentPos.Equals(otherState._agentPos) && _nbOfDirtyRoom == otherState._nbOfDirtyRoom;
+                bool res = _agentPos.Equals(otherState._agentPos) && _dirtyRoom.Count == otherState._dirtyRoom.Count && _dirtyRoomWithJewel.Count == otherState._dirtyRoomWithJewel.Count;
+                return false;
             }
         }
 
@@ -165,8 +166,8 @@ namespace VacuumAgentWPF
 
             float tempCost = 0;
             foreach (Vector2 dirtyRoom in _dirtyRoom) {
-                tempCost = (dirtyRoom - _agentPos).Magnitude();
-                if (minDistance >= tempCost)  minDistance = tempCost + 1;
+                tempCost = (dirtyRoom - _agentPos).Magnitude() + 1;
+                if (minDistance >= tempCost)  minDistance = tempCost;
             }
             foreach (Vector2 dirtyJewelRoom in _dirtyRoomWithJewel)
             {

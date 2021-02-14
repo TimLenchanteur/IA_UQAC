@@ -63,7 +63,7 @@ namespace VacuumAgentWPF
                 BFSNode currentNode = fringe.Dequeue();
                 if (problem.HasBeenSolved(currentNode._state)) return currentNode;
                 // Check if state in closed set
-                if(!closed.Contains(currentNode._state))
+                if (!closed.Contains(currentNode._state))
                 {
                     closed.Add(currentNode._state);
                     // Insert following nodes
