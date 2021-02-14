@@ -77,13 +77,14 @@ namespace VacuumAgentWPF
                     // The agent only move if at least one room is dirty
                     if (currentState.NbOfDirtyRoom > 0)
                     {
+                        Console.WriteLine("Exploring");
                         /*Console.WriteLine("Initial State");
                         Environment.Print();*/
 
                         // Formulate Goal
                         // We define the goal for this agent as cleaning one dirty room
                         CustomEnvState wishedState = new CustomEnvState(belief, _pos);
-                        wishedState.DefineWishedRoomDirtyAs(currentState.NbOfDirtyRoom - 1);
+                        wishedState.DefineWishedRoomDirtyAs(0);
                         wishedState.MarkStateForEquality(CustomEnvState.ROOM_STATE);
                         // Formulate problem
                         Problem problem = new Problem(currentState, wishedState);
@@ -93,6 +94,7 @@ namespace VacuumAgentWPF
                         _actionCycle = _optimalActionCycle == 0 ? intent.Count : _optimalActionCycle + rand.Next(0, Math.Max(intent.Count - _optimalActionCycle, 0)); 
 
                         MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateActionCycle());
+                        Console.WriteLine("Explored");
                     }
                 }
                 else if(_actionsCount<_actionCycle)
@@ -164,7 +166,6 @@ namespace VacuumAgentWPF
                 if (state.ContainJewel()) actions.Add(VacuumAction.GrabClean);
                 else actions.Add(VacuumAction.Clean);
             }
-           
             if ((posAgent.X - 1) >=  0) {
                 actions.Add(VacuumAction.GoLeft);
             }
