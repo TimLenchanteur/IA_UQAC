@@ -8,11 +8,8 @@ namespace VacuumAgentWPF
 {
     class BFSAlgo
     {
-        // To keep track of state visited i guess it would be easier to keep track of only the position 
-        //(Maybe need to override the equality not sure how contain work)
         class BFSNode
         {
-            // Would have probably been best to find a way to deal with this with polymorphism but overkill for this tp
             public CustomEnvState _state;
             public VacuumAgent.VacuumAction _action;
             public int _depth = 0;
@@ -33,14 +30,14 @@ namespace VacuumAgentWPF
         public static Stack<VacuumAgent.VacuumAction> ExecuteFor(Problem problem)
         {
             Stack<VacuumAgent.VacuumAction> vacuumActions = new Stack<VacuumAgent.VacuumAction>();
-            // Run the algorithm to find solution node
+            // Lancement de l'algorithme pour trouver un noeud solution du problème
             BFSNode lastNode = RunAlgo(problem);
             if(lastNode == null)
             {
                 return new Stack<VacuumAgent.VacuumAction>();
             }
 
-            // Get all actions leading to this node
+            // Récupération de toutes les actions conduisant à ce noeud
             while(lastNode._parentNode != null)
             {
                 vacuumActions.Push(lastNode._action);
@@ -51,9 +48,9 @@ namespace VacuumAgentWPF
 
         private static BFSNode RunAlgo(Problem problem)
         {
-            // Closed set of agent position for memory optimisation
+            // Liste des états déjà visités pour optimisation
             List<CustomEnvState> closed = new List<CustomEnvState>();
-            // Fringe of nodes
+            // Frontière des noeuds
             Queue<BFSNode> fringe = new Queue<BFSNode>();
             fringe.Enqueue(new BFSNode(problem._initialState));
 
@@ -62,11 +59,11 @@ namespace VacuumAgentWPF
                 if (fringe.Count == 0) return null;
                 BFSNode currentNode = fringe.Dequeue();
                 if (problem.HasBeenSolved(currentNode._state)) return currentNode;
-                // Check if state in closed set
+                // Vérification de l'absence de l'état dans les états visités
                 if (!closed.Contains(currentNode._state))
                 {
                     closed.Add(currentNode._state);
-                    // Insert following nodes
+                    // Ajout des noeuds suivants
                     List<VacuumAgent.VacuumAction> vacuumActions = VacuumAgent.PossibleActionFromThere(currentNode._state);
                     foreach (var action in vacuumActions)
                     {

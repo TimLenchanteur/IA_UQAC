@@ -5,31 +5,31 @@ namespace VacuumAgentWPF
 {
     class Environment
     {
-        // Possible object on the floor
-        // These can be used as bitwise operation (Ex: if box state is 3 then it mean there is both dirt and a jewel)
+        // Objets possible sur le sol
+        // Peuvent être utilisés pour des comparaison bit à bit
         public const int NONE = 0;
         public const int DIRT = 1;
         public const int JEWEL = 2;
 
-        // Cost for every action taken by the agent
+        // Coût de chaque action prise par l'agent
         const int ACTION_COST = 1;
         const float PENALTY = 1.2f;
         const float BONUS = 0.95f; 
 
-        // Performance score for the last time the agent executed his goal
+        // Score de performance de l'agent la dernière fois qu'elle a atteint son but (plus le score est bas, plus la performance est bonne)
         private static float _perfScore;
 
-        // Has the grid been initiated
+        // La grille a-t-elle été initialisée ?
         public static bool _init = false;
 
-        // Environenment dimensions
+        // Dimensions de l'environnement
         public static Vector2 _gridDim = new Vector2(0, 0);
-        // Environment modelisation
+        // Modélisation de l'environnement
         public static int[,] _grid;
 
         public static void Init()
         {
-            // Init environment grid (grid size has been decided in the instructions)
+            // Initialisation de l'environnement
             _gridDim.X = 5;
             _gridDim.Y = 5;
 
@@ -55,22 +55,22 @@ namespace VacuumAgentWPF
             Random rand = new Random();
             while (true)
             {
-                // Choose a random box in grid
+                // Choix d'une pièce aléatoire
                 int randPosX = rand.Next(_gridDim.X);
                 int randPosY = rand.Next(_gridDim.Y);
 
-                // Choose a random object to place in this box (messed a bit with the array so that the chance to get each one is not the same)
+                // Choix d'un objet aléatoire à placer dans la pièce
                 int randObjectIndex = rand.Next(possibleGeneratedObject.Length);
                 int randObject = possibleGeneratedObject[randObjectIndex];
 
-                // Check if there is no object of this type already placed here 
+                // Vérification qu'il n'y a pas déjà un objet de ce type dans la pièce
                 if ((_grid[randPosX, randPosY] & randObject) == 0)
                 {
-                    //Add it to the box
+                    //Ajout à la pièce
                     _grid[randPosX, randPosY] += randObject;
                 }
 
-                // Choose a random amount of time to fill the grid again then wait
+                // Choix d'un temps aléatoire avant de recommencer
                 int randTimeToWait = rand.Next(1000) + 500;
                 MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateEnvironment());
                 Thread.Sleep(randTimeToWait);
@@ -91,11 +91,7 @@ namespace VacuumAgentWPF
             return 1/_perfScore;
         }
 
-        /// <summary>
-        /// 
-        /// 
-        /// No new obstacle appear and the grid bound stay the same so the agent should always be able to move if he plan to
-        /// </summary>
+        // Aucun nouvel obstacle n'apparaît, l'agent est donc toujours libre de se déplacer où il le souhaite
         public static void MoveAgent(in Vector2 pos) {
             float perf = ACTION_COST;
             if ((_grid[pos.X, pos.Y]& DIRT) == DIRT) perf *= PENALTY;
@@ -103,10 +99,10 @@ namespace VacuumAgentWPF
         }
 
         public static bool TryGrabbing(in Vector2 pos) {
-            // Add cost either way
+            // Ajout du coût quoi qu'il arrive
             AddToPerf(ACTION_COST);
             if ((_grid[pos.X, pos.Y] & JEWEL) == JEWEL) {
-                // If there is indeed a jewel, grab it 
+                // S'il y a effectivement un bijou, on le ramasse
                 _grid[pos.X, pos.Y] -= JEWEL;
                 return true;
             }
@@ -117,7 +113,7 @@ namespace VacuumAgentWPF
         {
             float perf = ACTION_COST;
             if ((_grid[pos.X, pos.Y] & JEWEL) == JEWEL) {
-                // Add penalty because the agent is about to suck a jewel
+                // Ajout d'une pénalité car l'agent s'apprête à aspirer un bijou
                 perf *= PENALTY;
             }
             perf *= BONUS;

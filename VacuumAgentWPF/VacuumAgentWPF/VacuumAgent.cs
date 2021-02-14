@@ -43,7 +43,7 @@ namespace VacuumAgentWPF
         public static List<KeyValuePair<int, float>> _lastActionsCycleTrack;
 
         public static void Init() {
-            // Choose random location in the grid as  starting point
+            // Choix d'un emplacement de départ aléatoire
             Random rand = new Random();
             _pos = new Vector2(rand.Next(Environment._gridDim.X), rand.Next(Environment._gridDim.Y));
 
@@ -76,7 +76,7 @@ namespace VacuumAgentWPF
 
         public static void VacuumProc()
         {
-            // Wait for the environment to be ready
+            // Attente de l'initialisation de l'environnement
             while (!Environment._init) { }
             Init();
 
@@ -89,10 +89,10 @@ namespace VacuumAgentWPF
             {
                 if (intent.Count == 0 || _actionsCount>=_actionCycle)
                 {
-                    // Get environment current state
+                    // Récupération de l'état actuel de l'environnement
                     int[,] belief = Environment._grid;
                     CustomEnvState currentState = new CustomEnvState(belief, _pos);
-                    // The agent only move if at least one room is dirty
+                    // L'agent ne se déplace que si l'une des pièces est sale
                     if (currentState.NbOfDirtyRoom > 0)
                     {
                         if (_nextAlgo != _currentAlgorithm)
@@ -101,7 +101,7 @@ namespace VacuumAgentWPF
                             MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateAlgo(_currentAlgorithm.ToString()));
                         }
 
-                        // Keep track of performances
+                        // Mesure de performance
                         if (_actionsCount != 0)
                         {
                             if (_learningCount >= _learningCycle - 1)
@@ -117,16 +117,16 @@ namespace VacuumAgentWPF
                             _actionsCount = 0;
                         }
 
-                        // Formulate Goal
-                        // We define the goal for this agent as cleaning one dirty room
+                        // Formulation du but
+                        // Nous définissons le but de cet agent comme étant de nettoyer une seule pièce
                         CustomEnvState wishedState = new CustomEnvState(belief, _pos);
                         wishedState.DefineWishedRoomDirtyAs(currentState.NbOfDirtyRoom - 1);
                         wishedState.MarkAttributeForEquality(CustomEnvState.NUMBER_DIRTY_ROOM_ATTRIBUTE);
-                        // Formulate problem
+                        // Formulation du problème
                         Problem problem = new Problem(currentState, wishedState);
-                        // Explore
+                        // Exploration
                         intent = Explore(problem,_currentAlgorithm);
-                        // Update optimal action cycle
+                        // Mise à jour du cycle d'action optimal
                         _actionCycle = _optimalActionCycle == 0 ? intent.Count : _optimalActionCycle + WeightedRandom(0, Math.Max(intent.Count - _optimalActionCycle, 0)); 
                         MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateActionCycle());
                         MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateComputingState(""));
@@ -135,7 +135,7 @@ namespace VacuumAgentWPF
                 else if(_actionsCount<_actionCycle)
                 {
                     _actionsCount++;
-                    // Execute and remove one step of the action's plan
+                    // Exécuter et retirer une action du plan d'actions
                     VacuumAction action = intent.Pop();
                     Execute(action);
                     Thread.Sleep(700);
