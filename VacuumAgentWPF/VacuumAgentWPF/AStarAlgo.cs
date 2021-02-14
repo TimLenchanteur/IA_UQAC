@@ -14,26 +14,36 @@ namespace VacuumAgentWPF
             public CustomEnvState _state;
             public VacuumAgent.VacuumAction _action;
             public AStarNode _parentNode = null;
-            float _cost = 0;
+            public float _costToReachSolution;
+            public int _costToRechNode;
 
             public AStarNode(CustomEnvState initialState)
             {
                 _state = initialState;
-                _cost = _state.EuclidianActionHeuristic();
+                _costToRechNode = 0;
+                _costToReachSolution = _state.EuclidianActionHeuristic();
             }
 
             public AStarNode(AStarNode previousNode, VacuumAgent.VacuumAction action)
             {
                 _action = action;
                 _state = new CustomEnvState(previousNode._state, action);
-                // 1 is the cost of Manhattan to attain this node from previous node or cost of the action, either way it is the same cost
-                // Cost is at 0.25 to Clean just so that if the Robot need to grab he does it
-                _cost = 1 + (action == VacuumAgent.VacuumAction.Clean ?  0 : (action == VacuumAgent.VacuumAction.GrabClean ? 1 : _state.EuclidianActionHeuristic()));
+                _costToRechNode = previousNode._costToRechNode;
+                if(previousNode._action == VacuumAgent.VacuumAction.GrabClean)
+                {
+                    _costToRechNode += 2;
+                }
+                else
+                {
+                    _costToRechNode += 1;
+                }
+
+                _costToReachSolution = _costToRechNode + (action == VacuumAgent.VacuumAction.Clean ?  0 : (action == VacuumAgent.VacuumAction.GrabClean ? 1 : _state.EuclidianActionHeuristic()));
             }
 
             public int CompareTo(AStarNode other)
             {
-                return _cost.CompareTo(other._cost);
+                return _costToReachSolution.CompareTo(other._costToReachSolution);
             }
         }
 
