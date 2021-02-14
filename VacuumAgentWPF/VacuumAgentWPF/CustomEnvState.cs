@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -103,7 +103,28 @@ namespace VacuumAgentWPF
             }
             else
             {
-                bool res = _agentPos.Equals(otherState._agentPos) && _dirtyRoom.Count == otherState._dirtyRoom.Count && _dirtyRoomWithJewel.Count == otherState._dirtyRoomWithJewel.Count;
+                if (_agentPos.Equals(otherState._agentPos)) 
+                {
+                    if(_dirtyRoom.Count == otherState._dirtyRoom.Count && _dirtyRoomWithJewel.Count == otherState._dirtyRoomWithJewel.Count)
+                    {
+                        foreach(Vector2 room in _dirtyRoom)
+                        {
+                            if (!otherState._dirtyRoom.Contains(room))
+                            {
+                                return false;
+                            }
+                        }
+                        foreach (Vector2 room in _dirtyRoomWithJewel)
+                        {
+                            if (!otherState._dirtyRoomWithJewel.Contains(room))
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                }
                 return false;
             }
         }
