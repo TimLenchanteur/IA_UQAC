@@ -44,7 +44,7 @@ namespace VacuumAgentWPF
 
         public static void Init() {
             // Choose random location in the grid as  starting point
-            Random rand = new Random(5051);
+            Random rand = new Random();
             _pos = new Vector2(rand.Next(Environment._gridDim.X), rand.Next(Environment._gridDim.Y));
 
             _init = true;
@@ -69,7 +69,7 @@ namespace VacuumAgentWPF
                 }
                 numberLinked++;
             }
-            Random rand = new Random(8138);
+            Random rand = new Random();
             return chooseInside[rand.Next(0, chooseInside.Count)];
         }
         
@@ -101,7 +101,22 @@ namespace VacuumAgentWPF
                             MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateAlgo(_currentAlgorithm.ToString()));
                         }
 
-                        MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateComputingState("Calcul du prochain cycle d'action..."));
+                        // Keep track of performances
+                        if (_actionsCount != 0)
+                        {
+                            if (_learningCount >= _learningCycle - 1)
+                            {
+                                _optimalActionCycle = ComputeOptimalActionCycle();
+                                MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateOptimalActions());
+                                _learningCount = 0;
+                            }
+                            else _learningCount++;
+                            _lastActionsCycleTrack.Add(new KeyValuePair<int, float>(_actionsCount, Environment.GivePerf()));
+                            MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.AddLearnedAction(_actionsCount, Environment.GivePerf()));
+                            Environment.ResetPerf();
+                            _actionsCount = 0;
+                        }
+
                         // Formulate Goal
                         // We define the goal for this agent as cleaning one dirty room
                         CustomEnvState wishedState = new CustomEnvState(belief, _pos);
@@ -123,23 +138,6 @@ namespace VacuumAgentWPF
                     // Execute and remove one step of the action's plan
                     VacuumAction action = intent.Pop();
                     Execute(action);
-                    if (intent.Count == 0 || _actionsCount >= _actionCycle) {
-                        // Keep track of performances
-                        if (_actionsCount != 0)
-                        {
-                            if (_learningCount >= _learningCycle - 1)
-                            {
-                                _optimalActionCycle = ComputeOptimalActionCycle();
-                                MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateOptimalActions());
-                                _learningCount = 0;
-                            }
-                            else _learningCount++;
-                            _lastActionsCycleTrack.Add(new KeyValuePair<int, float>(_actionsCount, Environment.GivePerf()));
-                            MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.AddLearnedAction(_actionsCount, Environment.GivePerf()));
-                            Environment.ResetPerf();
-                            _actionsCount = 0;
-                        }
-                    }
                     Thread.Sleep(700);
                 }
             }

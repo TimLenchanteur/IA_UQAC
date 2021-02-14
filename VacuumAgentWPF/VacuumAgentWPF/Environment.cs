@@ -52,7 +52,7 @@ namespace VacuumAgentWPF
 
             int[] possibleGeneratedObject = { NONE, DIRT, NONE, JEWEL, NONE,  DIRT, DIRT};
 
-            Random rand = new Random(5181);
+            Random rand = new Random();
             while (true)
             {
                 // Choose a random box in grid
