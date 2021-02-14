@@ -5,41 +5,52 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VacuumAgentWPF"
         mc:Ignorable="d"
-        Title="VacuumAgent" Height="300" Width="250">
+        Title="VacuumAgent" Height="670" Width="850">
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
                 <Menu>
-                    <MenuItem Header="Algorithm">
+                    <MenuItem x:Name="Algorithme" Header="Algorithme : BFS">
                         <MenuItem Header="BFS" Click="ToBFSAlgo"/>
                         <MenuItem Header="AStar" Click="ToAStarAlgo"/>
                     </MenuItem>
-                    <TextBox x:Name="OptimalActions" IsReadOnly="True"></TextBox>
+                    <TextBlock x:Name="OptimalActions"  Text="Nombres optimal d'actions a programmées 0"/>
+                    <TextBlock x:Name="ActionCycle"  Text="Actions a programmées 0"/>
                 </Menu>
             </ToolBar>
         </ToolBarTray>
-        <!-- I set the window so that each cell can be 10unit and that there is still 50*250 of space to display button or other control widget-->
-        <Grid ShowGridLines="True" x:Name="GridRoot">
+        <Grid x:Name="GridRoot">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
-            <Image Name="RobotImage" Stretch="fill" Source="Images\Robot.png" 
+
+            <Grid  Grid.Column="0" ShowGridLines="True" x:Name="GridEnvironment">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Image Name="RobotImage" Stretch="fill" Source="Images\Robot.png" 
             VerticalAlignment = "Center" Visibility="Collapsed"/>
-            <Image Name="CleanImage" Stretch="fill" Source="Images\clean.png" 
+                <Image Name="CleanImage" Stretch="fill" Source="Images\clean.png" 
             VerticalAlignment = "Center" Visibility="Collapsed"/>
-            <Image Name="GrabImage" Stretch="fill" Source="Images\grab.png" 
+                <Image Name="GrabImage" Stretch="fill" Source="Images\grab.png" 
             VerticalAlignment = "Center" Visibility="Collapsed"/>
+            </Grid>
+
+            <StackPanel Grid.Column="1" x:Name="LearningPanel">
+                <TextBlock Text="Actions Evalués : " FontWeight="Bold"/>
+            </StackPanel>
         </Grid>
     </DockPanel>
 </Window>

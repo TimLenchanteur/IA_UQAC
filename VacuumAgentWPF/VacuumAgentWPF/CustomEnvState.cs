@@ -153,11 +153,11 @@ namespace VacuumAgentWPF
             float tempCost = 0;
             foreach (Vector2 dirtyRoom in _dirtyRoom) {
                 tempCost = (dirtyRoom - _agentPos).Magnitude();
-                if (minDistance >= tempCost)  minDistance = tempCost;
+                if (minDistance >= tempCost)  minDistance = tempCost + 1;
             }
             foreach (Vector2 dirtyJewelRoom in _dirtyRoomWithJewel)
             {
-                tempCost = (dirtyJewelRoom - _agentPos).Magnitude() + 1;
+                tempCost = (dirtyJewelRoom - _agentPos).Magnitude() + 2;
                 if (minDistance >= tempCost) minDistance = tempCost;
             }
             return minDistance;

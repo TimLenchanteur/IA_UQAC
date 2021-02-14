@@ -60,10 +60,8 @@
     <Compile Include="CustomEnvState.cs" />
     <Compile Include="Environment.cs" />
     <Compile Include="EnvState.cs" />
-    <Compile Include="IDSAlgo.cs" />
     <Compile Include="PriorityQueue.cs" />
     <Compile Include="Problem.cs" />
-    <Compile Include="RBFSAlgo.cs" />
     <Compile Include="VacuumAgent.cs" />
     <Compile Include="Vector2.cs" />
     <Page Include="MainWindow.xaml">

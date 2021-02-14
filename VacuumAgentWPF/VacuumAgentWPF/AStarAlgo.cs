@@ -31,7 +31,7 @@ namespace VacuumAgentWPF
                 _state = new CustomEnvState(previousNode._state, action);
                 // 1 is the cost of Manhattan to attain this node from previous node or cost of the action, either way it is the same cost
                 // Cost is at 0.25 to Clean just so that if the Robot need to grab he does it
-                _cost = 1 + (action == VacuumAgent.VacuumAction.Clean? (previousNode._action == VacuumAgent.VacuumAction.GrabClean? 1 : 0) : _state.EuclidianActionHeuristic());
+                _cost = 1 + (action == VacuumAgent.VacuumAction.Clean ?  0 : (action == VacuumAgent.VacuumAction.GrabClean ? 1 : _state.EuclidianActionHeuristic()));
             }
 
             public int CompareTo(AStarNode other)

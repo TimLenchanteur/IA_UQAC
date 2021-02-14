@@ -5,6 +5,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Threading;
 using System.Windows.Threading;
+using System.Windows.Input;
+using System.Text.RegularExpressions;
 
 namespace VacuumAgentWPF
 {
@@ -40,10 +42,11 @@ namespace VacuumAgentWPF
 
         public void UpdateRobotPosition(int x, int y)
         {
-            if(RobotImage.Visibility == Visibility.Collapsed)
+            if (RobotImage.Visibility == Visibility.Collapsed)
             {
                 RobotImage.Visibility = Visibility.Visible;
             }
+
             Grid.SetRow(RobotImage, x);
             Grid.SetColumn(RobotImage, y);
             Grid.SetZIndex(RobotImage, 100);
@@ -84,14 +87,14 @@ namespace VacuumAgentWPF
                 {
                     // Dust
                     Image dust = CreateImage("dust.png");
-                    GridRoot.Children.Add(dust);
+                    GridEnvironment.Children.Add(dust);
                     _dustImages[x, y] = dust;
                     Grid.SetRow(dust, x);
                     Grid.SetColumn(dust, y);
 
                     // Jewel
                     Image jewel = CreateImage("jewel.png");
-                    GridRoot.Children.Add(jewel);
+                    GridEnvironment.Children.Add(jewel);
                     _jewelImages[x, y] = jewel;
                     Grid.SetRow(jewel, x);
                     Grid.SetColumn(jewel, y);
@@ -99,9 +102,30 @@ namespace VacuumAgentWPF
             }
         }
 
+        public void AddLearnedAction(int nbActions, float performance)
+        {
+            TextBlock newTextBlock = new TextBlock();
+            newTextBlock.Text = "Actions : " + nbActions + ", Performance : " + performance;
+            LearningPanel.Children.Add(newTextBlock);
+        }
+
+        public void ReserLearningStack()
+        {
+            LearningPanel.Children.Clear();
+            TextBlock header = new TextBlock();
+            header.Text = "Actions Evalués:";
+            header.FontWeight = FontWeights.Bold;
+            LearningPanel.Children.Add(header);
+        }
+
         public void UpdateOptimalActions()
         {
-            OptimalActions.Text = "Optimal Actions Move = " + VacuumAgent._optimalActionCycle;
+            OptimalActions.Text = "Nombres optimal d'actions a programmées " + VacuumAgent._optimalActionCycle;
+            ReserLearningStack();
+        }
+
+        public void UpdateActionCycle() {
+            ActionCycle.Text = "Nombre d'actions programmées " + VacuumAgent._actionCycle;
         }
 
         public void DisplayClean()
@@ -154,11 +178,13 @@ namespace VacuumAgentWPF
 
         private void ToBFSAlgo(object sender, RoutedEventArgs e)
         {
+            Algorithme.Header = "Algotihme : BFS";
             VacuumAgent.ChangeExplorationAlgo(VacuumAgent.Algorithm.BFS);
         }
 
         private void ToAStarAlgo(object sender, RoutedEventArgs e)
         {
+            Algorithme.Header = "Algotihme : A*";
             VacuumAgent.ChangeExplorationAlgo(VacuumAgent.Algorithm.ASTAR);
         }
     }
