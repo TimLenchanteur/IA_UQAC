@@ -8,9 +8,9 @@ namespace VacuumAgentWPF
 {
     class CustomEnvState :EnvState
     {
-        public const int GRID_STATE = 1;
-        public const int ROOM_STATE = 2;
-        public const int AGENT_STATE = 3;
+        public const int GRID_STATE_ATTRIBUTE = 1;
+        public const int NUMBER_DIRTY_ROOM_ATTRIBUTE = 2;
+        public const int AGENT_POSTION_ATTRIBUTE = 3;
 
         List<Vector2> _dirtyRoom;
         List<Vector2> _dirtyRoomWithJewel;
@@ -74,24 +74,37 @@ namespace VacuumAgentWPF
             ExecuteNewAction(newAction);
         }
 
-        public override bool IsEqual(EnvState otherState) 
+        public override bool IsEqualRelativeToTestedAttribute(EnvState otherState) 
         {
             CustomEnvState otherCustomState = otherState as CustomEnvState;
             if (otherCustomState != null)
             {
                 switch (_markedState) {
-                    case GRID_STATE:
+                    case GRID_STATE_ATTRIBUTE:
                         break;
-                    case ROOM_STATE:
+                    case NUMBER_DIRTY_ROOM_ATTRIBUTE:
                         // This is the only one we will use, don't need any other
                         return otherCustomState._nbOfDirtyRoom == _nbOfDirtyRoom;
-                    case AGENT_STATE:
+                    case AGENT_POSTION_ATTRIBUTE:
                         break;
                     default:
                         break;
                 }
             }
-            return base.IsEqual(otherState);
+            return base.IsEqualRelativeToTestedAttribute(otherState);
+        }
+
+        public override bool Equals(Object obj)
+        {
+            CustomEnvState otherState = obj as CustomEnvState;
+            if (otherState == null)
+            {
+                return false;
+            }
+            else
+            {
+                return _agentPos.Equals(otherState._agentPos) && _nbOfDirtyRoom == otherState._nbOfDirtyRoom;
+            }
         }
 
         public void DefineWishedGridStateAs(List<Vector2> dirtyRoom, List<Vector2> dirtyRoomWithJewel) {

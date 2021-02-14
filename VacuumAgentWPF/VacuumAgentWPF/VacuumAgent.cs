@@ -29,6 +29,7 @@ namespace VacuumAgentWPF
 
         public static Vector2 _pos;
 
+        public static Algorithm _nextAlgo;
         public static Algorithm _currentAlgorithm;
 
         public static int _actionsCount;
@@ -56,6 +57,23 @@ namespace VacuumAgentWPF
             _learningCount = 0;
         }
 
+        private static int WeightedRandom(int min, int max) {
+            int baseNumber = 100;
+            int interval = max - min;
+            List<int> chooseInside = new List<int>();
+            int numberLinked = min;
+            for (int i = 0; i <= interval; i++) {
+                int howManyInsideList = baseNumber / (i + 1);
+                for (int j = 0; j < howManyInsideList; j++) {
+                    chooseInside.Add(numberLinked);
+                }
+                numberLinked++;
+            }
+            Random rand = new Random(8138);
+            return chooseInside[rand.Next(0, chooseInside.Count)];
+        }
+        
+
         public static void VacuumProc()
         {
             // Wait for the environment to be ready
@@ -65,7 +83,7 @@ namespace VacuumAgentWPF
             Console.WriteLine(3 & Environment.DIRT);
 
             Stack<VacuumAction> intent = new Stack<VacuumAction>();
-            Random rand = new Random(8138);
+          
             _actionCycle = 0;
             while (true)
             {
@@ -77,24 +95,26 @@ namespace VacuumAgentWPF
                     // The agent only move if at least one room is dirty
                     if (currentState.NbOfDirtyRoom > 0)
                     {
-                        Console.WriteLine("Exploring");
-                        /*Console.WriteLine("Initial State");
-                        Environment.Print();*/
+                        if (_nextAlgo != _currentAlgorithm)
+                        {
+                            _currentAlgorithm = _nextAlgo;
+                            MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateAlgo(_currentAlgorithm.ToString()));
+                        }
 
+                        MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateComputingState("Calcul du prochain cycle d'action..."));
                         // Formulate Goal
                         // We define the goal for this agent as cleaning one dirty room
                         CustomEnvState wishedState = new CustomEnvState(belief, _pos);
-                        wishedState.DefineWishedRoomDirtyAs(0);
-                        wishedState.MarkStateForEquality(CustomEnvState.ROOM_STATE);
+                        wishedState.DefineWishedRoomDirtyAs(Math.Max(0, currentState.NbOfDirtyRoom - 2));
+                        wishedState.MarkAttributeForEquality(CustomEnvState.NUMBER_DIRTY_ROOM_ATTRIBUTE);
                         // Formulate problem
                         Problem problem = new Problem(currentState, wishedState);
                         // Explore
                         intent = Explore(problem,_currentAlgorithm);
                         // Update optimal action cycle
-                        _actionCycle = _optimalActionCycle == 0 ? intent.Count : _optimalActionCycle + rand.Next(0, Math.Max(intent.Count - _optimalActionCycle, 0)); 
-
+                        _actionCycle = _optimalActionCycle == 0 ? intent.Count : _optimalActionCycle + WeightedRandom(0, Math.Max(intent.Count - _optimalActionCycle, 0)); 
                         MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateActionCycle());
-                        Console.WriteLine("Explored");
+                        MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.UpdateComputingState(""));
                     }
                 }
                 else if(_actionsCount<_actionCycle)
@@ -138,7 +158,11 @@ namespace VacuumAgentWPF
 
         public static void ChangeExplorationAlgo(Algorithm newAlgo)
         {
-            _currentAlgorithm = newAlgo;
+            _nextAlgo = newAlgo;
+        }
+
+        public static void ChangeLearningCycle(int newCycle) {
+            _learningCycle = newCycle;
         }
 
 

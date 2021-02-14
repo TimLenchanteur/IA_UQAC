@@ -14,11 +14,11 @@ namespace VacuumAgentWPF
             _markedState = 0;
         }
 
-        public void MarkStateForEquality(int state) {
+        public void MarkAttributeForEquality(int state) {
             _markedState = state;
         }
 
-        public virtual bool IsEqual(EnvState otherState) {
+        public virtual bool IsEqualRelativeToTestedAttribute(EnvState otherState) {
             return false;
         }
 

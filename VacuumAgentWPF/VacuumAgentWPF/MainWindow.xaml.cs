@@ -118,6 +118,11 @@ namespace VacuumAgentWPF
             LearningPanel.Children.Add(header);
         }
 
+        public void UpdateComputingState(String state) {
+            PrintComputing.Text = state;
+            Console.WriteLine(state);
+        }
+
         public void UpdateOptimalActions()
         {
             OptimalActions.Text = "Nombres optimal d'actions a programmées " + VacuumAgent._optimalActionCycle;
@@ -176,16 +181,44 @@ namespace VacuumAgentWPF
             environment.Abort();
         }
 
+        public void UpdateAlgo(String algorithm) {
+            Algorithme.Header = "Algorithme : " + algorithm;
+        }
+
         private void ToBFSAlgo(object sender, RoutedEventArgs e)
         {
-            Algorithme.Header = "Algotihme : BFS";
             VacuumAgent.ChangeExplorationAlgo(VacuumAgent.Algorithm.BFS);
         }
 
         private void ToAStarAlgo(object sender, RoutedEventArgs e)
         {
-            Algorithme.Header = "Algotihme : A*";
             VacuumAgent.ChangeExplorationAlgo(VacuumAgent.Algorithm.ASTAR);
         }
+
+
+        private void ThreeLearningCycle(object sender, RoutedEventArgs e)
+        {
+            LearningRound.Header = "Cycle d'apprentissage : 3";
+            VacuumAgent.ChangeLearningCycle(3);
+        }
+
+        private void FiveLearningCycle(object sender, RoutedEventArgs e)
+        {
+            LearningRound.Header = "Cycle d'apprentissage : 5";
+            VacuumAgent.ChangeLearningCycle(5);
+        }
+
+        private void TenLearningCycle(object sender, RoutedEventArgs e)
+        {
+            LearningRound.Header = "Cycle d'apprentissage : 10";
+            VacuumAgent.ChangeLearningCycle(10);
+        }
+
+        private void FifteenLearningCycle(object sender, RoutedEventArgs e)
+        {
+            LearningRound.Header = "Cycle d'apprentissage : 15";
+            VacuumAgent.ChangeLearningCycle(15);
+        }
+
     }
 }

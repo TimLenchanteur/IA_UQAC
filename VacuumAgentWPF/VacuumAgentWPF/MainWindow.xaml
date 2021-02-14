@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VacuumAgentWPF"
         mc:Ignorable="d"
-        Title="VacuumAgent" Height="670" Width="850">
+        Title="VacuumAgent" Height="770" Width="950">
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
@@ -14,8 +14,15 @@
                         <MenuItem Header="BFS" Click="ToBFSAlgo"/>
                         <MenuItem Header="AStar" Click="ToAStarAlgo"/>
                     </MenuItem>
+                    <TextBlock x:Name="PrintComputing"  Text="Calcul du prochain cycle d'action..."/>
                     <TextBlock x:Name="OptimalActions"  Text="Nombres optimal d'actions a programmées 0"/>
                     <TextBlock x:Name="ActionCycle"  Text="Actions a programmées 0"/>
+                    <MenuItem x:Name="LearningRound" Header="Cycle d'apprentissage : 5">
+                        <MenuItem Header="3" Click="ThreeLearningCycle"/>
+                        <MenuItem Header="5" Click="FiveLearningCycle"/>
+                        <MenuItem Header="10" Click="TenLearningCycle"/>
+                        <MenuItem Header="15" Click="FifteenLearningCycle"/>
+                    </MenuItem>
                 </Menu>
             </ToolBar>
         </ToolBarTray>

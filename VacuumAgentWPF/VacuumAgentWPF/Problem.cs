@@ -18,7 +18,7 @@ namespace VacuumAgentWPF
         }
 
         public bool HasBeenSolved(CustomEnvState resultState) {
-            return _wishedState.IsEqual(resultState);
+            return _wishedState.IsEqualRelativeToTestedAttribute(resultState);
         }
     }
 }
