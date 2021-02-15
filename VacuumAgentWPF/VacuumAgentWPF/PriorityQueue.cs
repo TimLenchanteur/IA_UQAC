@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VacuumAgentWPF
 {
-    // Based from https://ericbackhage.net/c/how-to-design-a-priority-queue-in-c/
+    // Basé sur https://ericbackhage.net/c/how-to-design-a-priority-queue-in-c/
     class PriorityQueue<T> where T : IComparable<T>
     {
         private readonly List<T> _queueAbstract = new List<T>();

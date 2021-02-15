@@ -69,9 +69,9 @@ namespace VacuumAgentWPF
 
         private static AStarNode RunAlgo(Problem problem)
         {
-            // Closed set of agent position for memory optimisation
+            // Liste des états déjà visités pour optimisation
             List<CustomEnvState> closed = new List<CustomEnvState>();
-            // Fringe of nodes
+            // Frontière des noeuds
             PriorityQueue<AStarNode> fringe = new PriorityQueue<AStarNode>();
             fringe.Enqueue(new AStarNode(problem._initialState));
 
@@ -80,11 +80,11 @@ namespace VacuumAgentWPF
                 if (fringe.Count == 0) return null;
                 AStarNode currentNode = fringe.Dequeue();
                 if (problem.HasBeenSolved(currentNode._state)) return currentNode;
-                // Check if state in closed set
+                // Vérification de l'absence de l'état dans les états visités
                 if (!closed.Contains(currentNode._state))
                 {
                     closed.Add(currentNode._state);
-                    // Insert following nodes
+                    // Ajout des noeuds suivants
                     List<VacuumAgent.VacuumAction> vacuumActions = VacuumAgent.PossibleActionFromThere(currentNode._state);
                     foreach (var action in vacuumActions)
                     {
