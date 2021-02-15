@@ -28,9 +28,12 @@ namespace VacuumAgentWPF
             {
                 _action = action;
                 _state = new CustomEnvState(previousNode._state, action);
+                /// Calcul du cout associe a ce noeud
+                /// Le cout pour atteindre ce noeud est donnee par le coup des actions precedente 
                 _costToRechNode = previousNode._costToRechNode;
                 if(previousNode._action == VacuumAgent.VacuumAction.GrabClean)
                 {
+                    /// On ajoute 1 si l'action precedente est grab clean car cela represente deux actions
                     _costToRechNode += 2;
                 }
                 else

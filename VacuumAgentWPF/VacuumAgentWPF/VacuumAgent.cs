@@ -57,6 +57,12 @@ namespace VacuumAgentWPF
             _learningCount = 0;
         }
 
+        /// <summary>
+        /// Calcul un random ponderee, + l'on s'eloigne du min moins on l'a de chance d'etre tire
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
         private static int WeightedRandom(int min, int max) {
             int baseNumber = 100;
             int interval = max - min;
@@ -143,6 +149,10 @@ namespace VacuumAgentWPF
             }
         }
 
+        /// <summary>
+        /// Calcul d'un cycle d'action optimal
+        /// </summary>
+        /// <returns></returns>
         static int ComputeOptimalActionCycle() {
             float result = 0;
             float coeff = 0;
@@ -163,7 +173,12 @@ namespace VacuumAgentWPF
             _learningCycle = newCycle;
         }
 
-
+        /// <summary>
+        /// Explore un algorithme pour un probleme donne
+        /// </summary>
+        /// <param name="problem"></param>
+        /// <param name="algorithm"></param>
+        /// <returns></returns>
         static Stack<VacuumAction> Explore(in Problem problem, in Algorithm algorithm)
         {
             Stack<VacuumAction> newintent = new Stack<VacuumAction>();
@@ -179,6 +194,11 @@ namespace VacuumAgentWPF
             return newintent;
         }
 
+        /// <summary>
+        /// Rend les actions possibles depuis un etat
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public static List<VacuumAction> PossibleActionFromThere(CustomEnvState state)
         {
             List<VacuumAction> actions = new List<VacuumAction>();
@@ -206,6 +226,10 @@ namespace VacuumAgentWPF
             return actions;
         }
 
+        /// <summary>
+        /// Execute une action
+        /// </summary>
+        /// <param name="action"></param>
         static void Execute(VacuumAction action) {
             switch (action) {
                 case VacuumAction.GoUp:
