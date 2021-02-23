@@ -17,8 +17,13 @@ namespace SudokuAppWPF
 
         int m_emptyGridCell = -1;
 
-        public SudokuGrid()
+
+        MainWindow m_registeredMainWindow;
+
+        public SudokuGrid(MainWindow registerWindow)
         {
+
+            m_registeredMainWindow = registerWindow;
             m_grid = new int[9, 9];
             for (int i = 0; i < 9; i++)
             {
@@ -29,8 +34,9 @@ namespace SudokuAppWPF
             }
         }
 
-        public SudokuGrid(string file)
+        public SudokuGrid(string file, MainWindow registerWindow)
         {
+            m_registeredMainWindow = registerWindow;
             m_grid = new int[9, 9];
             ReadFile(file);
         }
@@ -83,6 +89,19 @@ namespace SudokuAppWPF
                 c = 0;
                 l++;
             }
+        }
+
+        public void DisplayGrid() {
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (m_grid[i, j] != m_emptyGridCell) {
+                        m_registeredMainWindow.UpdateCase(i, j, m_grid[i,j]);
+                    }
+                }
+            }
+                  
         }
 
         public void PrintGrid()
