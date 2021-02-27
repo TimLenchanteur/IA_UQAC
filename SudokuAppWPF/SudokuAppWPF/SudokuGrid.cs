@@ -140,5 +140,43 @@ namespace SudokuAppWPF
             }
             Console.WriteLine(result);
         }
+
+        public void Solve()
+        {
+            m_grid = RecursiveBackTracking(new SudokuCSP(m_grid));
+            PrintGrid();
+        }
+
+        int[,] RecursiveBackTracking(SudokuCSP csp)
+        {
+            bool isComplete = true;
+            foreach (int i in csp.Grid)
+            {
+                if (i == -1)
+                {
+                    isComplete = false;
+                    break;
+                }
+            }
+            if (isComplete)
+            {
+                return csp.Grid;
+            }
+            Tuple<int, int> toAssign = csp.MinimumRemainingValue();
+            if(csp.Domains[toAssign.Item1, toAssign.Item2].Count == 0)
+            {
+                return null;
+            }
+            foreach (int value in csp.Domains[toAssign.Item1, toAssign.Item2])
+            {
+                csp.SetValue(toAssign.Item1, toAssign.Item2, value);
+                int[,] result = RecursiveBackTracking(csp);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
     }
 }
