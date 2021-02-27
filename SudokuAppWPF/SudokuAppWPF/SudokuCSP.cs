@@ -122,5 +122,19 @@ namespace SudokuAppWPF
             m_grid[i, j] = value;
             GenerateDomains();
         }
+
+        public int[,] GridCopy()
+        {
+            int[,] copy = new int[m_size, m_size];
+
+            for (int i = 0; i < m_size; i++)
+            {
+                for (int j = 0; j < m_size; j++)
+                {
+                    copy[i, j] = m_grid[i, j];
+                }
+            }
+            return copy;
+        }
     }
 }

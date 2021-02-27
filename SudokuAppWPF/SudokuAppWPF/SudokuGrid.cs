@@ -170,7 +170,8 @@ namespace SudokuAppWPF
             foreach (int value in csp.Domains[toAssign.Item1, toAssign.Item2])
             {
                 csp.SetValue(toAssign.Item1, toAssign.Item2, value);
-                int[,] result = RecursiveBackTracking(csp);
+                int[,] copiedGrid = csp.GridCopy();
+                int[,] result = RecursiveBackTracking(new SudokuCSP(copiedGrid));
                 if (result != null)
                 {
                     return result;
