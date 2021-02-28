@@ -154,11 +154,9 @@ namespace SudokuAppWPF
                 return csp.Grid;
             }
 
-            Tuple<int, int> toAssign = csp.MinimumRemainingValue();
-            if(csp.Domains[toAssign.Item1, toAssign.Item2].Count == 0)
-            {
-                return null;
-            }
+            Tuple<int, int> toAssign = SelectUnassignedVariable(csp);
+            if (toAssign == null) return null;
+
             foreach (int value in csp.Domains[toAssign.Item1, toAssign.Item2])
             {
                 csp.SetValue(toAssign.Item1, toAssign.Item2, value);
@@ -183,6 +181,16 @@ namespace SudokuAppWPF
                 }
             }
             return true;
+        }
+
+        private Tuple<int, int> SelectUnassignedVariable(SudokuCSP csp)
+        {
+            Tuple<int, int> toAssign = csp.MinimumRemainingValues()[0];
+            if (csp.Domains[toAssign.Item1, toAssign.Item2].Count == 0)
+            {
+                return null;
+            }
+            return toAssign;
         }
     }
 }

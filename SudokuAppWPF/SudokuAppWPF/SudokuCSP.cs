@@ -83,10 +83,10 @@ namespace SudokuAppWPF
             }
         }
 
-        public Tuple<int,int> MinimumRemainingValue()
+        public List<Tuple<int,int>> MinimumRemainingValues()
         {
             int mrv = 10;
-            Tuple<int, int> coordinates = new Tuple<int, int>(m_size,m_size);
+            List<Tuple<int, int>> values = new List<Tuple<int, int>>();
             for(int i=0; i<m_size; i++)
             {
                 for(int j=0; j<m_size; j++)
@@ -96,12 +96,17 @@ namespace SudokuAppWPF
                         if (m_domains[i, j].Count < mrv)
                         {
                             mrv = m_domains[i, j].Count;
-                            coordinates = new Tuple<int, int>(i, j);
+                            values.Clear();
+                            values.Add(new Tuple<int, int>(i, j));
+                        }
+                        else if(m_domains[i, j].Count == mrv)
+                        {
+                            values.Add(new Tuple<int, int>(i, j));
                         }
                     }
                 }
             }
-            return coordinates;
+            return values;
         }
 
         public void SetValue(int i, int j, int value)
