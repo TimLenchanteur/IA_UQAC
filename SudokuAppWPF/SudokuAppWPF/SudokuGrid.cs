@@ -185,7 +185,9 @@ namespace SudokuAppWPF
 
         private Tuple<int, int> SelectUnassignedVariable(SudokuCSP csp)
         {
-            Tuple<int, int> toAssign = csp.MinimumRemainingValues()[0];
+            var mrvValues = csp.MinimumRemainingValues();
+            Tuple<int, int> toAssign = csp.DegreeHeuristic(mrvValues)[0];
+
             if (csp.Domains[toAssign.Item1, toAssign.Item2].Count == 0)
             {
                 return null;

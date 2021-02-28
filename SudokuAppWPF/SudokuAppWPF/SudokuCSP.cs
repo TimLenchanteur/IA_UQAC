@@ -13,6 +13,7 @@ namespace SudokuAppWPF
             get { return m_grid; }
         }
         int m_size;
+
         List<int>[,] m_domains;
         public List<int>[,] Domains
         {
@@ -22,33 +23,51 @@ namespace SudokuAppWPF
             }
         }
 
+        int[,] m_constraints;
+
         public SudokuCSP(int[,] grid)
         {
             m_grid = grid;
             m_size = (int)Math.Sqrt(m_grid.Length);
             m_domains = new List<int>[m_size, m_size];
-            GenerateDomains();
+            m_constraints = new int[m_size, m_size];
+            GenerateAllDomainsConstraints();
         }
 
-        void GenerateDomain(int i, int j)
+        void GenerateDomainConstraints(int i, int j)
         {
             m_domains[i, j] = new List<int>(Enumerable.Range(1, m_size));
+            m_constraints[i, j] = 0;
 
             //check line
             for (int k = 0; k<m_size; k++)
             {
-                if (k != j && m_grid[i,k]!=-1)
+                if (k != j)
                 {
-                    m_domains[i, j].Remove(m_grid[i, k]);
+                    if(m_grid[i, k] != -1)
+                    {
+                        m_domains[i, j].Remove(m_grid[i, k]);
+                    }
+                    else
+                    {
+                        m_constraints[i, j]++;
+                    }
                 }
             }
 
             //check column
             for(int k = 0; k < m_size; k++)
             {
-                if (k != i && m_grid[k, j] != -1)
+                if (k != i)
                 {
-                    m_domains[i, j].Remove(m_grid[k, j]);
+                    if (m_grid[k, j] != -1)
+                    {
+                        m_domains[i, j].Remove(m_grid[k, j]);
+                    }
+                    else
+                    {
+                        m_constraints[i, j]++;
+                    }
                 }
             }
 
@@ -59,13 +78,21 @@ namespace SudokuAppWPF
                 {
                     if((i!=k && j!=l) && m_grid[k, l] != -1)
                     {
-                        m_domains[i, j].Remove(m_grid[k, l]);
+                        if(m_grid[k, l] != -1)
+                        {
+                            m_domains[i, j].Remove(m_grid[k, l]);
+                        }
+                        else
+                        {
+                            // Wrong: column and lines may have added this constraint already
+                            m_constraints[i, j]++;
+                        }
                     }
                 }
             }
         }
 
-        void GenerateDomains()
+        void GenerateAllDomainsConstraints()
         {
             for (int i = 0; i < m_size; i++)
             {
@@ -74,10 +101,11 @@ namespace SudokuAppWPF
                     if (m_grid[i, j] != -1)
                     {
                         m_domains[i, j] = new List<int>();
+                        m_constraints[i, j] = 0;
                     }
                     else
                     {
-                        GenerateDomain(i, j);
+                        GenerateDomainConstraints(i, j);
                     }
                 }
             }
@@ -109,10 +137,30 @@ namespace SudokuAppWPF
             return values;
         }
 
+        public List<Tuple<int,int>> DegreeHeuristic(List<Tuple<int, int>> mrvValues)
+        {
+            int maxConstraints = 0;
+            List<Tuple<int, int>> degreeValues = new List<Tuple<int, int>>();
+            foreach (var value in mrvValues)
+            {
+                if(m_constraints[value.Item1, value.Item2] > maxConstraints)
+                {
+                    maxConstraints = m_constraints[value.Item1, value.Item2];
+                    degreeValues.Clear();
+                    degreeValues.Add(value);
+                }
+                else if(m_constraints[value.Item1, value.Item2] == maxConstraints)
+                {
+                    degreeValues.Add(value);
+                }
+            }
+            return degreeValues;
+        }
+
         public void SetValue(int i, int j, int value)
         {
             m_grid[i, j] = value;
-            GenerateDomains();
+            GenerateAllDomainsConstraints();
         }
     }
 }
