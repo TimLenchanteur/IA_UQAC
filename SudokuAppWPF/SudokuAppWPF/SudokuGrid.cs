@@ -104,14 +104,14 @@ namespace SudokuAppWPF
                   
         }
 
-        public void PrintGrid()
+        public void PrintGrid(int [,] grid)
         {
             string result = "";
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    if (m_grid[i, j] == m_emptyGridCell)
+                    if (grid[i, j] == m_emptyGridCell)
                     {
                         result += m_emptyCell;
                     }
@@ -138,30 +138,22 @@ namespace SudokuAppWPF
                     result += "\n";
                 }
             }
-            Console.WriteLine(result);
+            System.Diagnostics.Debug.WriteLine(result);
         }
 
         public void Solve()
         {
             m_grid = RecursiveBackTracking(new SudokuCSP(m_grid));
-            PrintGrid();
+            PrintGrid(m_grid);
         }
 
         int[,] RecursiveBackTracking(SudokuCSP csp)
         {
-            bool isComplete = true;
-            foreach (int i in csp.Grid)
-            {
-                if (i == -1)
-                {
-                    isComplete = false;
-                    break;
-                }
-            }
-            if (isComplete)
+            if (IsComplete(csp.Grid))
             {
                 return csp.Grid;
             }
+
             Tuple<int, int> toAssign = csp.MinimumRemainingValue();
             if(csp.Domains[toAssign.Item1, toAssign.Item2].Count == 0)
             {
@@ -170,14 +162,27 @@ namespace SudokuAppWPF
             foreach (int value in csp.Domains[toAssign.Item1, toAssign.Item2])
             {
                 csp.SetValue(toAssign.Item1, toAssign.Item2, value);
-                int[,] copiedGrid = csp.GridCopy();
-                int[,] result = RecursiveBackTracking(new SudokuCSP(copiedGrid));
+                int[,] result = RecursiveBackTracking(csp);
                 if (result != null)
                 {
                     return result;
                 }
+                // Reset with old value
+                csp.SetValue(toAssign.Item1, toAssign.Item2, -1);
             }
             return null;
+        }
+
+        private bool IsComplete(int[,] assignment)
+        {
+            foreach (int i in assignment)
+            {
+                if (i == -1)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

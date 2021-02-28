@@ -34,7 +34,6 @@ namespace SudokuAppWPF
             Show();
 
             m_CurrentSudoku = new SudokuGrid(@"Grids/grid1.ss", this);
-            m_CurrentSudoku.PrintGrid();
             m_CurrentSudoku.DisplayGrid();
         }
 

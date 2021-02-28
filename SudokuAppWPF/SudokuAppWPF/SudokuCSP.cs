@@ -27,27 +27,15 @@ namespace SudokuAppWPF
             m_grid = grid;
             m_size = (int)Math.Sqrt(m_grid.Length);
             m_domains = new List<int>[m_size, m_size];
-            for(int i = 0; i < m_size; i++)
-            {
-                for (int j = 0; j < m_size; j++)
-                {
-                    if (m_grid[i, j] != -1)
-                    {
-                        m_domains[i, j] = new List<int>();
-                    }
-                    else
-                    {
-                        m_domains[i, j] = new List<int>(Enumerable.Range(1, m_size));
-                        GenerateDomain(i, j);
-                    }
-                }
-            }
+            GenerateDomains();
         }
 
         void GenerateDomain(int i, int j)
         {
+            m_domains[i, j] = new List<int>(Enumerable.Range(1, m_size));
+
             //check line
-            for(int k = 0; k<m_size; k++)
+            for (int k = 0; k<m_size; k++)
             {
                 if (k != j && m_grid[i,k]!=-1)
                 {
@@ -109,7 +97,6 @@ namespace SudokuAppWPF
                         {
                             mrv = m_domains[i, j].Count;
                             coordinates = new Tuple<int, int>(i, j);
-
                         }
                     }
                 }
@@ -121,20 +108,6 @@ namespace SudokuAppWPF
         {
             m_grid[i, j] = value;
             GenerateDomains();
-        }
-
-        public int[,] GridCopy()
-        {
-            int[,] copy = new int[m_size, m_size];
-
-            for (int i = 0; i < m_size; i++)
-            {
-                for (int j = 0; j < m_size; j++)
-                {
-                    copy[i, j] = m_grid[i, j];
-                }
-            }
-            return copy;
         }
     }
 }

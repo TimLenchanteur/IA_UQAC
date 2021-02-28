@@ -10,7 +10,7 @@
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
                 <Button x:Name="Import" Click="LoadSudokuClick" Content="Importer un sudoku"/>
-                <Button x:Name="Solve" Click="SolveCurrent" Content="Resoudre"/>
+                <Button x:Name="Solve" Click="SolveCurrent" Content="Résoudre"/>
             </ToolBar>
         </ToolBarTray>
         <Grid x:Name="Sudoku">
