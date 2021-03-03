@@ -137,6 +137,67 @@ namespace SudokuAppWPF
             return values;
         }
 
+        public int[] NeighboursDomains(int i, int j)
+        {
+           int[] domains = new int[m_size+1];
+
+            for (int k = 0; k < domains.Length; k++) {
+                domains[k] = 0;
+            }
+
+            //line
+            for (int k = 0; k < m_size; k++)
+            {
+                if (k != j && m_grid[k, j] != -1)
+                {
+                    foreach (int nonConstrainedValue in m_domains[k, j]) {
+                        domains[nonConstrainedValue] += 1;   
+                    }
+                }
+            }
+
+            //column
+            for (int k = 0; k < m_size; k++)
+            {
+                if (k != i && m_grid[i, k] != -1)
+                {
+                    foreach (int nonConstrainedValue in m_domains[i, k]){
+                        domains[nonConstrainedValue] += 1;
+                    }
+                }
+            }
+
+            //check square
+            for (int k = (i / 3) * 3; k < (i / 3) * 3 + 3; k++)
+            {
+                for (int l = (j / 3) * 3; l < (j / 3) * 3 + 3; l++)
+                {
+                    if (i != k && j != l && m_grid[k, l] != -1)
+                    {
+                        foreach (int nonConstrainedValue in m_domains[k, l]){
+                            domains[nonConstrainedValue] += 1;
+                        }
+                    }
+                }
+            }
+
+            return domains;
+        }
+
+        public int LeastConstrainingValue(List<int> currentDomain,int[] neighbourDomain)
+        {
+            int minConstraint = int.MaxValue;
+            int bestValue = -1;
+            foreach (int value in currentDomain)
+            {
+                if (minConstraint > neighbourDomain[value]) {
+                    minConstraint = neighbourDomain[value];
+                    bestValue = value;
+                }
+            }
+            return bestValue;
+        }
+
         public List<Tuple<int,int>> DegreeHeuristic(List<Tuple<int, int>> mrvValues)
         {
             int maxConstraints = 0;

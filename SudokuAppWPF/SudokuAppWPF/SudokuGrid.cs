@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
+using System.Threading;
 
 namespace SudokuAppWPF
 {
@@ -143,7 +145,17 @@ namespace SudokuAppWPF
 
         public void Solve()
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             m_grid = RecursiveBackTracking(new SudokuCSP(m_grid));
+            stopWatch.Stop();
+            // Get the elapsed time as a TimeSpan value.
+            TimeSpan ts = stopWatch.Elapsed;
+            // Format and display the TimeSpan value.
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+            Debug.WriteLine("RunTime " + elapsedTime);
             PrintGrid(m_grid);
         }
 
@@ -157,8 +169,22 @@ namespace SudokuAppWPF
             Tuple<int, int> toAssign = SelectUnassignedVariable(csp);
             if (toAssign == null) return null;
 
-            foreach (int value in csp.Domains[toAssign.Item1, toAssign.Item2])
-            {
+            /*int[] neighbourDomains = csp.NeighboursDomains(toAssign.Item1, toAssign.Item2);
+            List<int> nodeDomain = csp.Domains[toAssign.Item1, toAssign.Item2];
+
+            while (nodeDomain.Count != 0) {
+                int value = csp.LeastConstrainingValue(nodeDomain, neighbourDomains);
+                csp.SetValue(toAssign.Item1, toAssign.Item2, value);
+                nodeDomain.Remove(value);
+                int[,] result = RecursiveBackTracking(csp);
+                if (result != null)
+                {
+                    return result;
+                }
+                // Reset with old value
+                csp.SetValue(toAssign.Item1, toAssign.Item2, -1);
+            }*/
+            foreach (int value in csp.Domains[toAssign.Item1, toAssign.Item2]) {
                 csp.SetValue(toAssign.Item1, toAssign.Item2, value);
                 int[,] result = RecursiveBackTracking(csp);
                 if (result != null)
