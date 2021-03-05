@@ -13,6 +13,9 @@ namespace SudokuAppWPF
                 get => m_positionAttached;
             }
             List<CSPVariable> m_neighbors;
+            public List<CSPVariable> Neighbors {
+                get => m_neighbors;
+            }
 
             int m_currentValue;
             int m_remainingConstraint;
@@ -51,7 +54,7 @@ namespace SudokuAppWPF
                     m_remainingConstraint++;
                     if (HasSetValue() && !neighbor.HasSetValue())
                     {
-                        neighbor.RemoveValueFromDomains(m_currentValue);
+                        neighbor.RemoveValueFromDomain(m_currentValue);
                         neighbor.m_remainingConstraint--;
                     }
                 }
@@ -83,7 +86,7 @@ namespace SudokuAppWPF
                 m_domains.Add(value);
             }
 
-            public void RemoveValueFromDomains(int value)
+            public void RemoveValueFromDomain(int value)
             {
                 m_domains.Remove(value);
             }
@@ -93,7 +96,7 @@ namespace SudokuAppWPF
                 m_currentValue = value;
                 foreach (CSPVariable neighbor in m_neighbors)
                 {
-                    neighbor.RemoveValueFromDomains(value);
+                    neighbor.RemoveValueFromDomain(value);
                     neighbor.m_remainingConstraint--;
                 }
             }
@@ -110,7 +113,6 @@ namespace SudokuAppWPF
                     neighbor.AddValueInDomains(resetedValue);
                     neighbor.m_remainingConstraint++;
                 }
-
             }
         }
 
@@ -120,17 +122,12 @@ namespace SudokuAppWPF
             get => m_remainingVariable.Count;
         }
 
-        int[,] m_grid;
-        public int[,] Grid {
-            get => m_grid;
-        }
 
         public SudokuCSP(int[,] grid)
         {
-            m_grid = grid;
             m_remainingVariable = new List<CSPVariable>();
             m_constraints = new List<Tuple<CSPVariable, CSPVariable>>();
-            BuildGraph(m_grid);
+            BuildGraph(grid);
             return;
         }
 
@@ -196,15 +193,12 @@ namespace SudokuAppWPF
         public void SetValue(CSPVariable variable, int value)
         {
             variable.SetValue(value);
-            m_grid[variable.Position.Item1, variable.Position.Item2] = value;
             m_remainingVariable.Remove(variable);
             return;
         }
 
         public void ResetValue(CSPVariable variable) {
             variable.ResetValue();
-            //Line not necessary can remove after test
-            m_grid[variable.Position.Item1, variable.Position.Item2] = -1;
             m_remainingVariable.Add(variable);
             return;
         }
@@ -260,7 +254,33 @@ namespace SudokuAppWPF
             return bestValue;
         }
 
+        public void ACThree() {
+            //Queue is as effecient as list can't optimize this 
+            Queue<Tuple<CSPVariable, CSPVariable>> arcs = new Queue<Tuple<CSPVariable, CSPVariable>>(m_constraints);
 
+            while (arcs.Count != 0) {
+                Tuple<CSPVariable, CSPVariable> arc = arcs.Dequeue();
+                if (arc.Item1.HasSetValue() || arc.Item2.HasSetValue()) break;
+                if (RemoveInconsistentValue(arc)) {
+                    foreach (CSPVariable neighbor in arc.Item1.Neighbors) {
+                        if(!neighbor.HasSetValue()) arcs.Enqueue(new Tuple<CSPVariable, CSPVariable>(neighbor, arc.Item1));
+                    }
+                }
+            }
+        }
+
+        bool RemoveInconsistentValue(Tuple<CSPVariable, CSPVariable> arc) {
+            bool removed = false;
+            List<int> domainsNode1 = new List<int>(arc.Item1.NodeDomain);
+            foreach (int x in domainsNode1) {
+                //Contains seems actually faster than equal 
+                if (arc.Item2.NodeDomain.Contains(x) && arc.Item2.DomainSize == 1) {
+                    arc.Item1.RemoveValueFromDomain(x);
+                    removed = true;
+                }
+            }
+            return removed;
+        }
 
     }
 }

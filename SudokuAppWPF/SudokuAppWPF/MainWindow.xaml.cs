@@ -101,7 +101,19 @@ namespace SudokuAppWPF
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append(value);
             m_DisplayGrid[posX, posY].Visibility = Visibility.Visible;
+            m_DisplayGrid[posX, posY].Foreground = Brushes.Black;
             m_DisplayGrid[posX, posY].Text = stringBuilder.ToString();
+        }
+
+        public void UpdateCaseSolution(int posX, int posY, int value)
+        {
+            if (m_DisplayGrid[posX, posY].Visibility != Visibility.Visible) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.Append(value);
+                m_DisplayGrid[posX, posY].Visibility = Visibility.Visible;
+                m_DisplayGrid[posX, posY].Foreground = Brushes.Blue;
+                m_DisplayGrid[posX, posY].Text = stringBuilder.ToString();
+            }
         }
 
         public void ClearSudoku() {
