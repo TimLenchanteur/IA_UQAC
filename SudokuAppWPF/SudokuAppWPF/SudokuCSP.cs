@@ -255,8 +255,20 @@ namespace SudokuAppWPF
         }
 
         public void ACThree() {
-            //Queue is as effecient as list can't optimize this 
-            Queue<Tuple<CSPVariable, CSPVariable>> arcs = new Queue<Tuple<CSPVariable, CSPVariable>>(m_constraints);
+            Queue<Tuple<CSPVariable, CSPVariable>> arcs = new Queue<Tuple<CSPVariable, CSPVariable>>();
+
+            //we go through the list once and copy the arcs that will be needed again to the queue
+            foreach(Tuple<CSPVariable, CSPVariable> arc in m_constraints)
+            {
+                if (arc.Item1.HasSetValue() || arc.Item2.HasSetValue()) break;
+                if (RemoveInconsistentValue(arc))
+                {
+                    foreach (CSPVariable neighbor in arc.Item1.Neighbors)
+                    {
+                        if (!neighbor.HasSetValue()) arcs.Enqueue(new Tuple<CSPVariable, CSPVariable>(neighbor, arc.Item1));
+                    }
+                }
+            }
 
             while (arcs.Count != 0) {
                 Tuple<CSPVariable, CSPVariable> arc = arcs.Dequeue();
