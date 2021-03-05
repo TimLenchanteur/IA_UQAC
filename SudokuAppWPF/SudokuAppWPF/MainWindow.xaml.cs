@@ -115,7 +115,6 @@ namespace SudokuAppWPF
         private void SolveCurrent(object sender, RoutedEventArgs e)
         {
             m_CurrentSudoku.Solve();
-            m_CurrentSudoku.DisplayGrid();
         }
 
         private void LoadSudokuClick(object sender, RoutedEventArgs e)

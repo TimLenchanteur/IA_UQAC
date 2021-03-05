@@ -147,7 +147,8 @@ namespace SudokuAppWPF
         {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            m_grid = RecursiveBackTracking(new SudokuCSP(m_grid));
+            int[,] res = RecursiveBackTracking(new SudokuCSP(m_grid));
+            if (res != null) m_grid = res;
             stopWatch.Stop();
             // Get the elapsed time as a TimeSpan value.
             TimeSpan ts = stopWatch.Elapsed;
@@ -156,68 +157,51 @@ namespace SudokuAppWPF
                 ts.Hours, ts.Minutes, ts.Seconds,
                 ts.Milliseconds / 10);
             Debug.WriteLine("RunTime " + elapsedTime);
-            PrintGrid(m_grid);
+            if (res != null) {
+                PrintGrid(m_grid);
+                DisplayGrid();
+            }
+            else Debug.WriteLine("Couldn't solve sudoku");
         }
 
         int[,] RecursiveBackTracking(SudokuCSP csp)
         {
-            if (IsComplete(csp.Grid))
+            if (IsComplete(csp))
             {
                 return csp.Grid;
             }
 
-            Tuple<int, int> toAssign = SelectUnassignedVariable(csp);
+            SudokuCSP.CSPVariable toAssign = SelectUnassignedVariable(csp);
             if (toAssign == null) return null;
 
-            /*int[] neighbourDomains = csp.NeighboursDomains(toAssign.Item1, toAssign.Item2);
-            List<int> nodeDomain = csp.Domains[toAssign.Item1, toAssign.Item2];
+            int[] neighbourDomains = toAssign.NeighorsDomains();
+            List<int> nodeDomain = new List<int>(toAssign.NodeDomain);
 
-            while (nodeDomain.Count != 0) {
+            while (nodeDomain.Count != 0)
+            {
                 int value = csp.LeastConstrainingValue(nodeDomain, neighbourDomains);
-                csp.SetValue(toAssign.Item1, toAssign.Item2, value);
+                csp.SetValue(toAssign, value);
                 nodeDomain.Remove(value);
                 int[,] result = RecursiveBackTracking(csp);
-                if (result != null)
-                {
-                    return result;
-                }
+                if (result != null) return result;
                 // Reset with old value
-                csp.SetValue(toAssign.Item1, toAssign.Item2, -1);
-            }*/
-            foreach (int value in csp.Domains[toAssign.Item1, toAssign.Item2]) {
-                csp.SetValue(toAssign.Item1, toAssign.Item2, value);
-                int[,] result = RecursiveBackTracking(csp);
-                if (result != null)
-                {
-                    return result;
-                }
-                // Reset with old value
-                csp.SetValue(toAssign.Item1, toAssign.Item2, -1);
+                csp.ResetValue(toAssign);
             }
+
             return null;
         }
 
-        private bool IsComplete(int[,] assignment)
+        private bool IsComplete(SudokuCSP csp)
         {
-            foreach (int i in assignment)
-            {
-                if (i == -1)
-                {
-                    return false;
-                }
-            }
-            return true;
+            return csp.RemainingVariable == 0;
         }
 
-        private Tuple<int, int> SelectUnassignedVariable(SudokuCSP csp)
+        private SudokuCSP.CSPVariable SelectUnassignedVariable(SudokuCSP csp)
         {
             var mrvValues = csp.MinimumRemainingValues();
-            Tuple<int, int> toAssign = csp.DegreeHeuristic(mrvValues)[0];
+            SudokuCSP.CSPVariable toAssign = csp.DegreeHeuristic(mrvValues)[0];
 
-            if (csp.Domains[toAssign.Item1, toAssign.Item2].Count == 0)
-            {
-                return null;
-            }
+            if (toAssign.DomainSize == 0) return null;
             return toAssign;
         }
     }
