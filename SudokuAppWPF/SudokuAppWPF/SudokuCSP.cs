@@ -26,12 +26,14 @@ namespace SudokuAppWPF
 
             int m_maxDomainValues;
             List<int> m_domains;
+            Stack<List<int>> m_savedDomains;
             public List<int> NodeDomain {
                 get => m_domains;
             }
             public int DomainSize {
                 get => m_domains.Count;
             }
+
 
             public CSPVariable(Tuple<int, int> position, int sizeSquare) {
                 m_positionAttached = position;
@@ -40,6 +42,7 @@ namespace SudokuAppWPF
                 m_maxDomainValues = sizeSquare;
                 m_domains = new List<int>(Enumerable.Range(1, sizeSquare));
                 m_remainingConstraint = 0;
+                m_savedDomains = new Stack<List<int>>();
             }
 
             /// <summary>
@@ -48,15 +51,12 @@ namespace SudokuAppWPF
             /// </summary>
             /// <param name="neighbor"></param>
             public void AddNeigbhor(CSPVariable neighbor) {
-                if (!m_neighbors.Contains(neighbor))
+                m_neighbors.Add(neighbor);
+                m_remainingConstraint++;
+                if (HasSetValue() && !neighbor.HasSetValue())
                 {
-                    m_neighbors.Add(neighbor);
-                    m_remainingConstraint++;
-                    if (HasSetValue() && !neighbor.HasSetValue())
-                    {
-                        neighbor.RemoveValueFromDomain(m_currentValue);
-                        neighbor.m_remainingConstraint--;
-                    }
+                    neighbor.RemoveValueFromDomain(m_currentValue);
+                    neighbor.m_remainingConstraint--;
                 }
             }
 
@@ -76,6 +76,10 @@ namespace SudokuAppWPF
                 }
 
                 return domains;
+            }
+
+            public void SaveDomainAtDepth(List<int> domain) {
+                m_savedDomains.Push(domain);
             }
 
             public void AddValueInDomains(int value)
@@ -113,6 +117,10 @@ namespace SudokuAppWPF
                     neighbor.AddValueInDomains(resetedValue);
                     neighbor.m_remainingConstraint++;
                 }
+            }
+
+            public void ResetDomains() {
+                m_domains = m_savedDomains.Pop();
             }
         }
 
@@ -158,7 +166,6 @@ namespace SudokuAppWPF
                         {
                             m_constraints.Add(new Tuple<CSPVariable, CSPVariable>(grid[x, y], grid[x, k]));
                             grid[x, y].AddNeigbhor(grid[x, k]);
-                            grid[x, k].AddNeigbhor(grid[x,y]);
                         }
                     }
 
@@ -169,7 +176,6 @@ namespace SudokuAppWPF
                         {
                             m_constraints.Add(new Tuple<CSPVariable, CSPVariable>(grid[x, y], grid[k,y]));
                             grid[x, y].AddNeigbhor(grid[k, y]);
-                            grid[k, y].AddNeigbhor(grid[x, y]);
                         }
                     }
 
@@ -182,7 +188,6 @@ namespace SudokuAppWPF
                             {
                                 m_constraints.Add(new Tuple<CSPVariable, CSPVariable>(grid[x, y], grid[k, l]));
                                 grid[x, y].AddNeigbhor(grid[k, l]);
-                                grid[k, l].AddNeigbhor(grid[x, y]);
                             }
                         }
                     }
@@ -195,6 +200,13 @@ namespace SudokuAppWPF
             variable.SetValue(value);
             m_remainingVariable.Remove(variable);
             return;
+        }
+
+        public void ResetDomains(List<CSPVariable> changedVariables) {
+            foreach (CSPVariable changedVariable in changedVariables)
+            {
+                changedVariable.ResetDomains();
+            }
         }
 
         public void ResetValue(CSPVariable variable) {
@@ -254,14 +266,16 @@ namespace SudokuAppWPF
             return bestValue;
         }
 
-        public void ACThree() {
+        public List<CSPVariable> ACThree() {
+            //Queue is as effecient as list can't optimize this 
             Queue<Tuple<CSPVariable, CSPVariable>> arcs = new Queue<Tuple<CSPVariable, CSPVariable>>();
+            List<CSPVariable> changedVariables = new List<CSPVariable>();
 
-            //we go through the list once and copy the arcs that will be needed again to the queue
-            foreach(Tuple<CSPVariable, CSPVariable> arc in m_constraints)
+
+            foreach (Tuple<CSPVariable, CSPVariable> arc in m_constraints)
             {
-                if (arc.Item1.HasSetValue() || arc.Item2.HasSetValue()) break;
-                if (RemoveInconsistentValue(arc))
+                if (arc.Item1.HasSetValue() || arc.Item2.HasSetValue()) continue;
+                if (RemoveInconsistentValue(arc, changedVariables))
                 {
                     foreach (CSPVariable neighbor in arc.Item1.Neighbors)
                     {
@@ -272,24 +286,33 @@ namespace SudokuAppWPF
 
             while (arcs.Count != 0) {
                 Tuple<CSPVariable, CSPVariable> arc = arcs.Dequeue();
-                if (arc.Item1.HasSetValue() || arc.Item2.HasSetValue()) break;
-                if (RemoveInconsistentValue(arc)) {
+                if (arc.Item1.HasSetValue() || arc.Item2.HasSetValue()) continue;
+                if (RemoveInconsistentValue(arc,changedVariables)) {
                     foreach (CSPVariable neighbor in arc.Item1.Neighbors) {
-                        if(!neighbor.HasSetValue()) arcs.Enqueue(new Tuple<CSPVariable, CSPVariable>(neighbor, arc.Item1));
+                        if (!neighbor.HasSetValue()) {
+                            arcs.Enqueue(new Tuple<CSPVariable, CSPVariable>(neighbor, arc.Item1));
+                        } 
                     }
                 }
             }
+            return changedVariables;
         }
 
-        bool RemoveInconsistentValue(Tuple<CSPVariable, CSPVariable> arc) {
+        bool RemoveInconsistentValue(Tuple<CSPVariable, CSPVariable> arc, List<CSPVariable> changedVariables) {
             bool removed = false;
-            List<int> domainsNode1 = new List<int>(arc.Item1.NodeDomain);
+            CSPVariable variableToTest = arc.Item1;
+            CSPVariable variableNeighbor = arc.Item2;
+            List<int> domainsNode1 = new List<int>(variableToTest.NodeDomain);
             foreach (int x in domainsNode1) {
                 //Contains seems actually faster than equal 
-                if (arc.Item2.NodeDomain.Contains(x) && arc.Item2.DomainSize == 1) {
-                    arc.Item1.RemoveValueFromDomain(x);
+                if (variableNeighbor.NodeDomain.Contains(x) && variableNeighbor.DomainSize == 1) {
+                    variableToTest.RemoveValueFromDomain(x);
                     removed = true;
                 }
+            }
+            if (removed && !changedVariables.Contains(variableToTest)) {
+                variableToTest.SaveDomainAtDepth(domainsNode1);
+                changedVariables.Add(variableToTest);
             }
             return removed;
         }

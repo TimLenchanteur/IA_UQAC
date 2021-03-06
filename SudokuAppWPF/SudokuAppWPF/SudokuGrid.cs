@@ -93,8 +93,6 @@ namespace SudokuAppWPF
             }
         }
 
-      
-
         public void Solve()
         {
             Stopwatch stopWatch = new Stopwatch();
@@ -118,11 +116,15 @@ namespace SudokuAppWPF
         int[,] RecursiveBackTracking(SudokuCSP csp, int[,] assignement)
         {
             if (IsComplete(csp)) return assignement;
-            
-            csp.ACThree();
+
+            //List<SudokuCSP.CSPVariable> changedVariables = csp.ACThree();
 
             SudokuCSP.CSPVariable toAssign = SelectUnassignedVariable(csp);
-            if (toAssign == null) return null;
+            if (toAssign == null) {
+                //csp.ResetDomains(changedVariables);
+                return null;
+            }
+
 
             int[] neighbourDomains = toAssign.NeighorsDomains();
             List<int> nodeDomain = new List<int>(toAssign.NodeDomain);
@@ -134,7 +136,9 @@ namespace SudokuAppWPF
                 assignement[toAssign.Position.Item1, toAssign.Position.Item2] = value;
                 nodeDomain.Remove(value);
                 int[,] result = RecursiveBackTracking(csp, assignement);
-                if (result != null) return result;
+                if (result != null) {
+                    return result;
+                } 
                 // Reset with old value
                 csp.ResetValue(toAssign);
             }
