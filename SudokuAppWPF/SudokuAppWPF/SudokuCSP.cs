@@ -5,245 +5,184 @@ using System.Text;
 
 namespace SudokuAppWPF
 {
+    /// <summary>
+    /// Contraintes attribue aux variables d'un sudoku
+    /// </summary>
     public class SudokuCSP
     {
-        public class CSPVariable {
-            Tuple<int, int> m_positionAttached;
-            public Tuple<int, int> Position {
-                get => m_positionAttached;
-            }
-            List<CSPVariable> m_neighbors;
-            public List<CSPVariable> Neighbors {
-                get => m_neighbors;
-            }
+        // Taille d'une ligne du sudoku
+        int m_size;
+        // Valeurs legales courante de chaque variable
+        List<int>[,] m_variablesDomain;
+        // Voisins de chaque variables sur le graphe csp
+        // Chaque couple variable, voisin represente une contrainte binaire
+        List<SudokuSolver.SudokuVariable>[,] m_variablesNeighbors;
+        // Voisins non attribue de chaque variables sur le graphe csp 
+        List<SudokuSolver.SudokuVariable>[,] m_variableRemainingNeighbor;
 
-            int m_currentValue;
-            int m_remainingConstraint;
-            public int RemainingConstraint
+        /// <summary>
+        /// Constructeur
+        /// </summary>
+        /// <param name="assignment">Attribution initiale du sudoku</param>
+        public SudokuCSP(SudokuSolver.SudokuAssignment assignment) {
+            m_size = assignment.Size;
+            int[,] grid = assignment.Grid;
+            m_variablesDomain = new List<int>[m_size, m_size];
+            m_variablesNeighbors = new List<SudokuSolver.SudokuVariable>[m_size,m_size];
+            m_variableRemainingNeighbor = new List<SudokuSolver.SudokuVariable>[m_size, m_size];
+
+            SudokuSolver.SudokuVariable[,] tempVariableGrid = new SudokuSolver.SudokuVariable[m_size, m_size];
+
+            // Creer les variables
+            for (int x = 0; x < m_size; x++)
             {
-                get => m_remainingConstraint;
-            }
-
-            int m_maxDomainValues;
-            List<int> m_domains;
-            Stack<List<int>> m_savedDomains;
-            public List<int> NodeDomain {
-                get => m_domains;
-            }
-            public int DomainSize {
-                get => m_domains.Count;
-            }
-
-
-            public CSPVariable(Tuple<int, int> position, int sizeSquare) {
-                m_positionAttached = position;
-                m_neighbors = new List<CSPVariable>();
-                m_currentValue = -1;
-                m_maxDomainValues = sizeSquare;
-                m_domains = new List<int>(Enumerable.Range(1, sizeSquare));
-                m_remainingConstraint = 0;
-                m_savedDomains = new Stack<List<int>>();
-            }
-
-            /// <summary>
-            /// 
-            /// Appelez cette fonction uniquement a la construction
-            /// </summary>
-            /// <param name="neighbor"></param>
-            public void AddNeigbhor(CSPVariable neighbor) {
-                m_neighbors.Add(neighbor);
-                m_remainingConstraint++;
-                if (HasSetValue() && !neighbor.HasSetValue())
+                for (int y = 0; y < m_size; y++)
                 {
-                    neighbor.RemoveValueFromDomain(m_currentValue);
-                    neighbor.m_remainingConstraint--;
+                    tempVariableGrid[x, y] = new SudokuSolver.SudokuVariable(x,y);
+                    m_variablesDomain[x,y] = new List<int>(Enumerable.Range(1, m_size));
+                    m_variablesNeighbors[x,y] = new List<SudokuSolver.SudokuVariable>();
+                    m_variableRemainingNeighbor[x,y] = new List<SudokuSolver.SudokuVariable>();
                 }
             }
 
-            public int[] NeighorsDomains() {
-                int[] domains = new int[m_maxDomainValues + 1];
-
-                for (int k = 0; k < domains.Length; k++)
+            int squareSize = (int)Math.Sqrt(m_size);
+            // Creer les contraintes
+            for (int x = 0; x < m_size; x++)
+            {
+                for (int y = 0; y < m_size; y++)
                 {
-                    domains[k] = 0;
-                }
 
-                foreach (CSPVariable neighbors in m_neighbors) {
-                    foreach (int nonConstrainedValue in neighbors.m_domains)
-                    {
-                        domains[nonConstrainedValue] += 1;
+                    // Si la variable a deja ete assigne on peut mettre a jour son domaine et ne pas chercher ses voisins
+                    if (grid[x,y] != -1) {
+                        m_variablesDomain[x,y].Clear();
+                        m_variablesDomain[x, y].Add(grid[x, y]);
+                        continue;
                     }
-                }
 
-                return domains;
-            }
-
-            public void SaveDomainAtDepth(List<int> domain) {
-                m_savedDomains.Push(domain);
-            }
-
-            public void AddValueInDomains(int value)
-            {
-                foreach (CSPVariable neighbor in m_neighbors) {
-                    if (neighbor.m_currentValue == value) return;
-                }
-                m_domains.Add(value);
-            }
-
-            public void RemoveValueFromDomain(int value)
-            {
-                m_domains.Remove(value);
-            }
-
-            public void SetValue(int value)
-            {
-                m_currentValue = value;
-                foreach (CSPVariable neighbor in m_neighbors)
-                {
-                    neighbor.RemoveValueFromDomain(value);
-                    neighbor.m_remainingConstraint--;
-                }
-            }
-
-            public bool HasSetValue() {
-                return m_currentValue != -1;
-            }
-
-            public void ResetValue() {
-                int resetedValue = m_currentValue;
-                m_currentValue = -1;
-                foreach (CSPVariable neighbor in m_neighbors)
-                {
-                    neighbor.AddValueInDomains(resetedValue);
-                    neighbor.m_remainingConstraint++;
-                }
-            }
-
-            public void ResetDomains() {
-                m_domains = m_savedDomains.Pop();
-            }
-        }
-
-        public List<CSPVariable> m_remainingVariable;
-        List<Tuple<CSPVariable, CSPVariable>> m_constraints;
-        public int RemainingVariable { 
-            get => m_remainingVariable.Count;
-        }
-
-
-        public SudokuCSP(int[,] grid)
-        {
-            m_remainingVariable = new List<CSPVariable>();
-            m_constraints = new List<Tuple<CSPVariable, CSPVariable>>();
-            BuildGraph(grid);
-            return;
-        }
-
-        void BuildGraph(int[,] grid) {
-            int squareSize = (int)Math.Sqrt(grid.Length);
-            CSPVariable[,] tempVariableGrid = new CSPVariable[squareSize, squareSize];
-
-            for (int x = 0; x < squareSize; x++) {
-                for (int y = 0; y < squareSize; y++) {
-                    tempVariableGrid[x, y] = new CSPVariable(new Tuple<int, int>(x, y), squareSize);
-                    if (grid[x, y] != -1) tempVariableGrid[x, y].SetValue(grid[x, y]);
-                    else m_remainingVariable.Add(tempVariableGrid[x, y]);
-                }
-            }
-
-            CreateConstraint(tempVariableGrid, squareSize);
-        }
-
-        void CreateConstraint(CSPVariable[,] grid, int gridSize) {
-
-            for (int x = 0; x < gridSize; x++) {
-                for (int y = 0; y < gridSize; y++) {
-
-                    //Column
-                    for (int k = 0; k < gridSize; k++)
+                    // Sinon on l'ajoute a la liste des variable non assignes
+                    assignment.AddRemainingVariable(tempVariableGrid[x, y]);
+                    
+                    // On va aussi chercher tous ses voisins 
+                    // Si l'un d'entre eux a ete assigne on enleve sa valeur des valeurs legal de la variable courente, il n'est aussi pas
+                    // necessaire de l'ajouter a la liste des voisins restant de cette variables
+                    // Colonnes
+                    for (int k = 0; k < m_size; k++)
                     {
                         if (k != y)
                         {
-                            m_constraints.Add(new Tuple<CSPVariable, CSPVariable>(grid[x, y], grid[x, k]));
-                            grid[x, y].AddNeigbhor(grid[x, k]);
+                            m_variablesNeighbors[x, y].Add(tempVariableGrid[x, k]);
+                            if (grid[x, k] != -1) m_variablesDomain[x, y].Remove(grid[x, k]);
+                            else m_variableRemainingNeighbor[x, y].Add(tempVariableGrid[x, k]);
                         }
                     }
 
-                    //Line
-                    for (int k = 0; k < gridSize; k++)
+                    // Lignes 
+                    for (int k = 0; k < m_size; k++)
                     {
                         if (k != x)
                         {
-                            m_constraints.Add(new Tuple<CSPVariable, CSPVariable>(grid[x, y], grid[k,y]));
-                            grid[x, y].AddNeigbhor(grid[k, y]);
+                            m_variablesNeighbors[x, y].Add(tempVariableGrid[k,y]);
+                            if (grid[k, y] != -1) m_variablesDomain[x, y].Remove(grid[k, y]);
+                            else m_variableRemainingNeighbor[x, y].Add(tempVariableGrid[k, y]);
                         }
                     }
 
-                    //check square
-                    for (int k = (x / 3) * 3; k < (x / 3) * 3 + 3; k++)
+                    // Carre
+                    for (int k = (x / squareSize) * squareSize; k < (x / squareSize) * squareSize + squareSize; k++)
                     {
-                        for (int l = (y / 3) * 3; l < (y / 3) * 3 + 3; l++)
+                        for (int l = (y / squareSize) * squareSize; l < (y / squareSize) * squareSize + squareSize; l++)
                         {
                             if (x != k && y != l)
                             {
-                                m_constraints.Add(new Tuple<CSPVariable, CSPVariable>(grid[x, y], grid[k, l]));
-                                grid[x, y].AddNeigbhor(grid[k, l]);
+                                m_variablesNeighbors[x, y].Add(tempVariableGrid[k, l]);
+                                if (grid[k, l] != -1) m_variablesDomain[x, y].Remove(grid[k, l]);
+                                else m_variableRemainingNeighbor[x, y].Add(tempVariableGrid[k, l]);
                             }
                         }
                     }
                 }
             }
+
         }
 
-        public void SetValue(CSPVariable variable, int value)
-        {
-            variable.SetValue(value);
-            m_remainingVariable.Remove(variable);
-            return;
-        }
+        /// <summary>
+        /// Constructeur de copie
+        /// </summary>
+        /// <param name="otherCSP">Le CSP a copie</param>
+        public SudokuCSP(SudokuCSP otherCSP) {
+            m_size = otherCSP.m_size;
+            m_variablesNeighbors = otherCSP.m_variablesNeighbors;
+            m_variablesDomain = new List<int>[m_size, m_size];
+            m_variableRemainingNeighbor = new List<SudokuSolver.SudokuVariable>[m_size, m_size];
 
-        public void ResetDomains(List<CSPVariable> changedVariables) {
-            foreach (CSPVariable changedVariable in changedVariables)
+            for (int x = 0; x < m_size; x++)
             {
-                changedVariable.ResetDomains();
+                for (int y = 0; y < m_size; y++)
+                {
+                    m_variablesDomain[x, y] = new List<int>(otherCSP.m_variablesDomain[x,y]);
+                    m_variableRemainingNeighbor[x, y] = new List<SudokuSolver.SudokuVariable>(otherCSP.m_variableRemainingNeighbor[x, y]);
+                }
             }
         }
 
-        public void ResetValue(CSPVariable variable) {
-            variable.ResetValue();
-            m_remainingVariable.Add(variable);
-            return;
+        /// <summary>
+        /// La valeur qui vient d'etre attribue est t'elle consistante avec les contrainte ?
+        /// </summary>
+        /// <param name="variable">Variable attribue</param>
+        /// <param name="value">Valeur attribue</param>
+        /// <returns>vrai si c'est la cas, faux sinon</returns>
+        public bool IsValueConsistent(SudokuSolver.SudokuVariable variable, int value) {
+            // Regarde si la valeur appartient au valeur legale de la variable
+            // On peut se permettre de faire ca car on utilise du forward checking, sinon il faudrait tester les contraintes une par une a partir de l'assignement
+            return m_variablesDomain[variable.X, variable.Y].Contains(value);
         }
 
-        public List<CSPVariable> MinimumRemainingValues()
+        /// <summary>
+        /// Retourne une liste des variables auquel il reste le moins de variables legales
+        /// </summary>
+        /// <param name="assignment"></param>
+        /// <returns>Les variables qui contiennent le moins de valeurs legales</returns>
+        public List<SudokuSolver.SudokuVariable> MinimumRemainingValues(SudokuSolver.SudokuAssignment assignment)
         {
             int mrv = 10;
-            List<CSPVariable> values = new List<CSPVariable>();
-            foreach (CSPVariable variable in m_remainingVariable) {
-                if (variable.DomainSize < mrv)
+            List<SudokuSolver.SudokuVariable> values = new List<SudokuSolver.SudokuVariable>();
+            foreach (SudokuSolver.SudokuVariable variable in assignment.RemainingVariable)
+            {
+                // Recupere le nombre de valeurs restante de la variable
+                // On peut se permettre de faire ca car on utilise le forward checking
+                // Dans le cas contraire il aurait fallu regarder tous les voisin pour chaque variables
+                int domainSize = m_variablesDomain[variable.X, variable.Y].Count;
+                if(domainSize < mrv)
                 {
-                    mrv = variable.DomainSize;
+                    mrv = domainSize;
                     values.Clear();
                     values.Add(variable);
                 }
-                else if (variable.DomainSize == mrv) values.Add(variable);
+                else if (domainSize == mrv) values.Add(variable);
             }
             return values;
         }
 
-        public List<CSPVariable> DegreeHeuristic(List<CSPVariable> mrvValues)
+        /// <summary>
+        /// Selectionne les variables qui sont le moins contrainte parmis celle restant a attribues
+        /// </summary>
+        /// <param name="mrvValues">Une liste de variables</param>
+        /// <returns>Une liste des variables les moins contraintes</returns>
+        public List<SudokuSolver.SudokuVariable> DegreeHeuristic(List<SudokuSolver.SudokuVariable> mrvValues)
         {
             int maxConstraints = 0;
-            List<CSPVariable> degreeValues = new List<CSPVariable>();
+            List<SudokuSolver.SudokuVariable> degreeValues = new List<SudokuSolver.SudokuVariable>();
+            // Pour le moment les voisins restant sont gerer dans le forward checking pour eviter certaines operations (reinserer la variable non assigne dans les voisins restant)
             foreach (var variable in mrvValues)
             {
-                if (variable.RemainingConstraint > maxConstraints)
+                int remainingConstraints = m_variableRemainingNeighbor[variable.X, variable.Y].Count;
+                if (remainingConstraints > maxConstraints)
                 {
-                    maxConstraints = variable.RemainingConstraint;
+                    maxConstraints = remainingConstraints;
                     degreeValues.Clear();
                     degreeValues.Add(variable);
                 }
-                else if (variable.RemainingConstraint == maxConstraints)
+                else if (remainingConstraints == maxConstraints)
                 {
                     degreeValues.Add(variable);
                 }
@@ -251,71 +190,142 @@ namespace SudokuAppWPF
             return degreeValues;
         }
 
+        /// <summary>
+        /// Compte le nombre de contraintes pour chaque valeurs possible d'une variables
+        /// </summary>
+        /// <param name="variable">La variable</param>
+        /// <returns>Nombre de contraintes pour chaque valeur possible dune variable</returns>
+        public int[] NeighborsDomains(SudokuSolver.SudokuVariable variable) {
+            int[] neighborsDomains = new int[m_size];
+
+            for (int i = 0; i < m_size; i++) {
+                neighborsDomains[i] = 0;
+            }
+
+            // Cela marche seulement parce que les domaines sont mis a jour dans le forward checking sans lui
+            // il faudrait passer l'assignement et verifier pour tout les voisins et negligeant les voisins assigne
+            foreach (SudokuSolver.SudokuVariable neighbors in m_variableRemainingNeighbor[variable.X, variable.Y]) {
+                foreach (int value in m_variablesDomain[neighbors.X, neighbors.Y]) {
+                    neighborsDomains[value - 1]++;
+                }
+            }
+            return neighborsDomains;
+        }
+
+        /// <summary>
+        /// Les valeurs legales restantes d'une variable
+        /// </summary>
+        /// <param name="variable">La variable</param>
+        /// <returns>Une liste des valeurs legales restante de la variable</returns>
+        public List<int> VariableDomains(SudokuSolver.SudokuVariable variable) {
+            return m_variablesDomain[variable.X, variable.Y];
+        }
+
+        /// <summary>
+        /// Retourne la valeur la moins contraignante parmi celle renseigne
+        /// </summary>
+        /// <param name="currentDomain">Les valeurs legale a regarder</param>
+        /// <param name="neighbourDomain">Un tableau liant les valeurs legales au nombre de contraintes exerces sur celle-ci</param>
+        /// <returns>La valeur la moins contraignante </returns>
         public int LeastConstrainingValue(List<int> currentDomain, int[] neighbourDomain)
         {
             int minConstraint = int.MaxValue;
             int bestValue = -1;
             foreach (int value in currentDomain)
             {
-                if (minConstraint > neighbourDomain[value])
+                if (minConstraint > neighbourDomain[value-1])
                 {
-                    minConstraint = neighbourDomain[value];
+                    minConstraint = neighbourDomain[value-1];
                     bestValue = value;
                 }
             }
             return bestValue;
         }
 
-        public List<CSPVariable> ACThree() {
-            //Queue is as effecient as list can't optimize this 
-            Queue<Tuple<CSPVariable, CSPVariable>> arcs = new Queue<Tuple<CSPVariable, CSPVariable>>();
-            List<CSPVariable> changedVariables = new List<CSPVariable>();
+        /// <summary>
+        /// Algorithme permettant de verifier avec un temps d'avance si des valeurs legales ne pourront jamais etre assigne a une variable
+        /// </summary>
+        /// <param name="cspBase">Les contraintes actuelles sur le sudoku</param>
+        /// <param name="assignement">L'attribution actuelle des variables</param>
+        /// <param name="lastAssignedVariable">La derniere variable attribue</param>
+        /// <returns>Les contraintes possiblement avec des valeurs legales en moins</returns>
+        public static SudokuCSP ACThree(SudokuCSP cspBase, SudokuSolver.SudokuAssignment assignement, SudokuSolver.SudokuVariable lastAssignedVariable) {
+            // Le fait d'effectuer une copie permet de ne pas avoir a s'inquieter de reset les changements qui on ete effectue 
+            // dans l'algorithme si le chemin n'est pas retenue
+            // Cela amene cependant une complexite suplementaire dans l'algorithme
+            SudokuCSP newCsp = new SudokuCSP(cspBase);
 
+            // On modifie a jour le domaine de la derniere variable assigne 
+            // Cela est fait dans cette fonction car cela permet de ne pas avoir a se souvenir du domaine modifie
+            // si jamais l'assignement de cette variable ne permet pas de resoudre le sudoku
+            newCsp.m_variablesDomain[lastAssignedVariable.X, lastAssignedVariable.Y].Clear();
+            newCsp.m_variablesDomain[lastAssignedVariable.X, lastAssignedVariable.Y].Add(assignement.Grid[lastAssignedVariable.X, lastAssignedVariable.Y]);
+            foreach (SudokuSolver.SudokuVariable neighbor in newCsp.m_variableRemainingNeighbor[lastAssignedVariable.X, lastAssignedVariable.Y]) {
+                newCsp.m_variableRemainingNeighbor[neighbor.X, neighbor.Y].Remove(lastAssignedVariable);
+            }
 
-            foreach (Tuple<CSPVariable, CSPVariable> arc in m_constraints)
+            Queue<Tuple<SudokuSolver.SudokuVariable, SudokuSolver.SudokuVariable>> arcs = new Queue<Tuple<SudokuSolver.SudokuVariable, SudokuSolver.SudokuVariable>>();
+            
+            // On fait d'abord un tour sur les arcs entre toute les variables restantes et leur voisin
+            foreach (SudokuSolver.SudokuVariable remainingVariable in assignement.RemainingVariable)
             {
-                if (arc.Item1.HasSetValue() || arc.Item2.HasSetValue()) continue;
-                if (RemoveInconsistentValue(arc, changedVariables))
+                // Ici du fait que l'on sache dans quel variable on va modifier les domaines, on peut se permettre de ne pas rajouter ses voisins
+                // a chaque fois qu'on lui enleve un domaine 
+                bool remove = false;
+                foreach (SudokuSolver.SudokuVariable neighbor in newCsp.m_variablesNeighbors[remainingVariable.X, remainingVariable.Y]) {
+                    remove |= RemoveInconsistentValue(newCsp, remainingVariable, neighbor);
+                }
+                if (remove)
                 {
-                    foreach (CSPVariable neighbor in arc.Item1.Neighbors)
+                    foreach (SudokuSolver.SudokuVariable remainingNeighbor in newCsp.m_variableRemainingNeighbor[remainingVariable.X, remainingVariable.Y])
                     {
-                        if (!neighbor.HasSetValue()) arcs.Enqueue(new Tuple<CSPVariable, CSPVariable>(neighbor, arc.Item1));
+                        arcs.Enqueue(new Tuple<SudokuSolver.SudokuVariable, SudokuSolver.SudokuVariable>(remainingNeighbor, remainingVariable));
                     }
                 }
             }
 
-            while (arcs.Count != 0) {
-                Tuple<CSPVariable, CSPVariable> arc = arcs.Dequeue();
-                if (arc.Item1.HasSetValue() || arc.Item2.HasSetValue()) continue;
-                if (RemoveInconsistentValue(arc,changedVariables)) {
-                    foreach (CSPVariable neighbor in arc.Item1.Neighbors) {
-                        if (!neighbor.HasSetValue()) {
-                            arcs.Enqueue(new Tuple<CSPVariable, CSPVariable>(neighbor, arc.Item1));
-                        } 
+            // On effectue ensuite les operations necessaire sur la queue jusqu'a ce que celle-ci soit vide
+            while (arcs.Count != 0)
+            {
+                Tuple<SudokuSolver.SudokuVariable, SudokuSolver.SudokuVariable> arc = arcs.Dequeue();
+                if (RemoveInconsistentValue(newCsp, arc.Item1, arc.Item2))
+                {
+                    foreach (SudokuSolver.SudokuVariable remainingNeighbor in newCsp.m_variableRemainingNeighbor[arc.Item1.X, arc.Item1.Y])
+                    {
+                        arcs.Enqueue(new Tuple<SudokuSolver.SudokuVariable, SudokuSolver.SudokuVariable>(remainingNeighbor, arc.Item1));
                     }
                 }
             }
-            return changedVariables;
+
+            return newCsp;
         }
 
-        bool RemoveInconsistentValue(Tuple<CSPVariable, CSPVariable> arc, List<CSPVariable> changedVariables) {
+        /// <summary>
+        /// Enleve les valeurs inconsistante des valeurs legales d'une variable
+        /// </summary>
+        /// <param name="csp">Les contraintes actuelle sur le sudoku</param>
+        /// <param name="variableToCheck">La variables dont on verifie les valeurs legales</param>
+        /// <param name="variableNeighbor">Un voisin de la variable</param>
+        /// <returns></returns>
+        static bool RemoveInconsistentValue(SudokuCSP csp, SudokuSolver.SudokuVariable variableToCheck, SudokuSolver.SudokuVariable variableNeighbor)
+        {
             bool removed = false;
-            CSPVariable variableToTest = arc.Item1;
-            CSPVariable variableNeighbor = arc.Item2;
-            List<int> domainsNode1 = new List<int>(variableToTest.NodeDomain);
-            foreach (int x in domainsNode1) {
-                //Contains seems actually faster than equal 
-                if (variableNeighbor.NodeDomain.Contains(x) && variableNeighbor.DomainSize == 1) {
-                    variableToTest.RemoveValueFromDomain(x);
+            List<int> domainsNode1 = new List<int>(csp.m_variablesDomain[variableToCheck.X, variableToCheck.Y]);
+            List<int> domaineNode2 = csp.m_variablesDomain[variableNeighbor.X, variableNeighbor.Y];
+            foreach (int x in domainsNode1)
+            {
+                // Si le domaine de la variable voisine ne contient qu'une seule valeur c'est qu'elle a soit ete assigne
+                // soit c'est la seule variable que l'on peut lui assigne. 
+                // Dans tous les cas on ne pourra pas donner cette valeur a la variable courante
+                if (domaineNode2.Contains(x) && domaineNode2.Count == 1) {
+                    csp.m_variablesDomain[variableToCheck.X, variableToCheck.Y].Remove(x);
                     removed = true;
+                    break;
                 }
-            }
-            if (removed && !changedVariables.Contains(variableToTest)) {
-                variableToTest.SaveDomainAtDepth(domainsNode1);
-                changedVariables.Add(variableToTest);
             }
             return removed;
         }
 
     }
 }
+

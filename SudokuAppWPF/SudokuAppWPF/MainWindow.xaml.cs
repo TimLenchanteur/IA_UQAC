@@ -18,7 +18,7 @@ using Microsoft.Win32;
 namespace SudokuAppWPF
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Class utilise pour realiser la logique de la partie graphique de l'application
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -47,6 +47,8 @@ namespace SudokuAppWPF
                     displayValue.FontSize = 30.0;
                     displayValue.TextAlignment = TextAlignment.Center;
                     displayValue.Visibility = Visibility.Collapsed;
+                    displayValue.BorderBrush = new SolidColorBrush(new Color());
+                    displayValue.BorderThickness = new Thickness(2);
                     if (x > 5) {
                         if (y > 5)
                         {
@@ -97,6 +99,12 @@ namespace SudokuAppWPF
             }
         }
 
+        public void UpdateResultText(bool reset, bool couldSolve, string elapsedTime) {
+            if (reset) ResultText.Text = "";
+            else if (couldSolve) ResultText.Text = "Résolu en " + elapsedTime;
+            else ResultText.Text = "Impossible de résoudre le sudoku";
+        }
+
         public void UpdateCase(int posX, int posY, int value) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append(value);
@@ -129,13 +137,21 @@ namespace SudokuAppWPF
             m_CurrentSudoku.Solve();
         }
 
+        /// <summary>
+        /// Charge un nouveau sudoku
+        /// </summary>
+        /// <param name="sender">Le button ayant appele cette fonction</param>
+        /// <param name="e">Parametre supplementaire si necessaire</param>
         private void LoadSudokuClick(object sender, RoutedEventArgs e)
-        { 
+        {
+            UpdateResultText(true, false, "");
+            // Ouvre une fenetre de dialogue permetant d'allez chercher le sudoku
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Sudoku files (*.ss)|*.ss";
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
             if (openFileDialog.ShowDialog() == true) {
+                // Affichage et sauvegarde temporaire du sudoku chargé
                 m_CurrentSudoku = new SudokuGrid(openFileDialog.FileName, this);
                 ClearSudoku();
                 m_CurrentSudoku.DisplayGrid();

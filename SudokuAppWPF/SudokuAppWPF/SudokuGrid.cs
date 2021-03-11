@@ -6,22 +6,30 @@ using System.Threading;
 
 namespace SudokuAppWPF
 {
+    /// <summary>
+    /// Classe representant l'environement dans lequel l'IA evolue
+    /// </summary>
     class SudokuGrid
     {
-        // Grid containing the value of sudoku
+        // Grille contenant les valeurs du sudoku
         int[,] m_grid;
         public int[,] Grid { get { return m_grid; } }
 
-        // For display and .ss files
+        // Pour afficher un print des fichiers .ss 
         char m_verticalSeparator = '!';
         char m_horizontalSeparator = '-';
         char m_emptyCell = '.';
 
+        // Variable identifiant les cases vides
         int m_emptyGridCell = -1;
 
-
+        // Communication avec la partie graphique de l'application
         MainWindow m_registeredMainWindow;
 
+        /// <summary>
+        /// Constructeur
+        /// </summary>
+        /// <param name="registerWindow">Classe depuis laquelle l'objet a ete construit</param>
         public SudokuGrid(MainWindow registerWindow)
         {
 
@@ -36,6 +44,11 @@ namespace SudokuAppWPF
             }
         }
 
+        /// <summary>
+        /// Constructeur
+        /// </summary>
+        /// <param name="file">Fichier a charger</param>
+        /// <param name="registerWindow">Classe depuis laquelle l'objet a ete construit</param>
         public SudokuGrid(string file, MainWindow registerWindow)
         {
             m_registeredMainWindow = registerWindow;
@@ -54,6 +67,10 @@ namespace SudokuAppWPF
             }
         }
 
+        /// <summary>
+        /// Lit le fichier fourni
+        /// </summary>
+        /// <param name="file">Adresse du fichier a lire</param>
         void ReadFile(string file)
         {
             string ending = file.Substring(file.Length - 3);
@@ -93,73 +110,38 @@ namespace SudokuAppWPF
             }
         }
 
+        /// <summary>
+        /// Resolu le sudoku actuellement charger
+        /// </summary>
         public void Solve()
         {
+            // Chronometre l'algorithme
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            m_grid = RecursiveBackTracking(new SudokuCSP(m_grid), m_grid);
+            // Construction et appel de l'IA pouvant resoudre la sudoku
+            SudokuSolver solver = new SudokuSolver(m_grid, (int)Math.Sqrt(m_grid.Length));
+            int[,] res = solver.Solve();
             stopWatch.Stop();
-            // Get the elapsed time as a TimeSpan value.
-            TimeSpan ts = stopWatch.Elapsed;
-            // Format and display the TimeSpan value.
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds,
-                ts.Milliseconds / 10);
-            Debug.WriteLine("RunTime " + elapsedTime);
-            if (m_grid != null) {
-                PrintGrid(m_grid);
-                DisplaySolution(m_grid);
-            }
-            else Debug.WriteLine("Couldn't solve sudoku");
-        }
-
-        int[,] RecursiveBackTracking(SudokuCSP csp, int[,] assignement)
-        {
-            if (IsComplete(csp)) return assignement;
-
-            //List<SudokuCSP.CSPVariable> changedVariables = csp.ACThree();
-
-            SudokuCSP.CSPVariable toAssign = SelectUnassignedVariable(csp);
-            if (toAssign == null) {
-                //csp.ResetDomains(changedVariables);
-                return null;
-            }
-
-
-            int[] neighbourDomains = toAssign.NeighorsDomains();
-            List<int> nodeDomain = new List<int>(toAssign.NodeDomain);
-
-            while (nodeDomain.Count != 0)
+            if (res != null)
             {
-                int value = csp.LeastConstrainingValue(nodeDomain, neighbourDomains);
-                csp.SetValue(toAssign, value);
-                assignement[toAssign.Position.Item1, toAssign.Position.Item2] = value;
-                nodeDomain.Remove(value);
-                int[,] result = RecursiveBackTracking(csp, assignement);
-                if (result != null) {
-                    return result;
-                } 
-                // Reset with old value
-                csp.ResetValue(toAssign);
+                m_grid = res;
+                //PrintGrid(m_grid);
+                DisplaySolution(m_grid);
+                // Recupere le temps passe entre le dernier start et stop du chronometre
+                TimeSpan ts = stopWatch.Elapsed;
+                // Formated le temps recuperé.
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
+                m_registeredMainWindow.UpdateResultText(false, true, elapsedTime);
             }
-
-            return null;
+            else m_registeredMainWindow.UpdateResultText(false, false, "");
         }
 
-        private bool IsComplete(SudokuCSP csp)
-        {
-            return csp.RemainingVariable == 0;
-        }
-
-        private SudokuCSP.CSPVariable SelectUnassignedVariable(SudokuCSP csp)
-        {
-            var mrvValues = csp.MinimumRemainingValues();
-            SudokuCSP.CSPVariable toAssign = csp.DegreeHeuristic(mrvValues)[0];
-
-            if (toAssign.DomainSize == 0) return null;
-            return toAssign;
-        }
-
+        
+        /// <summary>
+        /// Affiche la grille dans l'application
+        /// </summary>
         public void DisplayGrid()
         {
             for (int i = 0; i < 9; i++)
@@ -175,6 +157,9 @@ namespace SudokuAppWPF
 
         }
 
+        /// <summary>
+        /// Affiche la solution du sudoku dans l'application
+        /// </summary>
         public void DisplaySolution(int[,] solution)
         {
             for (int i = 0; i < 9; i++)
@@ -187,6 +172,10 @@ namespace SudokuAppWPF
 
         }
 
+        /// <summary>
+        /// Affiche la grille courante dans la console
+        /// </summary>
+        /// <param name="grid"></param>
         public void PrintGrid(int[,] grid)
         {
             string result = "";
