@@ -5,8 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MagicWoodWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="450" Width="450">
 
-    </Grid>
+    <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button x:Name="Bouger" Click="MoveAgent" Content="Bouger l'agent"/>
+            </ToolBar>
+        </ToolBarTray>
+        <Grid x:Name="Wood">
+
+            <Grid  Grid.Column="0" ShowGridLines="True" x:Name="GridEnvironment">
+                <Grid.ColumnDefinitions>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                </Grid.RowDefinitions>
+                <Image Name="AgentImage" Stretch="fill" Source="images\agent.png" 
+            VerticalAlignment = "Center" Visibility="Collapsed"/>
+            </Grid>
+
+        </Grid>
+    </DockPanel>
 </Window>

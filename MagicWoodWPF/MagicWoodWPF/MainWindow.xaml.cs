@@ -30,7 +30,9 @@ namespace MagicWoodWPF
 
             // Genere le bois initial
             int sqrtSize = 3;
+            GenerateAppGrid(sqrtSize);
             GenerateWood(sqrtSize);
+            UpdateAgentPosition(new Vector2(0, 0));
         }
 
         /// <summary>
@@ -46,8 +48,13 @@ namespace MagicWoodWPF
         /// Genere la grille correspondante au bois dans l'application
         /// </summary>
         /// <param name="sqrtSize"></param>
-        void GenerateAppGrid(int sqrtSize) {
-            throw new NotImplementedException();
+        void GenerateAppGrid(int sqrtSize)
+        {
+            for(int i = 0; i < sqrtSize; i++)
+            {
+                GridEnvironment.ColumnDefinitions.Add(new ColumnDefinition());
+                GridEnvironment.RowDefinitions.Add(new RowDefinition());
+            }
         }
 
         /// <summary>
@@ -55,8 +62,58 @@ namespace MagicWoodWPF
         /// </summary>
         /// <param name="grid"></param>
         public void DisplayWood(int[,] grid)
-        {
-            throw new NotImplementedException();
+        { 
+            for(int i = 0; i < grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.GetLength(1); j++)
+                {
+                    // Monster
+                    if(grid[i,j] == MagicWood.MONSTER)
+                    {
+                        Image dust = CreateImage("monster.png");
+                        dust.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(dust);
+                        Grid.SetRow(dust, i);
+                        Grid.SetColumn(dust, j);
+                    }
+                    // Smell
+                    if (grid[i, j] == MagicWood.SMELL)
+                    {
+                        Image dust = CreateImage("poopangel.png");
+                        dust.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(dust);
+                        Grid.SetRow(dust, i);
+                        Grid.SetColumn(dust, j);
+                    }
+                    // Crevasse
+                    if (grid[i, j] == MagicWood.CREVASSE)
+                    {
+                        Image dust = CreateImage("crevasse.png");
+                        dust.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(dust);
+                        Grid.SetRow(dust, i);
+                        Grid.SetColumn(dust, j);
+                    }
+                    // Wind
+                    if (grid[i, j] == MagicWood.WIND)
+                    {
+                        Image dust = CreateImage("cloud.png");
+                        dust.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(dust);
+                        Grid.SetRow(dust, i);
+                        Grid.SetColumn(dust, j);
+                    }
+                    // Portal
+                    if (grid[i, j] == MagicWood.PORTAL)
+                    {
+                        Image dust = CreateImage("portal.png");
+                        dust.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(dust);
+                        Grid.SetRow(dust, i);
+                        Grid.SetColumn(dust, j);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -65,7 +122,14 @@ namespace MagicWoodWPF
         /// <param name="newPosition">Nouvelle position de l'agent</param>
         public void UpdateAgentPosition(Vector2 newPosition)
         {
-            throw new NotImplementedException();
+            if (AgentImage.Visibility == Visibility.Collapsed)
+            {
+                AgentImage.Visibility = Visibility.Visible;
+            }
+
+            Grid.SetRow(AgentImage, newPosition.X);
+            Grid.SetColumn(AgentImage, newPosition.Y);
+            Grid.SetZIndex(AgentImage, 100);
         }
 
         /// <summary>
@@ -76,6 +140,18 @@ namespace MagicWoodWPF
         private void MoveAgent(object sender, RoutedEventArgs e)
         {
             _currentAgent.ExecuteMove();
+        }
+
+        /// Create an image from a string
+        private Image CreateImage(string imageName)
+        {
+            Image image = new Image();
+            image.Stretch = Stretch.Fill;
+            image.Visibility = Visibility.Collapsed;
+            image.VerticalAlignment = VerticalAlignment.Center;
+            image.Source = new BitmapImage(new Uri("Images/" + imageName, UriKind.Relative));
+
+            return image;
         }
     }
 }

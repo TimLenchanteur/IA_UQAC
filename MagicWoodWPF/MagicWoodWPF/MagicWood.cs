@@ -5,17 +5,18 @@ using System.Text;
 namespace MagicWoodWPF
 {
     /// <summary>
-    /// Environement dans lequel evolue l'intelligence artificielle
+    /// Environnement dans lequel évolue l'intelligence artificielle
     /// </summary>
     class MagicWood
     {
-        // Modelisation des objets et agent present dans la forêt
-        // La modelisation permet de verifier la presence de ces element a partir d'une operation sur les bits de l'entier
+        // Modelisation des objets et agent présents dans la forêt
+        // La modélisation permet de verifier la présence de ces élements à partir d'une operation sur les bits de l'entier
         public const int NONE = 0;
-        public const int RIFT = 1;
+        public const int CREVASSE = 1;
         public const int WIND = 2;
         public const int MONSTER = 4;
         public const int SMELL = 8;
+        public const int PORTAL = 10;
 
         // Taille et grille modelisant le bois
         int _sqrtSize;
@@ -40,7 +41,7 @@ namespace MagicWoodWPF
             _woodGrid = new int[sqrtSize, sqrtSize];
             _appDisplayer = appDisplayer;
 
-            // Peuple et affiche l'environement
+            // Peuple l'environnement
             PopulateWood();
             _appDisplayer.DisplayWood(_woodGrid);
         }
@@ -48,8 +49,17 @@ namespace MagicWoodWPF
         /// <summary>
         /// Peuple le bois de crevasse et monstre
         /// </summary>
-        void PopulateWood() {
-            throw new NotImplementedException();
+        void PopulateWood()
+        {
+            // Juste pour le test, à modifier
+            _woodGrid[2, 0] = MONSTER;
+            _woodGrid[1, 0] = SMELL;
+            _woodGrid[2, 1] = SMELL;
+            _woodGrid[2, 2] = WIND;
+            _woodGrid[1, 1] = WIND;
+            _woodGrid[0, 2] = WIND;
+            _woodGrid[1, 2] = CREVASSE;
+            _woodGrid[0, 1] = PORTAL;
         }
 
         /// <summary>

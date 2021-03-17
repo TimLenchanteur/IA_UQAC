@@ -6,4 +6,22 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="images\agent.png" />
+    <None Remove="images\cloud.png" />
+    <None Remove="images\crevasse.png" />
+    <None Remove="images\monster.png" />
+    <None Remove="images\poopangel.png" />
+    <None Remove="images\portal.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\agent.png" />
+    <Resource Include="images\cloud.png" />
+    <Resource Include="images\crevasse.png" />
+    <Resource Include="images\monster.png" />
+    <Resource Include="images\poopangel.png" />
+    <Resource Include="images\portal.png" />
+  </ItemGroup>
+
 </Project>
