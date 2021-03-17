@@ -16,7 +16,7 @@ namespace MagicWoodWPF
         public const int WIND = 2;
         public const int MONSTER = 4;
         public const int SMELL = 8;
-        public const int PORTAL = 10;
+        public const int PORTAL = 16;
 
         // Taille et grille modelisant le bois
         int _sqrtSize;

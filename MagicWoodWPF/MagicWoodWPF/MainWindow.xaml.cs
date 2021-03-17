@@ -77,7 +77,7 @@ namespace MagicWoodWPF
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
                     // Monster
-                    if(grid[i,j] == MagicWood.MONSTER)
+                    if((grid[i,j] & MagicWood.MONSTER) == MagicWood.MONSTER)
                     {
                         Image monster = CreateImage("monster.png");
                         monster.Visibility = Visibility.Visible;
@@ -87,7 +87,7 @@ namespace MagicWoodWPF
                         m_images[i, j] = monster;
                     }
                     // Smell
-                    if (grid[i, j] == MagicWood.SMELL)
+                    if ((grid[i, j] & MagicWood.SMELL) == MagicWood.SMELL)
                     {
                         Image poopangel = CreateImage("poopangel.png");
                         poopangel.Visibility = Visibility.Visible;
@@ -97,7 +97,7 @@ namespace MagicWoodWPF
                         m_images[i, j] = poopangel;
                     }
                     // Crevasse
-                    if (grid[i, j] == MagicWood.CREVASSE)
+                    if ((grid[i, j] & MagicWood.CREVASSE) == MagicWood.CREVASSE)
                     {
                         Image crevasse = CreateImage("crevasse.png");
                         crevasse.Visibility = Visibility.Visible;
@@ -107,7 +107,7 @@ namespace MagicWoodWPF
                         m_images[i, j] = crevasse;
                     }
                     // Wind
-                    if (grid[i, j] == MagicWood.WIND)
+                    if ((grid[i, j] & MagicWood.WIND) == MagicWood.WIND)
                     {
                         Image cloud = CreateImage("cloud.png");
                         cloud.Visibility = Visibility.Visible;
@@ -117,7 +117,7 @@ namespace MagicWoodWPF
                         m_images[i, j] = cloud;
                     }
                     // Portal
-                    if (grid[i, j] == MagicWood.PORTAL)
+                    if ((grid[i, j] & MagicWood.PORTAL) == MagicWood.PORTAL)
                     {
                         Image portal = CreateImage("portal.png");
                         portal.Visibility = Visibility.Visible;
