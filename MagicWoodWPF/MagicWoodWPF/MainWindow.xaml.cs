@@ -24,6 +24,9 @@ namespace MagicWoodWPF
         MagicWood _currentWood;
         WoodTravelerAgent _currentAgent;
 
+        // Enregistre toutes les images présentes sur la grille
+        Image[,] m_images;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,6 +36,8 @@ namespace MagicWoodWPF
             GenerateAppGrid(sqrtSize);
             GenerateWood(sqrtSize);
             UpdateAgentPosition(new Vector2(0, 0));
+            GenerateAppGrid(4);
+            GenerateWood(4);
         }
 
         /// <summary>
@@ -50,7 +55,11 @@ namespace MagicWoodWPF
         /// <param name="sqrtSize"></param>
         void GenerateAppGrid(int sqrtSize)
         {
-            for(int i = 0; i < sqrtSize; i++)
+            ClearImages();
+            m_images = new Image[sqrtSize, sqrtSize];
+            GridEnvironment.ColumnDefinitions.Clear();
+            GridEnvironment.RowDefinitions.Clear();
+            for (int i = 0; i < sqrtSize; i++)
             {
                 GridEnvironment.ColumnDefinitions.Add(new ColumnDefinition());
                 GridEnvironment.RowDefinitions.Add(new RowDefinition());
@@ -70,47 +79,52 @@ namespace MagicWoodWPF
                     // Monster
                     if(grid[i,j] == MagicWood.MONSTER)
                     {
-                        Image dust = CreateImage("monster.png");
-                        dust.Visibility = Visibility.Visible;
-                        GridEnvironment.Children.Add(dust);
-                        Grid.SetRow(dust, i);
-                        Grid.SetColumn(dust, j);
+                        Image monster = CreateImage("monster.png");
+                        monster.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(monster);
+                        Grid.SetRow(monster, i);
+                        Grid.SetColumn(monster, j);
+                        m_images[i, j] = monster;
                     }
                     // Smell
                     if (grid[i, j] == MagicWood.SMELL)
                     {
-                        Image dust = CreateImage("poopangel.png");
-                        dust.Visibility = Visibility.Visible;
-                        GridEnvironment.Children.Add(dust);
-                        Grid.SetRow(dust, i);
-                        Grid.SetColumn(dust, j);
+                        Image poopangel = CreateImage("poopangel.png");
+                        poopangel.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(poopangel);
+                        Grid.SetRow(poopangel, i);
+                        Grid.SetColumn(poopangel, j);
+                        m_images[i, j] = poopangel;
                     }
                     // Crevasse
                     if (grid[i, j] == MagicWood.CREVASSE)
                     {
-                        Image dust = CreateImage("crevasse.png");
-                        dust.Visibility = Visibility.Visible;
-                        GridEnvironment.Children.Add(dust);
-                        Grid.SetRow(dust, i);
-                        Grid.SetColumn(dust, j);
+                        Image crevasse = CreateImage("crevasse.png");
+                        crevasse.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(crevasse);
+                        Grid.SetRow(crevasse, i);
+                        Grid.SetColumn(crevasse, j);
+                        m_images[i, j] = crevasse;
                     }
                     // Wind
                     if (grid[i, j] == MagicWood.WIND)
                     {
-                        Image dust = CreateImage("cloud.png");
-                        dust.Visibility = Visibility.Visible;
-                        GridEnvironment.Children.Add(dust);
-                        Grid.SetRow(dust, i);
-                        Grid.SetColumn(dust, j);
+                        Image cloud = CreateImage("cloud.png");
+                        cloud.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(cloud);
+                        Grid.SetRow(cloud, i);
+                        Grid.SetColumn(cloud, j);
+                        m_images[i, j] = cloud;
                     }
                     // Portal
                     if (grid[i, j] == MagicWood.PORTAL)
                     {
-                        Image dust = CreateImage("portal.png");
-                        dust.Visibility = Visibility.Visible;
-                        GridEnvironment.Children.Add(dust);
-                        Grid.SetRow(dust, i);
-                        Grid.SetColumn(dust, j);
+                        Image portal = CreateImage("portal.png");
+                        portal.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(portal);
+                        Grid.SetRow(portal, i);
+                        Grid.SetColumn(portal, j);
+                        m_images[i, j] = portal;
                     }
                 }
             }
@@ -152,6 +166,20 @@ namespace MagicWoodWPF
             image.Source = new BitmapImage(new Uri("Images/" + imageName, UriKind.Relative));
 
             return image;
+        }
+
+        private void ClearImages()
+        {
+            if (m_images == null) return;
+
+            for (int i = 0; i < m_images.GetLength(0); i++)
+            {
+                for (int j = 0; j < m_images.GetLength(1); j++)
+                {
+                    GridEnvironment.Children.Remove(m_images[i,j]);
+                    m_images[i, j] = null;
+                }
+            }
         }
     }
 }
