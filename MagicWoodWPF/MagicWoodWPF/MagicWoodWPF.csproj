@@ -24,4 +24,13 @@
     <Resource Include="images\portal.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="rules\rule2.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="rules\rules1.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using MagicWoodWPF.Facts;
 
 namespace MagicWoodWPF
 {
@@ -19,23 +20,35 @@ namespace MagicWoodWPF
         // Classe permetant d'afficher l'environement dans l'application
         MainWindow _appDisplayer;
 
-        // Plan d'action ou intention de l'effecteur 
-        // (Peut etre que la stack n'est pas adapte ici vu qu'il va falloir ajouter des elements entre certaines actions) 
-        Stack<Effector> _actionPlan;
+        // But de l'agent
+        Fact _goal;
 
-        WoodTravelerAgent(MainWindow appDisplayer, MagicWood environment) {
+        // Croyances actuel de l'agent
+        List<Fact> _beliefs;
+        // Ensemble de regles qui definisse les croyance de l'agent
+        List<Rule> _rules;
+
+        public WoodTravelerAgent(MainWindow appDisplayer, MagicWood environment) {
             _appDisplayer = appDisplayer;
             _environment = environment;
-            _currentPosition = _environment.PlaceAgent();
+            //_currentPosition = _environment.PlaceAgent();
+            _beliefs = new List<Fact>();
+            _rules = RulesGenerator.Instance.GeneratedRules;
 
             // Initialise le plan d'action
             // Le but etant de quitter la foret la derniere action du plan sera donc l'effecteur qui permet de quitter la foret
-            _actionPlan = new Stack<Effector>();
             Effector leave = new Effector(Leave);
-            _actionPlan.Push(leave);
         }
 
         #region Capteurs
+        /// <summary>
+        /// Applique les capteurs de l'agent et modifie ses croyances a partir de ceux-ci
+        /// </summary>
+        void CaptureSignals()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Capteur permettant de reperer le vent
         /// </summary>
@@ -122,15 +135,37 @@ namespace MagicWoodWPF
         /// Execute l'effecteur le plus approprie selon l'agent
         /// </summary>
         public void ExecuteMove() {
+            // Observe l’environnement
+            CaptureSignals();
+
+            // Met A jour les croyance a partir des nouveaux fait observe et des croyances deja etablie
+            _beliefs = InferenceEngine.InferenceCycle(_beliefs, _rules, _goal);
+
+            // Choisit une action
+            Effector nextAction = PlanNextMove();
+
+            // Exécute l’action
+            if (nextAction != null) {
+                nextAction();
+            }
+
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// Planifie le prochain effecteur a execute 
         /// </summary>
-        void PlanNextMove() {
+        Effector PlanNextMove() {
+            // Etablis une liste des actions possible a partir des croyances 
+            List<Effector> _actionsDoable;
+
+            // Defini la meilleur actions a partir du but et des performances et des proba
+
+            // Return la meilleur actions
             throw new NotImplementedException();
         }
+
+
     
     }
 }

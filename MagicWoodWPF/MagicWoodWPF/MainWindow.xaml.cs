@@ -43,6 +43,7 @@ namespace MagicWoodWPF
         void GenerateWood(int sqrtSize)
         {
             _currentWood = new MagicWood(this, sqrtSize);
+            _currentAgent = new WoodTravelerAgent(this, _currentWood);
         }
 
         /// <summary>
