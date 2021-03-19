@@ -1,0 +1,9 @@
+<Regle  ConsommeDeclencheurs = "true">
+	<Declencheurs>
+		<ObjetEstSur Position = "X" ObjetIndefini = "true" Probabilite = "Probable"/>
+		<ObjetEstSur Position = "X" ObjetIndefini = "true" Probabilite = "Probable"/>
+	</Declencheurs>
+	<Corps>
+		<ObjetEstSur Position = "X" ObjetIndefini = "true" Probabilite = "Presque Sure"/>
+	</Corps>
+</Regle>

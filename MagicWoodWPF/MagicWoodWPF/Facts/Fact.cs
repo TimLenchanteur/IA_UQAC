@@ -9,20 +9,56 @@ namespace MagicWoodWPF.Facts
     public struct FactID {
         public const int FACTID_NONE = 0;
         public const int FACTID_LEAVE = 1;
+        public const int FACTID_ELEMENTS = 2;
+        public const int FACTID_CLUE = 3;
     }
 
     public enum AbstractVector
     {
         [XmlEnum(Name = "X")]
         originalPos,
-        [XmlEnum(Name = "XUp")]
+        [XmlEnum(Name = "XDessus")]
         Up,
-        [XmlEnum(Name = "XDown")]
+        [XmlEnum(Name = "XSous")]
         Down,
-        [XmlEnum(Name = "XRight")]
+        [XmlEnum(Name = "XDroite")]
         Right,
-        [XmlEnum(Name = "XLeft")]
+        [XmlEnum(Name = "XGauche")]
         Left
+    }
+
+    public enum ObjectType
+    {
+        [XmlEnum(Name = "Aucun")]
+        None,
+        [XmlEnum(Name = "Monstre")]
+        Monster,
+        [XmlEnum(Name = "Crevasse")]
+        Rift,
+        [XmlEnum(Name = "Portail")]
+        Portail
+    }
+
+    public enum ClueType
+    {
+        [XmlEnum(Name = "Vent")]
+        Wind,
+        [XmlEnum(Name = "Odeur")]
+        Smell,
+        [XmlEnum(Name = "Lumiere")]
+        Light
+    }
+
+    public enum Probability
+    {
+        [XmlEnum(Name = "Possible")]
+        Possible,
+        [XmlEnum(Name = "Probable")]
+        Likely,
+        [XmlEnum(Name = "Tres Probable")]
+        VeryLikely,
+        [XmlEnum(Name = "Presque Sure")]
+        AlmostCertain
     }
 
     [XmlType(TypeName = "Fait")]
@@ -43,10 +79,14 @@ namespace MagicWoodWPF.Facts
             _isAbstract = true;
         }
 
-        public virtual bool IsEquals() {
-            return _id == 0;
+
+        /// <summary>
+        /// Defini si le fait est equivalent a un autre fait 
+        /// </summary>
+        /// <param name="otherFact">L'autre fait propose</param>
+        /// <returns>Vrai si les faits sont equivalent, faux sinon</returns>
+        public virtual bool IsEquals(Fact otherFact) {
+            return _id == otherFact._id;
         }
-
-
     }
 }

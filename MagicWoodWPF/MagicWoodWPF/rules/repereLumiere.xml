@@ -1,0 +1,8 @@
+<Regle  ConsommeDeclencheurs = "true">
+	<Declencheurs>
+		<IndiceEstSur Position = "X" Indice = "Lumiere"/>
+	</Declencheurs>
+	<Corps>
+		<ObjetEstSur Position = "X" Objet = "Portail" Probabilite = "Presque Sure"/>
+	</Corps>
+</Regle>

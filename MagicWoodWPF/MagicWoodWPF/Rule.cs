@@ -17,15 +17,19 @@ namespace MagicWoodWPF
         public bool _useTriggers;
 
         // Faits declencheurs de la regle
-        [XmlArray(ElementName = "Declencheurs"), 
-        XmlArrayItem(Type = typeof(Fact)),
-        XmlArrayItem(Type = typeof(CanLeave))]
+        [XmlArray(ElementName = "Declencheurs")]
+        [XmlArrayItem(typeof(Fact))]
+        [XmlArrayItem(typeof(CanLeave))]
+        [XmlArrayItem(typeof(ElementIsOn))]
+        [XmlArrayItem(typeof(ClueIsOn))]
         public Fact[] _triggers;
         
         // Faits concluant la regle
-        [XmlArray(ElementName = "Corps"),
-        XmlArrayItem(Type = typeof(Fact)),
-        XmlArrayItem(Type = typeof(CanLeave))]
+        [XmlArray(ElementName = "Corps")]
+        [XmlArrayItem(typeof(Fact))]
+        [XmlArrayItem(typeof(CanLeave))]
+        [XmlArrayItem(typeof(ElementIsOn))]
+        [XmlArrayItem(typeof(ClueIsOn))]
         public Fact[] _body;
 
         public Rule() {}

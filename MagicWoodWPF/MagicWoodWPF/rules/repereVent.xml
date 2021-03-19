@@ -1,0 +1,11 @@
+<Regle  ConsommeDeclencheurs = "true">
+	<Declencheurs>
+		<IndiceEstSur Position = "X" Indice = "Vent"/>
+	</Declencheurs>
+	<Corps>
+		<ObjetEstSur Position = "XDessus" Objet = "Crevasse" Probabilite = "Possible"/>
+		<ObjetEstSur Position = "XSous" Objet = "Crevasse" Probabilite = "Possible"/>
+		<ObjetEstSur Position = "XDroite" Objet = "Crevasse" Probabilite = "Possible"/>
+		<ObjetEstSur Position = "XGauche" Objet = "Crevasse" Probabilite = "Possible"/>
+	</Corps>
+</Regle>

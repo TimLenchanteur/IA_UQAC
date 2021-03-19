@@ -1,0 +1,11 @@
+<Regle  ConsommeDeclencheurs = "true">
+	<Declencheurs>
+		<IndiceEstSur Position = "X" Indice = "Odeur"/>
+	</Declencheurs>
+	<Corps>
+		<ObjetEstSur Position = "XDessus" Objet = "Monstre" Probabilite = "Possible"/>
+		<ObjetEstSur Position = "XSous" Objet = "Monstre" Probabilite = "Possible"/>
+		<ObjetEstSur Position = "XDroite" Objet = "Monstre" Probabilite = "Possible"/>
+		<ObjetEstSur Position = "XGauche" Objet = "Monstre" Probabilite = "Possible"/>
+	</Corps>
+</Regle>
