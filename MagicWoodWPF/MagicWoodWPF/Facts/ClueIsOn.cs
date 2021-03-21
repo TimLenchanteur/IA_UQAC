@@ -28,7 +28,7 @@ namespace MagicWoodWPF.Facts
         public ClueIsOn(Vector2 position, ClueType clueType)
         {
             _position = position;
-            //_clue= clueType;
+            _clue = clueType;
         }
 
         /// <summary>

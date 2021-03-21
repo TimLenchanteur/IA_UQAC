@@ -46,31 +46,45 @@ namespace MagicWoodWPF
         /// </summary>
         void CaptureSignals()
         {
-            throw new NotImplementedException();
+            if(FeelWind())
+            {
+                _beliefs.Add(new ClueIsOn(_currentPosition, ClueType.Wind));
+            }
+            if (SmellSomething())
+            {
+                _beliefs.Add(new ClueIsOn(_currentPosition, ClueType.Smell));
+            }
+            if (SeeLight())
+            {
+                _beliefs.Add(new ClueIsOn(_currentPosition, ClueType.Light));
+            }
         }
 
         /// <summary>
         /// Capteur permettant de reperer le vent
         /// </summary>
         /// <returns>vrai si l'agent a reperer du vent sur la case ou il se trouve, faux sinon</returns>
-        bool FeelWind() {
-            throw new NotImplementedException();
+        bool FeelWind()
+        {
+            return (_environment.Grid[_currentPosition.X, _currentPosition.Y] & MagicWood.WIND) == MagicWood.WIND;
         }
 
         /// <summary>
         /// Capteur permettant de sentir une odeur
         /// </summary>
         /// <returns>vrai si l'agent sent une odeur sur la case ou il se trouve, faux sinon</returns>
-        bool SmellSomething() {
-            throw new NotImplementedException();
+        bool SmellSomething()
+        {
+            return (_environment.Grid[_currentPosition.X, _currentPosition.Y] & MagicWood.SMELL) == MagicWood.SMELL;
         }
 
         /// <summary>
         /// Capteur permettant de reperer de la lumiere
         /// </summary>
         /// <returns>vrai si l'agent voit de la lumiere sur la case ou il se trouve, faux sinon</returns>
-        bool SeeLight() {
-            throw new NotImplementedException();
+        bool SeeLight()
+        {
+            return (_environment.Grid[_currentPosition.X, _currentPosition.Y] & MagicWood.PORTAL) == MagicWood.PORTAL;
         }
         #endregion
 
