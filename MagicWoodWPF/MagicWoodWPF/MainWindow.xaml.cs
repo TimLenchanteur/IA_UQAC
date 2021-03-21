@@ -29,9 +29,6 @@ namespace MagicWoodWPF
             InitializeComponent();
 
             // Genere le bois initial
-            UpdateAgentPosition(new Vector2(0, 0));
-            GenerateAppGrid(3);
-            GenerateWood(3);
             GenerateAppGrid(4);
             GenerateWood(4);
         }

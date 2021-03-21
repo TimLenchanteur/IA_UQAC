@@ -31,7 +31,7 @@ namespace MagicWoodWPF
         public WoodTravelerAgent(MainWindow appDisplayer, MagicWood environment) {
             _appDisplayer = appDisplayer;
             _environment = environment;
-            //_currentPosition = _environment.PlaceAgent();
+            _currentPosition = _environment.PlaceAgent();
             _beliefs = new List<Fact>();
             _rules = RulesGenerator.Instance.GeneratedRules;
 
@@ -100,7 +100,7 @@ namespace MagicWoodWPF
         /// </summary>
         void MoveUp()
         {
-            throw new NotImplementedException();
+            _currentPosition.Y -= 1;
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace MagicWoodWPF
         /// </summary>
         void MoveDown()
         {
-            throw new NotImplementedException();
+            _currentPosition.Y += 1;
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace MagicWoodWPF
         /// </summary>
         void MoveRight()
         {
-            throw new NotImplementedException();
+            _currentPosition.X += 1;
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace MagicWoodWPF
         /// </summary>
         void MoveLeft()
         {
-            throw new NotImplementedException();
+            _currentPosition.X -= 1;
         }
 
         /// <summary>

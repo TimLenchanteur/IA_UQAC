@@ -80,11 +80,26 @@ namespace MagicWoodWPF
         }
 
         /// <summary>
-        /// Place l'agent sur une case qui n'a pas de crevasse
+        /// Place l'agent sur une case qui n'a pas de crevasse ni de monstre
         /// </summary>
         /// <returns>La position de depart de l'agent</returns>
-        public Vector2 PlaceAgent() {
-            throw new NotImplementedException();
+        public Vector2 PlaceAgent()
+        {
+            for(int i = 0; i < _sqrtSize; i++)
+            {
+                for(int j = 0; j < _sqrtSize; j++)
+                {
+                    // Si la case ne contient ni de crevasse ni de monstre
+                    if((_woodGrid[i, j] & CREVASSE) != CREVASSE && (_woodGrid[i, j] & MONSTER) != MONSTER)
+                    {
+                        Vector2 position = new Vector2(i, j);
+                        _appDisplayer.UpdateAgentPosition(position);
+                        return position;
+                    }
+                }
+            }
+            // Toutes les cases contiennent soit un monstre soit une crevasse, on ne peut pas placer l'agent
+            return new Vector2(-1, -1);
         }
 
         /// Ajoute une valeur sur les cases adjacentes, pour les monstres (smell) ou les crevasses (wind)
