@@ -1,8 +1,0 @@
-<Regle ConsommeDeclencheurs = "true">
-	<Declencheurs>
-		<ObjetEstSur Position = "X" Objet = "Portail" Probabilite = "Presque Sure"/>
-	</Declencheurs>
-	<Corps>
-		<PeutPartir Position = "X"/>
-	</Corps>
-</Regle>

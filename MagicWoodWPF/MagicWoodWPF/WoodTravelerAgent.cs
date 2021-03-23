@@ -20,9 +20,6 @@ namespace MagicWoodWPF
         // Classe permetant d'afficher l'environement dans l'application
         MainWindow _appDisplayer;
 
-        // But de l'agent
-        Fact _goal;
-
         // Croyances actuel de l'agent
         List<Fact> _beliefs;
         // Ensemble de regles qui definisse les croyance de l'agent
@@ -34,10 +31,6 @@ namespace MagicWoodWPF
             _currentPosition = _environment.PlaceAgent();
             _beliefs = new List<Fact>();
             _rules = RulesGenerator.Instance.GeneratedRules;
-
-            // Initialise le plan d'action
-            // Le but etant de quitter la foret la derniere action du plan sera donc l'effecteur qui permet de quitter la foret
-            Effector leave = new Effector(Leave);
         }
 
         #region Capteurs
@@ -153,7 +146,7 @@ namespace MagicWoodWPF
             CaptureSignals();
 
             // Met A jour les croyance a partir des nouveaux fait observe et des croyances deja etablie
-            _beliefs = InferenceEngine.InferenceCycle(_beliefs, _rules, _goal);
+            _beliefs = InferenceEngine.InferenceCycle(_beliefs, _rules);
 
             // Choisit une action
             Effector nextAction = PlanNextMove();

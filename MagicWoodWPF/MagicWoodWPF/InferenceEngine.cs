@@ -14,31 +14,30 @@ namespace MagicWoodWPF
         /// <param name="rules">Regles sur les croyances</param>
         /// <param name="goal">Croyance a atteindre</param>
         /// <returns>Les nouvelles croyances de l'agent</returns>
-        static public List<Fact> InferenceCycle(List<Fact> beliefs, List<Rule> rules, Fact goal) {
+        static public List<Fact> InferenceCycle(List<Fact> beliefs, List<Rule> rules) {
 
-            // Pas sur que la boucle soit applicable ?
             List<Fact> newBeliefs = new List<Fact>(beliefs);
+            List<Rule> markedRules = new List<Rule>();
 
+            // Chainage avant en largeur etant donne qu'on ne peut pas vraiment atteindre le but a partir des regles
             // Si le but a ete atteint pas besoin de mettre a jour les fait
-            while (GoalReached()) {
-                // Filtre les regles applicable
-                List<Rule> relevantRules = FilterRules(newBeliefs, rules);
 
-                // Choose Rule 
-                Rule choosenRule = ChooseRuleBasedOnGoal(relevantRules, goal);
+            // Filtre les regles applicable
+            List<Rule> relevantRules = FilterRules(newBeliefs,rules, ref markedRules);
+            while (relevantRules.Count != 0) {
+                // Choisi la regle
+                Rule choosenRule = ChooseNextRule(relevantRules);
 
-                // Apply rule
-                ApplyRule(choosenRule, out newBeliefs);
+                // Applique la regle
+                ApplyRule(choosenRule, ref newBeliefs);
+
+                //Marque la regle
+                markedRules.Add(choosenRule);
+
+                // Filtre les nouvelles regles applicable
+                relevantRules = FilterRules(newBeliefs, rules, ref markedRules);
             }
             return newBeliefs;
-        }
-
-        /// <summary>
-        /// Defini si la croyance a atteindre l'a ete
-        /// </summary>
-        /// <returns>Vrai si c'est le cas, faux sinon</returns>
-        static bool GoalReached() {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -47,18 +46,28 @@ namespace MagicWoodWPF
         /// <param name="beliefs">Croyances actuel</param>
         /// <param name="rules">Ensemble des regles possible sur les croyances</param>
         /// <returns>Les regles qu'il est possible d'execute</returns>
-        static List<Rule> FilterRules(List<Fact> beliefs, List<Rule> rules) {
-            throw new NotImplementedException();
+        static List<Rule> FilterRules(List<Fact> beliefs, List<Rule> rules, ref List<Rule> markedRules) {
+            List<Rule> filteredRules = new List<Rule>();
+            foreach(Rule rule in rules){
+                if (markedRules.Contains(rule)) continue;
+                // Si la regle contient des fait contradictoire avec les croyance, la marque
+                throw new NotImplementedException();
+                // Si des fait permettant de declancher cette regle existent,
+                // on recupere une regles equivalente cree a partir des faits declencheur pour avoir une regle qui n'est plus abstraite
+                Rule runtimeRule = rule.RuntimeRule(beliefs);
+                if (runtimeRule != null) filteredRules.Add(runtimeRule);
+            }
+            return filteredRules;
         }
 
         /// <summary>
-        /// Choisi une regle parmis celle propose a partir du but de l'agent
+        /// Choisi une regle parmis celle propose 
         /// </summary>
         /// <param name="rules">Ensemble de regles sur les croyances</param>
-        /// <param name="goal">But a atteindre</param>
         /// <returns>La regle choisi</returns>
-        static Rule ChooseRuleBasedOnGoal(List<Rule> rules, Fact goal)
+        static Rule ChooseNextRule(List<Rule> rules)
         {
+           
             throw new NotImplementedException();
         }
 
@@ -67,8 +76,10 @@ namespace MagicWoodWPF
         /// </summary>
         /// <param name="ruleToApply">Regle a appliquer</param>
         /// <param name="currentBeliefs">En entree, les croyance actuelle. En les croyance apres appliquations de la regle</param>
-        static void ApplyRule(Rule ruleToApply, out List<Fact> currentBeliefs)
+        static void ApplyRule(Rule ruleToApply, ref List<Fact> currentBeliefs)
         {
+            // Applique la regle
+            // Ajoute ou fusionne les faits resultants
             throw new NotImplementedException();
         }
     }

@@ -68,6 +68,11 @@ namespace MagicWoodWPF.Facts
         [XmlIgnore]
         protected int _id;
 
+        [XmlAttribute(AttributeName = "Position")]
+        public AbstractVector _abstractPos;
+
+        protected Vector2 _position;
+
         // Defini si le fait est abstrait ou non
         // Les faits abstraits ne devrait etre que ceux serialiser, les non abstrait sont ceux creer pendant le runtime
         // Cette variable permet d'utiliser une notation abstraite comme X pour definir une variable qui ne sera connu que pendant le runtime
@@ -79,14 +84,25 @@ namespace MagicWoodWPF.Facts
             _isAbstract = true;
         }
 
-
         /// <summary>
         /// Defini si le fait est equivalent a un autre fait 
         /// </summary>
         /// <param name="otherFact">L'autre fait propose</param>
         /// <returns>Vrai si les faits sont equivalent, faux sinon</returns>
-        public virtual bool IsEquals(Fact otherFact) {
-            return _id == otherFact._id;
+        public override bool Equals(Object obj)
+        {
+            Fact otherFact = obj as Fact;
+            if (otherFact == null)
+            {
+                return false;
+            }
+
+            bool res = true;
+            if (!_isAbstract && !otherFact._isAbstract) res &= _position.Equals(otherFact._position);
+            res &= _id == otherFact._id;
+            return res;
         }
+
+
     }
 }
