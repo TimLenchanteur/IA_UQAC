@@ -14,8 +14,6 @@ namespace MagicWoodWPF.Facts
         [XmlAttribute(AttributeName = "Probabilite")]
         public Probability _probability;
 
-
-
         protected ElementIsOn() : base()
         {
             _id = FactID.FACTID_ELEMENTS;
@@ -34,9 +32,9 @@ namespace MagicWoodWPF.Facts
 
 
         /// <summary>
-        /// Defini si le fait est equivalent a un autre fait 
+        /// Defini si le fait est egal a un autre objet 
         /// </summary>
-        /// <param name="otherFact">L'autre fait propose</param>
+        /// <param name="obj">L'autre objet propose</param>
         /// <returns>Vrai si les faits sont equivalent, faux sinon</returns>
         public override bool Equals(Object obj)
         {

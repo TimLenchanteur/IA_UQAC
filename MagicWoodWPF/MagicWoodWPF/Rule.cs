@@ -30,69 +30,135 @@ namespace MagicWoodWPF
         [XmlArrayItem(typeof(ClueIsOn))]
         public Fact[] _body;
 
+        // Defini si une regle est abstraite
+        // Une regle est abstraite si elle contient au moins un fait abstrait
         [XmlIgnore]
         protected bool _isAbstract;
 
-        [XmlIgnore]
-        protected Vector2 _XValue;
-
+        /// <summary>
+        /// Constructeur
+        /// </summary>
         protected Rule() {
             _isAbstract = true;
         }
 
-        protected Rule(Vector2 xValue, Fact[] triggers, Fact[] body) {
-            _XValue = xValue;
+        /// <summary>
+        /// Constructeur de regle concrete
+        /// </summary>
+        /// <param name="triggers">Une liste de declencheur contenant uniquement des fait concret</param>
+        /// <param name="body">Une liste modelisant le corps de la regle contenant uniquement des faits concrets</param>
+        protected Rule(Fact[] triggers, Fact[] body) {
             _isAbstract = false; 
             _triggers = triggers;
             _body = body;
         }
 
         /// <summary>
-        /// A partir d'une liste de fait, verifie que si les faits necessaire pour activer cette regle existe
-        /// Si c'est le cas construit une nouvelle regle equivalente avec les faits non abstrait
-        /// Seule facon de creer une regle pendant le runtime
+        /// Indique si la regle est abstraite ou non 
         /// </summary>
-        /// <returns>Une regle equivalente avec des fait non abstrait</returns>
-        public Rule RuntimeRule(List<Fact> currentBeliefs) {
-            Fact[] triggers =new Fact[_triggers.Length];
-            int countTrigger = 0;
-            Vector2 xValue = new Vector2(0,0);
-            foreach (Fact fact in currentBeliefs) {
-                for (int i = 0; i < _triggers.Length; i++) {
-                    if (fact.Equals(_triggers[i]) && triggers[i] == null) {
-                        triggers[i] = fact;
-                        countTrigger += 1;
-
-                        //Define x value
-                        throw new NotImplementedException();
-
-                        break;
-                    }
-                }
-            }
-            if (countTrigger == _triggers.Length) {
-                return new Rule(xValue, triggers, CreateBody(triggers));
-            }
-            return null;
-        }
-
-        Vector2 defineXValue(Fact abstractfact, Fact definedFact) {
-            /*switch () { 
-                
-            }*/
-            throw new NotImplementedException();
-        }
-
-        Fact[] CreateBody(Fact[] triggers) {
-            Fact[] body = new Fact[_body.Length];
-
-            throw new NotImplementedException();
+        /// <returns>Vrai si la regle est abstraite, faux sinon</returns>
+        public bool IsAbstract()
+        {
+            return _isAbstract;
         }
 
         /// <summary>
-        /// Defini si le fait est equivalent a un autre fait 
+        /// Applique la regles sur la base de fait renseigner
         /// </summary>
-        /// <param name="otherFact">L'autre fait propose</param>
+        /// <param name="currentFact">Une base de fait, apres application elle pourra contenir des faits differents</param>
+        public void Apply(ref List<Fact> currentFacts)
+        {
+            // Si la regle doit consommer les declencheur elle les enleve de la base de fait 
+            if (_useTriggers)
+            {
+                foreach (Fact trigger in _triggers)
+                {
+                    currentFacts.Remove(trigger);
+                }
+            }
+
+            foreach (Fact newFact in _body)
+            {
+                // Si le fait est deja contenu dans la base de donnees le fusionner (Utile pour le facteur de certitude)
+                if (currentFacts.Contains(newFact))
+                {
+                    int index = currentFacts.IndexOf(newFact);
+                    currentFacts[index].Merge(newFact);
+                }
+                else
+                {
+                    currentFacts.Add(newFact);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Indique qu'une regle n'est pas utilisable du fait d'un fait contradictoire ou de fait non present
+        /// </summary>
+        /// <param name="currentBeliefs"></param>
+        /// <returns></returns>
+        public bool BecameIrrelevant(List<Fact> currentBeliefs, ref bool isInConflict) {
+            if (IsInConflict(currentBeliefs)) {
+                isInConflict = true;
+                return true;
+            }
+            foreach(Fact trigger in _triggers){
+                if (!currentBeliefs.Contains(trigger)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Indique qu'une regle est entree en conflit avec un plusieurs fait d'une base de fait
+        /// </summary>
+        /// <param name="currentBeliefs">La base de fait a verifie</param>
+        /// <returns></returns>
+        protected bool IsInConflict(List<Fact> currentBeliefs) {
+            foreach (Fact trigger in _triggers)
+            {
+                foreach (Fact belief in currentBeliefs) {
+                    if (!trigger.InConflictWith(belief)) return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Renvoie une liste de toute les regles qui on pu etre construite a partir de cette regle et d'une base de fait
+        /// </summary>
+        /// <param name="currentBeliefs">Une base de fait</param>
+        /// <returns>La liste de toute les regles cree a partir de la regle abstraite</returns>
+        public List<Rule> RelevantsRules(List<Fact> currentBeliefs) {
+            List<Rule> relevantRules = new List<Rule>();
+            if (_isAbstract) {
+                // On cherche assez de fait equivalent avec les declencheurs pour que l'on puisse traduire tout les elements abstrait de la regle
+                // On cree une base de traduction d'element abstrait
+
+                // Une fois que l'on a traduit la regle on verifie si elle peut etre declenche et si c'est le cas on l'ajoute a la liste
+
+                // On recommence pour voir si il n'est pas possible d'interpreter la regle differement avec les autres fait 
+
+                throw new NotImplementedException();
+            }
+            else {
+                //Verifie que tout les fait necessaire pour valider cette regle sont present dans la base
+                bool relevant = true;
+                foreach (Fact trigger in _triggers) {
+                    if (!currentBeliefs.Contains(trigger)) {
+                        relevant = false;
+                        break;
+                    }
+                }
+                //Si c'est le cas renvoye uniquement cette regle
+                if (relevant) relevantRules.Add(this);
+            }
+            return relevantRules;
+        }
+
+        /// <summary>
+        /// Defini si un objet est egale a cette regle
+        /// </summary>
+        /// <param name="obj">L'autre objet propose</param>
         /// <returns>Vrai si les faits sont equivalent, faux sinon</returns>
         public override bool Equals(Object obj)
         {
@@ -108,5 +174,7 @@ namespace MagicWoodWPF
             }
             return true;
         }
+
+
     }
 }

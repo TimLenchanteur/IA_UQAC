@@ -8,9 +8,8 @@ namespace MagicWoodWPF.Facts
 {
     public struct FactID {
         public const int FACTID_NONE = 0;
-        public const int FACTID_LEAVE = 1;
-        public const int FACTID_ELEMENTS = 2;
-        public const int FACTID_CLUE = 3;
+        public const int FACTID_ELEMENTS = 1;
+        public const int FACTID_CLUE = 2;
     }
 
     public enum AbstractVector
@@ -79,15 +78,66 @@ namespace MagicWoodWPF.Facts
         [XmlIgnore]
         protected bool _isAbstract;
 
+        [XmlIgnore]
+        protected bool _isUncertain = false;
+        protected float _certaintyFactor;
+
         protected Fact() {
             _id = FactID.FACTID_NONE;
             _isAbstract = true;
         }
 
+        public int GetID() {
+            return _id;
+        }
+
+        public Vector2 GetPosition() {
+            return _position;
+        }
+
         /// <summary>
-        /// Defini si le fait est equivalent a un autre fait 
+        /// Fusionne deux fait equivalent
         /// </summary>
         /// <param name="otherFact">L'autre fait propose</param>
+        public virtual void Merge(Fact otherFact)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Indique si ce fait est en conflit avec un autre fait
+        /// </summary>
+        /// <param name="otherFact">L'autre fait</param>
+        /// <returns></returns>
+        public virtual bool InConflictWith(Fact otherFact) {
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// Defini si le fait est equivalent a un autre fait
+        /// </summary>
+        /// <param name="fact">L'autre fait</param>
+        /// <returns></returns>
+        public virtual bool IsEquivalent(Fact fact)
+        {
+
+            /*if (otherFact == null)
+            {
+                return false;
+            }
+
+            bool res = true;
+            if (!_isAbstract && !otherFact._isAbstract) res &= _position.Equals(otherFact._position);
+            res &= _id == otherFact._id;
+            return res;*/
+            throw new NotFiniteNumberException();
+        }
+
+        /// <summary>
+        /// Defini si le fait est egal a un autre objet 
+        /// </summary>
+        /// <param name="obj">L'autre objet propose</param>
         /// <returns>Vrai si les faits sont equivalent, faux sinon</returns>
         public override bool Equals(Object obj)
         {
@@ -101,8 +151,7 @@ namespace MagicWoodWPF.Facts
             if (!_isAbstract && !otherFact._isAbstract) res &= _position.Equals(otherFact._position);
             res &= _id == otherFact._id;
             return res;
+            throw new NotFiniteNumberException();
         }
-
-
     }
 }
