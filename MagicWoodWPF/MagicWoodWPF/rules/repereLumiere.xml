@@ -3,6 +3,6 @@
 		<IndiceEstSur Position = "X" Indice = "Lumiere"/>
 	</Declencheurs>
 	<Corps>
-		<ObjetEstSur Position = "X" Objet = "Portail" Probabilite = "Presque Sure"/>
+		<ObjetEstSur Position = "X" Objet = "Portail"/>
 	</Corps>
 </Regle>

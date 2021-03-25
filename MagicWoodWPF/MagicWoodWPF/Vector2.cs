@@ -20,7 +20,7 @@ namespace MagicWoodWPF
             set => _y = value;
         }
 
-        Vector2()
+        public Vector2()
         {
             _x = 0;
             _y = 0;

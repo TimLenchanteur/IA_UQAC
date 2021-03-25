@@ -10,6 +10,7 @@ namespace MagicWoodWPF.Facts
         public const int FACTID_NONE = 0;
         public const int FACTID_ELEMENTS = 1;
         public const int FACTID_CLUE = 2;
+        public const int FACTID_EXPLORE = 3;
     }
 
     public enum AbstractVector
@@ -48,16 +49,37 @@ namespace MagicWoodWPF.Facts
         Light
     }
 
+    public enum Death {
+        [XmlEnum(Name = "0")]
+        Zero,
+        [XmlEnum(Name = "1")]
+        Once,
+        [XmlEnum(Name = "2+")]
+        MoreThanOnce
+    }
+
     public enum Probability
     {
-        [XmlEnum(Name = "Possible")]
-        Possible,
-        [XmlEnum(Name = "Probable")]
-        Likely,
-        [XmlEnum(Name = "Tres Probable")]
-        VeryLikely,
-        [XmlEnum(Name = "Presque Sure")]
-        AlmostCertain
+        [XmlEnum(Name = "Aucune")]
+        None,
+        [XmlEnum(Name = "Impossible")]
+        DefinitelyNot,
+        [XmlEnum(Name = "Surement pas")]
+        AlmostCertainlyNot,
+        [XmlEnum(Name = "Probablement pas")]
+        ProbablyNot,
+        [XmlEnum(Name = "Peut etre pas")]
+        MaybeNot,
+        [XmlEnum(Name = "Inconnu")]
+        Unknown,
+        [XmlEnum(Name = "Peut etre")]
+        Maybe,
+        [XmlEnum(Name = "Probablenent")]
+        Probably,
+        [XmlEnum(Name = "Presque sure")]
+        AlmostCertainly,
+        [XmlEnum(Name = "Certain")]
+        Definitely
     }
 
     [XmlType(TypeName = "Fait")]
@@ -78,8 +100,14 @@ namespace MagicWoodWPF.Facts
         [XmlIgnore]
         protected bool _isAbstract;
 
-        [XmlIgnore]
-        protected bool _isUncertain = false;
+        // Attribut definissant une probabilite pour un fait abstrait possedant un facteur d'incertitude
+        // Par defaut la probabilite est mise a aucune ce qui signifie que le fait n'est pas lie a un facteur d'incertitude
+        [XmlAttribute(AttributeName = "Probabilite")]
+        public Probability _probability;
+
+        // Defini si un fait concret est uncertain
+        protected bool _isUncertain;
+        // Facteur d'incertitude associe au fait
         protected float _certaintyFactor;
 
         protected Fact() {
@@ -87,21 +115,60 @@ namespace MagicWoodWPF.Facts
             _isAbstract = true;
         }
 
+        public Fact(float certaintyFactor) {
+            _isAbstract = false;
+            _isUncertain = true;
+            _certaintyFactor = certaintyFactor;
+        }
+
         public int GetID() {
             return _id;
         }
 
-        public Vector2 GetPosition() {
+        public Vector2 GetPosition()
+        {
             return _position;
         }
 
+        public float GetCertaintyFactor() {
+            return _certaintyFactor;
+        }
+
+        public bool isAbstract() {
+            return _isAbstract;
+        }
+
         /// <summary>
-        /// Fusionne deux fait equivalent
+        /// Indique si le fait est soumis a un facteur d'incertitude
+        /// </summary>
+        /// <returns>Vrai si le fait est lie a un facteur d'incertitude, faux sinon</returns>
+        public bool isUncertain(){ 
+            if(_isAbstract) return _probability != Probability.None;
+            return _isUncertain;
+        }
+
+        /// <summary>
+        /// Fusionne ce fait avec un autre fait concret equivalent a l'interieur de ce fait
         /// </summary>
         /// <param name="otherFact">L'autre fait propose</param>
         public virtual void Merge(Fact otherFact)
         {
-            throw new NotImplementedException();
+            // Rien ne sert de combiner des fait qui ne sont pas concret ou soumis a un facteur de certitude
+            if (_isAbstract || otherFact._isAbstract) return;
+            if (!_isUncertain || otherFact._isUncertain) {
+                _isUncertain = false;
+                return;
+            }
+
+            if (_certaintyFactor > 0 && otherFact._certaintyFactor > 0) {
+                _certaintyFactor = _certaintyFactor + otherFact._certaintyFactor * (1 - _certaintyFactor);
+            }
+            else if (_certaintyFactor < 0 && otherFact._certaintyFactor < 0) {
+                _certaintyFactor = _certaintyFactor + otherFact._certaintyFactor * (1 + _certaintyFactor);
+            }
+            else if (_certaintyFactor < 0 || otherFact._certaintyFactor < 0) {
+                _certaintyFactor = (_certaintyFactor + otherFact._certaintyFactor) / (1 - MathF.Min(MathF.Abs(_certaintyFactor), MathF.Abs(otherFact._certaintyFactor)));
+            }
         }
 
         /// <summary>
@@ -110,7 +177,7 @@ namespace MagicWoodWPF.Facts
         /// <param name="otherFact">L'autre fait</param>
         /// <returns></returns>
         public virtual bool InConflictWith(Fact otherFact) {
-            throw new NotImplementedException();
+            return false;
         }
 
 
@@ -119,19 +186,87 @@ namespace MagicWoodWPF.Facts
         /// </summary>
         /// <param name="fact">L'autre fait</param>
         /// <returns></returns>
-        public virtual bool IsEquivalent(Fact fact)
+        public virtual bool IsEquivalent(Fact otherFact)
         {
-
-            /*if (otherFact == null)
-            {
-                return false;
-            }
-
             bool res = true;
             if (!_isAbstract && !otherFact._isAbstract) res &= _position.Equals(otherFact._position);
             res &= _id == otherFact._id;
-            return res;*/
-            throw new NotFiniteNumberException();
+            return res;
+        }
+
+        /// <summary>
+        /// Traduie la position abstraite de ce fait a partir d'une valeur X
+        /// Cette fonction ne doit etre utilise que sur des fait abstrait
+        /// </summary>
+        /// <param name="xValue">La valeur concrete de X</param>
+        /// <returns></returns>
+        public Vector2 TranslatePosition(Vector2 xValue) {
+            Vector2 translation = new Vector2(xValue.X, xValue.Y);
+            switch (_abstractPos)
+            {
+                case AbstractVector.Up:
+                    translation.Y += 1;
+                    break;
+                case AbstractVector.Down:
+                    translation.Y -= 1;
+                    break;
+                case AbstractVector.Right:
+                    translation.X += 1;
+                    break;
+                case AbstractVector.Left:
+                    translation.X -= 1;
+                    break;
+                default:
+                    break;
+            }
+
+            return translation;
+        }
+
+        /// <summary>
+        /// Met a jour le facteur de certitude 
+        /// Ne doit etre utilise que sur des faits non abstrait et incertain
+        /// </summary>
+        public void UpdateCertaintyFactorBy(float factor) {
+            _certaintyFactor *= factor;
+        }
+
+        /// <summary>
+        /// Traduie la probabilite d'un fait abstrait en un facteur de certitude
+        /// Ne doit etre utilise que sur des fait abstrait incertain
+        /// </summary>
+        /// <returns></returns>
+        public float TranslateProbability() {
+            float certaintyFactor = 1;
+            switch (_probability) {
+                case Probability.DefinitelyNot:
+                    certaintyFactor = -1;
+                    break;
+                case Probability.AlmostCertainlyNot:
+                    certaintyFactor = -0.8f;
+                    break;
+                case Probability.ProbablyNot:
+                    certaintyFactor = -0.6f;
+                    break;
+                case Probability.MaybeNot:
+                    certaintyFactor = -0.4f;
+                    break;
+                case Probability.Unknown:
+                    certaintyFactor = 0.2f;
+                    break;
+                case Probability.Maybe:
+                    certaintyFactor = 0.4f;
+                    break;
+                case Probability.Probably:
+                    certaintyFactor = 0.6f;
+                    break;
+                case Probability.AlmostCertainly:
+                    certaintyFactor = 0.8f;
+                    break;
+                default:
+                    break;
+            }
+            return certaintyFactor;
         }
 
         /// <summary>
@@ -149,9 +284,9 @@ namespace MagicWoodWPF.Facts
 
             bool res = true;
             if (!_isAbstract && !otherFact._isAbstract) res &= _position.Equals(otherFact._position);
+            else res &= _isAbstract && otherFact._isAbstract;
             res &= _id == otherFact._id;
             return res;
-            throw new NotFiniteNumberException();
         }
     }
 }

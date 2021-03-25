@@ -3,9 +3,13 @@
 		<IndiceEstSur Position = "X" Indice = "Vent"/>
 	</Declencheurs>
 	<Corps>
-		<ObjetEstSur Position = "XDessus" Objet = "Crevasse" Probabilite = "Possible"/>
-		<ObjetEstSur Position = "XSous" Objet = "Crevasse" Probabilite = "Possible"/>
-		<ObjetEstSur Position = "XDroite" Objet = "Crevasse" Probabilite = "Possible"/>
-		<ObjetEstSur Position = "XGauche" Objet = "Crevasse" Probabilite = "Possible"/>
+		<ObjetEstSur Position = "XDessus" Objet = "Crevasse" Probabilite = "Peut etre"/>
+		<ObjetEstSur Position = "XSous" Objet = "Crevasse" Probabilite = "Peut etre"/>
+		<ObjetEstSur Position = "XDroite" Objet = "Crevasse" Probabilite = "Peut etre"/>
+		<ObjetEstSur Position = "XGauche" Objet = "Crevasse" Probabilite = "Peut etre"/>
+		<ObjetEstSur Position = "XDessus" Objet = "Aucun" Probabilite = "Peut etre pas"/>
+		<ObjetEstSur Position = "XSous" Objet = "Aucun" Probabilite = "Peut etre pas"/>
+		<ObjetEstSur Position = "XDroite" Objet = "Aucun" Probabilite = "Peut etre pas"/>
+		<ObjetEstSur Position = "XGauche" Objet = "Aucun" Probabilite = "Peut etre pas"/>
 	</Corps>
 </Regle>

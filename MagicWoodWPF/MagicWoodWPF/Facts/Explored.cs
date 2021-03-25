@@ -5,50 +5,39 @@ using System.Xml.Serialization;
 
 namespace MagicWoodWPF.Facts
 {
-    [XmlType(TypeName = "IndiceEstSur")]
-    public class ClueIsOn:Fact
+    [XmlType(TypeName = "Explorer")]
+    public class Explored:Fact
     {
-        [XmlAttribute(AttributeName = "Indice")]
-        public ClueType _clue;
+        [XmlAttribute(AttributeName = "Mort")]
+        public Death _deathCount;
 
-        protected ClueIsOn() : base()
+        protected Explored() : base()
         {
-            _id = FactID.FACTID_CLUE;
+            _id = FactID.FACTID_EXPLORE;
         }
 
         /// <summary>
         /// Constructeur pendant le runtime
         /// </summary>
         /// <param name="position">Position a partir duquel le joueur peut partir</param>
-        public ClueIsOn(Vector2 position, ClueType clueType)
+        public Explored(Vector2 position, Death deathCount)
         {
-            _id = FactID.FACTID_CLUE;
+            _id = FactID.FACTID_EXPLORE;
             _isAbstract = false;
             _position = position;
-            _clue = clueType;
-        }
-
-        /// <summary>
-        /// Constructeur pendant le runtime
-        /// </summary>
-        /// <param name="position">Position a partir duquel le joueur peut partir</param>
-        public ClueIsOn(Vector2 position, ClueType clueType, float certaintyFactor):base(certaintyFactor)
-        {
-            _id = FactID.FACTID_CLUE;
-            _position = position;
-            _clue = clueType;
+            _deathCount = deathCount;
         }
 
         /// <summary>
         /// Defini si le fait est equivalent a un autre fait
         /// </summary>
-        /// <param name="fact">L'autre fait</param>
+        /// <param name="otherFact">L'autre fait</param>
         /// <returns></returns>
         public override bool IsEquivalent(Fact otherFact)
         {
             if (!base.IsEquivalent(otherFact)) return false;
-            ClueIsOn otherClueIsOnFact = otherFact as ClueIsOn;
-            return _clue == otherClueIsOnFact._clue;
+            Explored otherExploredFact = otherFact as Explored;
+            return _deathCount == otherExploredFact._deathCount;
         }
 
         /// <summary>
@@ -59,8 +48,8 @@ namespace MagicWoodWPF.Facts
         public override bool Equals(Object obj)
         {
             if (!base.Equals(obj)) return false;
-            ClueIsOn otherClueIsOnFact = obj as ClueIsOn;
-            return _clue == otherClueIsOnFact._clue;
+            Explored otherExploredFact = obj as Explored;
+            return _deathCount == otherExploredFact._deathCount;
         }
     }
 }
