@@ -182,6 +182,40 @@ namespace MagicWoodWPF
             return cells;
         }
 
+        /// <summary>
+        /// Deplace l'agent sur une nouvelle case
+        /// </summary>
+        /// <param name="position">Position de la case ou l'agent veut se deplacer</param>
+        /// <returns>Vrai si l'agent a reussi a se deplacer, faux si il est mort</returns>
+
+        public bool MoveAgent(Vector2 position) {
+            if ((_woodGrid[position.X, position.Y] & CREVASSE) == CREVASSE || (_woodGrid[position.X, position.Y] & MONSTER) == MONSTER) {
+                return false;
+            }
+            _appDisplayer.UpdateAgentPosition(position);
+            return true;
+        }
+
+        /// <summary>
+        /// Permet a l'agent de lancer un rocher a cette endroit
+        /// </summary>
+        /// <param name="position">Position ou le rocher est envoyer</param>
+        public void AgentThrowRock(Vector2 position)
+        {
+            if ((_woodGrid[position.X, position.Y] & MONSTER) == MONSTER) _woodGrid[position.X, position.Y] -= MONSTER;
+            _appDisplayer.DisplayWood(_woodGrid);
+        }
+
+        /// <summary>
+        /// Permet a l'agent de quitter le bois si il est bien sur un portail
+        /// </summary>
+        /// <param name="position">Position presumer du portail</param>
+        public void AgentLeave(Vector2 position)
+        {
+            _appDisplayer.UpdateAgentPosition(position);
+            if ((_woodGrid[position.X, position.Y] & PORTAL) == PORTAL) _appDisplayer.GenerateAppGrid(_sqrtSize + 1);
+        }
+
         public void DisplayWood()
         {
             string result = "";

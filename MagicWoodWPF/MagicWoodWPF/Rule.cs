@@ -22,6 +22,7 @@ namespace MagicWoodWPF
         [XmlArrayItem(typeof(ElementIsOn))]
         [XmlArrayItem(typeof(ClueIsOn))]
         [XmlArrayItem(typeof(Explored))]
+        [XmlArrayItem(typeof(RockThrown))]
         public Fact[] _triggers;
 
         // Faits concluant la regle
@@ -30,6 +31,7 @@ namespace MagicWoodWPF
         [XmlArrayItem(typeof(ElementIsOn))]
         [XmlArrayItem(typeof(ClueIsOn))]
         [XmlArrayItem(typeof(Explored))]
+        [XmlArrayItem(typeof(RockThrown))]
         public Fact[] _body;
 
         // Defini si une regle est abstraite
@@ -261,6 +263,10 @@ namespace MagicWoodWPF
                     Explored explored = (Explored)abstractFact;
                     // Fait toujours certain
                     newRealFact = new Explored(position, explored._deathCount);
+                    break;
+                case FactID.FACTID_ROCK:
+                    // Fait toujours certain
+                    newRealFact = new RockThrown(position);
                     break;
                 default:
                     break;

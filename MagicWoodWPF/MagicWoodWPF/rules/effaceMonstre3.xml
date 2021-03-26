@@ -1,0 +1,9 @@
+<Regle  ConsommeDeclencheurs = "true">
+	<Declencheurs>
+		<ObjetEstSur Position = "X" Objet = "Monstre"/>
+		<Rocher Position = "X"/>
+	</Declencheurs>
+	<Corps>
+		<Rocher Position = "X"/>
+	</Corps>
+</Regle>

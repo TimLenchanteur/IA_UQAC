@@ -82,59 +82,93 @@ namespace MagicWoodWPF
         #endregion
 
         #region Effecteurs
-        /// <summary>
-        /// Signature d'un effecteur
-        /// </summary>
-        /// <param name="direction">Parametre passe a tout les effecteurs</param>
-        delegate void Effector();
+        // Signature d'un effecteur
+        abstract class Effector {
 
-        /// <summary>
-        /// Deplace l'agent vers le haut
-        /// </summary>
-        void MoveUp()
-        {
-            _currentPosition.Y -= 1;
+            // Position a laquelle on veut effectuer l'action
+            protected Vector2 _position;
+
+            /// <summary>
+            /// Position a laquelle on veut effectuer l'action
+            /// </summary>
+            /// <param name="position"></param>
+            public Effector(Vector2 position){
+                _position = position;
+            }
+
+            /// <summary>
+            /// Execute l'action
+            /// </summary>
+            public abstract void Execute(WoodTravelerAgent agent);
         }
 
-        /// <summary>
-        /// Deplace l'agent vers le bas
-        /// </summary>
-        void MoveDown()
-        {
-            _currentPosition.Y += 1;
+        // Action de bouger sur une case
+        class Move : Effector {
+
+            public Move(Vector2 position) :base(position) { }
+
+            public override void Execute(WoodTravelerAgent agent)
+            {
+                bool died = agent._environment.MoveAgent(_position);
+                Explored alreadyExplored = null;
+                foreach(Fact fact in agent._beliefs)
+                {
+                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(_position)) {
+                        alreadyExplored = (Explored)fact;
+                        break;
+                    }
+                }
+
+                Death deathCount = Death.Zero;
+                if (alreadyExplored != null){
+                    agent._beliefs.Remove(alreadyExplored);
+                    // Si on l'a refait c'est forcement qu'il ya deja eu une mort
+                    deathCount = Death.MoreThanOnce;
+                }
+                else {
+                    if (died) deathCount = Death.Once;
+                    
+                }
+                Explored newFact = new Explored(_position, deathCount);
+                agent._beliefs.Add(newFact);
+            }
         }
 
-        /// <summary>
-        ///  Deplace l'agent vers la droite
-        /// </summary>
-        void MoveRight()
-        {
-            _currentPosition.X += 1;
+        // Action de lancer un rocher sur une case
+        class Throw : Effector {
+            public Throw(Vector2 position) : base(position) { }
+
+            public override void Execute(WoodTravelerAgent agent)
+            {
+                agent._environment.AgentThrowRock(_position);
+
+                RockThrown newMarkedRock = new RockThrown(_position);
+                agent._beliefs.Add(newMarkedRock);
+
+                // On ne pense plus qu'il y a un monstre a cette endroit
+                ElementIsOn canHaveMonster = null;
+                foreach (Fact fact in agent._beliefs)
+                {
+                    if (fact.GetID() == FactID.FACTID_ELEMENTS && ((ElementIsOn)fact)._object == ObjectType.Monster)
+                    {
+                        canHaveMonster = (ElementIsOn)fact;
+                        break;
+                    }
+                }
+                if (canHaveMonster != null) agent._beliefs.Remove(canHaveMonster);
+            }
         }
 
-        /// <summary>
-        ///  Deplace l'agent vers la gauche
-        /// </summary>
-        void MoveLeft()
-        {
-            _currentPosition.X -= 1;
-        }
 
-        /// <summary>
-        /// Lance un rocher sur une case
-        /// </summary>
-        void ThrowRock()
+        // Action de quitter la foret dans laquelle se trouve l'agent
+        class Leave:Effector
         {
-            throw new NotImplementedException();
-        }
+            public Leave(Vector2 position) : base(position) { }
 
-
-        /// <summary>
-        /// Quitte la foret dans laquelle se trouve l'agent
-        /// </summary>
-        void Leave()
-        {
-            throw new NotImplementedException();
+            public override void Execute(WoodTravelerAgent agent)
+            {
+                agent._environment.AgentLeave(_position);
+            }
         }
         #endregion
 
@@ -153,7 +187,7 @@ namespace MagicWoodWPF
 
             // Exécute l’action
             if (nextAction != null) {
-                nextAction();
+                nextAction.Execute(this);
             }
 
             throw new NotImplementedException();

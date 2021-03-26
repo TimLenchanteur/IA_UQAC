@@ -47,7 +47,7 @@ namespace MagicWoodWPF
         /// Genere la grille correspondante au bois dans l'application
         /// </summary>
         /// <param name="sqrtSize"></param>
-        void GenerateAppGrid(int sqrtSize)
+        public void GenerateAppGrid(int sqrtSize)
         {
             ClearImages();
             GridEnvironment.ColumnDefinitions.Clear();
