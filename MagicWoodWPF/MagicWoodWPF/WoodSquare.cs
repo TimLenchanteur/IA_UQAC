@@ -57,6 +57,19 @@ namespace MagicWoodWPF
             get => _clues.Contains(ClueType.Light);
         }
 
+
+        float _monsterProb;
+        public float MonsterProb { 
+            get => _monsterProb;
+            set => _monsterProb = value;
+        }
+
+        float _riftProb;
+        public float RiftProb {
+            get => _riftProb;
+            set => _riftProb = value;
+        }
+
         public WoodSquare() {
             _canExplore = false;
             _hasRock = false;
@@ -64,6 +77,9 @@ namespace MagicWoodWPF
 
             _elementThatCouldBeThere = new List<ObjectType>();
             _clues = new List<ClueType>();
+
+            _monsterProb = 0;
+            _riftProb = 0;
         }
 
         public void Unblock(){
