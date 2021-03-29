@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MagicWoodWPF.Facts;
@@ -29,7 +29,7 @@ namespace MagicWoodWPF
                 // Choisi la regle
                 // On choisis la derniere regle ajouter car ce sera celle la plus en profondeur dans l'arbre 
                 // (Elle aura ete debloquer par la regle precedente)
-                Rule choosenRule = relevantRules[rules.Count - 1];
+                Rule choosenRule = relevantRules[relevantRules.Count - 1];
 
                 // Applique la regle
                 choosenRule.Apply(ref newBeliefs);
