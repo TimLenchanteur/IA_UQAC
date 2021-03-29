@@ -107,6 +107,34 @@ namespace MagicWoodWPF
 
             public Move(Vector2 position) :base(position) { }
 
+            /// <summary>
+            /// Ajoute les nouvelle position que le jour peut explorer a partir de celle-ci
+            /// Ne doit etre appele que lors de la premiere exploration
+            /// </summary>
+            /// <param name="agent"></param>
+            protected void AddExplorablePosition(WoodTravelerAgent agent) {
+                bool exploredUp = false;
+                bool exploredDown = false;
+                bool exploredRight = false;
+                bool exploredLeft = false;
+
+                Vector2 up = new Vector2(_position.X, _position.Y + 1);
+                Vector2 down = new Vector2(_position.X, _position.Y - 1);
+                Vector2 right = new Vector2(_position.X + 1, _position.Y);
+                Vector2 left = new Vector2(_position.X - 1, _position.Y);
+                    
+                foreach (Fact fact in agent._beliefs) {
+                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(up)) exploredUp = true;
+                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(down)) exploredDown = true;
+                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(right)) exploredRight = true;
+                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(left)) exploredLeft = true;
+                }
+                if (!exploredUp) agent._beliefs.Add(new ElementIsOn(up, ObjectType.None, 0.2f));
+                if (!exploredDown) agent._beliefs.Add(new ElementIsOn(down, ObjectType.None, 0.2f));
+                if (!exploredRight) agent._beliefs.Add(new ElementIsOn(right, ObjectType.None, 0.2f));
+                if (!exploredLeft) agent._beliefs.Add(new ElementIsOn(left, ObjectType.None, 0.2f));
+            }
+
             public override void Execute(WoodTravelerAgent agent)
             {
                 bool died = agent._environment.MoveAgent(_position);
@@ -127,7 +155,7 @@ namespace MagicWoodWPF
                 }
                 else {
                     if (died) deathCount = Death.Once;
-                    
+                    AddExplorablePosition(agent);
                 }
                 Explored newFact = new Explored(_position, deathCount);
                 agent._beliefs.Add(newFact);
