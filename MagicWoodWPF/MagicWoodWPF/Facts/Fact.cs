@@ -30,14 +30,12 @@ namespace MagicWoodWPF.Facts
 
     public enum ObjectType
     {
-        [XmlEnum(Name = "Aucun")]
-        None,
         [XmlEnum(Name = "Monstre")]
         Monster,
         [XmlEnum(Name = "Crevasse")]
         Rift,
         [XmlEnum(Name = "Portail")]
-        Portail
+        Portal
     }
 
     public enum ClueType

@@ -13,9 +13,10 @@ namespace MagicWoodWPF
         /// <param name="beliefs">Croyances initial</param>
         /// <param name="rules">Regles sur les croyances</param>
         /// <returns>Les nouvelles croyances de l'agent</returns>
-        static public List<Fact> InferenceCycle(List<Fact> beliefs, List<Rule> rules) {
+        static public void InferenceCycle(ref WoodSquare[,] beliefs, List<Rule> rules) {
 
-            List<Rule> markedRules = new List<Rule>();
+            throw new NotImplementedException();
+           /* List<Rule> markedRules = new List<Rule>();
             List<Fact> newBeliefs = new List<Fact>(beliefs);
             List<Rule> relevantRules = new List<Rule>();
 
@@ -41,7 +42,7 @@ namespace MagicWoodWPF
                 // Filtre les nouvelles regles applicable
                 FilterRules(newBeliefs, rules, markedRules, ref relevantRules);
             }
-            return newBeliefs;
+            return newBeliefs;*/
         }
 
         /// <summary>

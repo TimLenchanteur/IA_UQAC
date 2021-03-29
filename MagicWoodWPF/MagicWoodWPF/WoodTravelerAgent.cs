@@ -21,7 +21,7 @@ namespace MagicWoodWPF
         MainWindow _appDisplayer;
 
         // Croyances actuel de l'agent
-        List<Fact> _beliefs;
+        WoodSquare[,] _beliefs;
         // Ensemble de regles qui definisse les croyance de l'agent
         List<Rule> _rules;
 
@@ -29,8 +29,20 @@ namespace MagicWoodWPF
             _appDisplayer = appDisplayer;
             _environment = environment;
             _currentPosition = _environment.PlaceAgent();
-            _beliefs = new List<Fact>();
             _rules = RulesGenerator.Instance.GeneratedRules;
+
+            _beliefs = new WoodSquare[environment.SqrtSize, environment.SqrtSize];
+            for (int x = 0; x<environment.SqrtSize; x++) {
+                for (int y = 0; y < environment.SqrtSize; y++) {
+                    _beliefs[x, y] = new WoodSquare();
+                    if (x == _currentPosition.X && y == _currentPosition.Y) {
+                        _beliefs[x,y].MarkedAsExplored(false);
+                    }
+                    if (x == _currentPosition.X - 1 || x == _currentPosition.X + 1 || y == _currentPosition.Y + 1 || y == _currentPosition.Y - 1) {
+                        _beliefs[x, y].Unblock();
+                    }
+                }
+            }
         }
 
         #region Capteurs
@@ -41,15 +53,15 @@ namespace MagicWoodWPF
         {
             if(FeelWind())
             {
-                _beliefs.Add(new ClueIsOn(_currentPosition, ClueType.Wind));
+                _beliefs[_currentPosition.X, _currentPosition.Y].PerceiveNewClue(ClueType.Wind); 
             }
             if (SmellSomething())
             {
-                _beliefs.Add(new ClueIsOn(_currentPosition, ClueType.Smell));
+                _beliefs[_currentPosition.X, _currentPosition.Y].PerceiveNewClue(ClueType.Smell);
             }
             if (SeeLight())
             {
-                _beliefs.Add(new ClueIsOn(_currentPosition, ClueType.Light));
+                _beliefs[_currentPosition.X, _currentPosition.Y].PerceiveNewClue(ClueType.Light);
             }
         }
 
@@ -113,52 +125,23 @@ namespace MagicWoodWPF
             /// </summary>
             /// <param name="agent"></param>
             protected void AddExplorablePosition(WoodTravelerAgent agent) {
-                bool exploredUp = false;
-                bool exploredDown = false;
-                bool exploredRight = false;
-                bool exploredLeft = false;
 
-                Vector2 up = new Vector2(_position.X, _position.Y + 1);
-                Vector2 down = new Vector2(_position.X, _position.Y - 1);
-                Vector2 right = new Vector2(_position.X + 1, _position.Y);
-                Vector2 left = new Vector2(_position.X - 1, _position.Y);
-                    
-                foreach (Fact fact in agent._beliefs) {
-                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(up)) exploredUp = true;
-                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(down)) exploredDown = true;
-                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(right)) exploredRight = true;
-                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(left)) exploredLeft = true;
-                }
-                if (!exploredUp) agent._beliefs.Add(new ElementIsOn(up, ObjectType.None, 0.2f));
-                if (!exploredDown) agent._beliefs.Add(new ElementIsOn(down, ObjectType.None, 0.2f));
-                if (!exploredRight) agent._beliefs.Add(new ElementIsOn(right, ObjectType.None, 0.2f));
-                if (!exploredLeft) agent._beliefs.Add(new ElementIsOn(left, ObjectType.None, 0.2f));
+                agent._beliefs[_position.X + 1, _position.Y].Unblock();
+                agent._beliefs[_position.X - 1, _position.Y].Unblock();
+                agent._beliefs[_position.X, _position.Y + 1].Unblock();
+                agent._beliefs[_position.X, _position.Y - 1].Unblock();
             }
 
             public override void Execute(WoodTravelerAgent agent)
             {
-                bool died = agent._environment.MoveAgent(_position);
-                Explored alreadyExplored = null;
-                foreach(Fact fact in agent._beliefs)
-                {
-                    if (fact.GetID() == FactID.FACTID_EXPLORE && fact.GetPosition().Equals(_position)) {
-                        alreadyExplored = (Explored)fact;
-                        break;
-                    }
-                }
+                bool died = !agent._environment.MoveAgent(_position);
 
-                Death deathCount = Death.Zero;
-                if (alreadyExplored != null){
-                    agent._beliefs.Remove(alreadyExplored);
-                    // Si on l'a refait c'est forcement qu'il ya deja eu une mort
-                    deathCount = Death.MoreThanOnce;
-                }
-                else {
-                    if (died) deathCount = Death.Once;
+                if (!died) {
+                    agent._currentPosition = _position;
                     AddExplorablePosition(agent);
                 }
-                Explored newFact = new Explored(_position, deathCount);
-                agent._beliefs.Add(newFact);
+
+                agent._beliefs[_position.X, _position.Y].MarkedAsExplored(died);
             }
         }
 
@@ -170,20 +153,7 @@ namespace MagicWoodWPF
             {
                 agent._environment.AgentThrowRock(_position);
 
-                RockThrown newMarkedRock = new RockThrown(_position);
-                agent._beliefs.Add(newMarkedRock);
-
-                // On ne pense plus qu'il y a un monstre a cette endroit
-                ElementIsOn canHaveMonster = null;
-                foreach (Fact fact in agent._beliefs)
-                {
-                    if (fact.GetID() == FactID.FACTID_ELEMENTS && ((ElementIsOn)fact)._object == ObjectType.Monster)
-                    {
-                        canHaveMonster = (ElementIsOn)fact;
-                        break;
-                    }
-                }
-                if (canHaveMonster != null) agent._beliefs.Remove(canHaveMonster);
+                agent._beliefs[_position.X, _position.Y].ThrowRock();
             }
         }
 
@@ -208,7 +178,7 @@ namespace MagicWoodWPF
             CaptureSignals();
 
             // Met A jour les croyance a partir des nouveaux fait observe et des croyances deja etablie
-            _beliefs = InferenceEngine.InferenceCycle(_beliefs, _rules);
+            InferenceEngine.InferenceCycle(ref _beliefs, _rules);
 
             // Choisit une action
             Effector nextAction = PlanNextMove();
