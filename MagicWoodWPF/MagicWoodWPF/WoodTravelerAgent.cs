@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MagicWoodWPF.Facts;
@@ -34,7 +34,7 @@ namespace MagicWoodWPF
             _beliefs = new WoodSquare[environment.SqrtSize, environment.SqrtSize];
             for (int x = 0; x<environment.SqrtSize; x++) {
                 for (int y = 0; y < environment.SqrtSize; y++) {
-                    _beliefs[x, y] = new WoodSquare();
+                    _beliefs[x, y] = new WoodSquare(new Vector2(x,y));
                     if (x == _currentPosition.X && y == _currentPosition.Y) {
                         _beliefs[x,y].MarkedAsExplored(false);
                     }

@@ -7,6 +7,12 @@ namespace MagicWoodWPF
 {
     public class WoodSquare
     {
+        Vector2 _position;
+        public Vector2 Position
+        {
+            get => _position;
+        }
+
         bool _canExplore;
         public bool CanExplore {
             get => _canExplore;
@@ -72,7 +78,9 @@ namespace MagicWoodWPF
             set => _riftProb = value;
         }
 
-        public WoodSquare() {
+        public WoodSquare(Vector2 position) {
+            _position = position;
+
             _canExplore = false;
             _hasRock = false;
             _explored = false;
