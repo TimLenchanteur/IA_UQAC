@@ -114,6 +114,10 @@ namespace MagicWoodWPF
             }
         }
 
+        public void CleanPossibility() {
+            _hazardThatCouldBeThere.Clear();
+        }
+
         public void FoundPortalHere() {
             _isAnExit = true;
         }

@@ -28,28 +28,27 @@ namespace MagicWoodWPF.Facts
             _clue = clueType;
         }
 
-
-        public override bool InConflictWith(WoodSquare otherFact)
-        {
-            throw new NotImplementedException();
-        }
-
-
+        // Ne sera probablement pas utilise car on ne peut pas inferer l'existence d'une preuve avec les regles actuel
         public override void Apply(WoodSquare square)
         {
-            throw new NotImplementedException();
+            square.PerceiveNewClue(_clue);
         }
 
         public override bool IsContainedIn(WoodSquare square)
         {
-            throw new NotImplementedException();
+            switch (_clue) {
+                case ClueType.Smell:
+                    return square.HasSmell;
+                case ClueType.Wind:
+                    return square.HasWind;
+                case ClueType.Light:
+                    return square.IsBright;
+                default:
+                    break;
+            }
+            return false;
         }
 
-        /// <summary>
-        /// Defini si le fait est egal a un autre objet 
-        /// </summary>
-        /// <param name="obj">L'autre objet propose</param>
-        /// <returns>Vrai si les faits sont equivalent, faux sinon</returns>
         public override bool Equals(Object obj)
         {
             if (!base.Equals(obj)) return false;

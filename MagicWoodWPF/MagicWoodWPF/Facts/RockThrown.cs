@@ -30,23 +30,25 @@ namespace MagicWoodWPF.Facts
 
         public override bool InConflictWith(WoodSquare otherFact)
         {
-            throw new NotImplementedException();
+            return otherFact.HasRock != _atThisLocation;
         }
 
-
+        // Ne sera probablement pas utilise car on ne peut pas inferer son existence avec les regles actuel
         public override void Apply(WoodSquare square)
         {
-            throw new NotImplementedException();
+            if (_atThisLocation) square.ThrowRock();
         }
 
         public override bool IsContainedIn(WoodSquare square)
         {
-            throw new NotImplementedException();
+            return square.HasRock == _atThisLocation;
         }
 
         public override bool Equals(Object obj)
         {
-            throw new NotImplementedException();
+            if (!base.Equals(obj)) return false;
+            RockThrown otherRockFact = obj as RockThrown;
+            return _atThisLocation == otherRockFact._atThisLocation;
         }
 
     }

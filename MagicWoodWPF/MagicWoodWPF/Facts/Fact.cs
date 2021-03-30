@@ -122,16 +122,23 @@ namespace MagicWoodWPF.Facts
         /// <param name="otherFact">L'autre fait</param>
         /// <returns></returns>
         public virtual bool InConflictWith(WoodSquare otherFact) {
-            throw new NotImplementedException();
+            return false;
         }
 
 
-        public virtual void Apply(WoodSquare square) {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// Applique le fait sur la case 
+        /// </summary>
+        /// <param name="square">Case associe au fait</param>
+        public virtual void Apply(WoodSquare square) {}
 
+        /// <summary>
+        /// Verifie si le fait est present sur une case
+        /// </summary>
+        /// <param name="square">Case sur laquelle verifie</param>
+        /// <returns>Vrai si le fait est present faux sinon</returns>
         public virtual bool IsContainedIn(WoodSquare square) {
-            throw new NotImplementedException();
+            return false;
         }
 
 

@@ -27,23 +27,25 @@ namespace MagicWoodWPF.Facts
 
         public override bool InConflictWith(WoodSquare otherFact)
         {
-            throw new NotImplementedException();
+            return otherFact.CanExplore != _activated;
         }
 
-
+        // Ne sera probablement pas utilise car on ne peut pas inferer son existence avec les regles actuel
         public override void Apply(WoodSquare square)
         {
-            throw new NotImplementedException();
+            if (_activated) square.Unblock();
         }
 
         public override bool IsContainedIn(WoodSquare square)
         {
-            throw new NotImplementedException();
+            return square.CanExplore == _activated;
         }
 
         public override bool Equals(Object obj)
         {
-            throw new NotImplementedException();
+            if (!base.Equals(obj)) return false;
+            CanExplore otherCanexploreFact = obj as CanExplore;
+            return _activated == otherCanexploreFact._activated;
         }
     }
 }

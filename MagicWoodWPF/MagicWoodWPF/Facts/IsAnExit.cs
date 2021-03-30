@@ -15,37 +15,37 @@ namespace MagicWoodWPF.Facts
 
         protected IsAnExit() : base()
         {
-            _id = FactID.FACTID_CANEXPLORE;
+            _id = FactID.FACTID_EXIT;
         }
 
         public IsAnExit(Vector2 position, bool activated)
         {
-            _id = FactID.FACTID_CANEXPLORE;
+            _id = FactID.FACTID_EXIT;
             _activated = activated;
             _isAbstract = false;
             _position = position;
         }
 
-
         public override bool InConflictWith(WoodSquare otherFact)
         {
-            throw new NotImplementedException();
+            return otherFact.IsAnExit != _activated;
         }
-
 
         public override void Apply(WoodSquare square)
         {
-            throw new NotImplementedException();
+           if(_activated) square.FoundPortalHere();
         }
 
         public override bool IsContainedIn(WoodSquare square)
         {
-            throw new NotImplementedException();
+           return square.IsAnExit == _activated;
         }
 
         public override bool Equals(Object obj)
         {
-            throw new NotImplementedException();
+            if(!base.Equals(obj))return false;
+            IsAnExit otherExitFact = obj as IsAnExit;
+            return otherExitFact._activated == _activated;
         }
     }
 }

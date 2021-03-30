@@ -2,7 +2,7 @@
 	<Declencheurs>
 		<IndiceEstSur Position = "X" Indice = "Vent"/>
 		<EstUneSortie Position = "XDessus" Actif = "false"/>
-		<Explorable Position = "XDessus">
+		<Explorable Position = "XDessus"/>
 	</Declencheurs>
 	<Corps>
 		<DangerEstSur Position = "XDessus" Type = "Crevasse"/>

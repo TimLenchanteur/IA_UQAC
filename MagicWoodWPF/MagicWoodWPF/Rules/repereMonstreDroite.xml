@@ -2,8 +2,8 @@
 	<Declencheurs>
 		<IndiceEstSur Position = "X" Indice = "Odeur"/>
 		<EstUneSortie Position = "XDroite" Actif = "false"/>
-		<Rocher Position = "XDroite" Present = "false" >
-		<Explorable Position = "XDroite">
+		<Rocher Position = "XDroite" Present = "false"/>
+		<Explorable Position = "XDroite"/>
 	</Declencheurs>
 	<Corps>
 		<DangerEstSur Position = "XDroite" Type = "Monstre"/>

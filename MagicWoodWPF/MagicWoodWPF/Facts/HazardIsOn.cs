@@ -37,34 +37,28 @@ namespace MagicWoodWPF.Facts
         /// <returns></returns>
         public override bool InConflictWith(WoodSquare otherFact)
         {
-            throw new NotImplementedException();
-            /*if (otherFact.GetID() != FactID.FACTID_ELEMENTS) return false;
-            ElementIsOn otherElementIsOn = otherFact as ElementIsOn;
-
-            return 
-                (((otherElementIsOn._object == ObjectType.Portail && (_object == ObjectType.Monster || _object == ObjectType.Rift)) || (_object == ObjectType.None && otherElementIsOn._object != ObjectType.None))
-                && ((_certaintyFactor == 1 && _isUncertain)||!_isUncertain))
-                ||
-                (((_object == ObjectType.Portail && (otherElementIsOn._object == ObjectType.Monster || otherElementIsOn._object == ObjectType.Rift)) || (otherElementIsOn._object == ObjectType.None && _object != ObjectType.None))
-                && ((otherElementIsOn._certaintyFactor == 1 && otherElementIsOn._isUncertain) || !otherElementIsOn._isUncertain));*/
+            if (otherFact.IsAnExit && (_type == DangerType.Monster || _type == DangerType.Rift)) return true;
+            if (otherFact.HasRock && _type == DangerType.Monster) return true;
+            if (otherFact.Explored && !otherFact.Deadly || !otherFact.CanExplore) return true;
+            return false;
         }
 
         public override void Apply(WoodSquare square)
         {
-            throw new NotImplementedException();
+            if (_type == DangerType.Impossible)
+            {
+                square.CleanPossibility();
+            }
+            else {
+                square.AddElementToPossibility(_type);
+            }
         }
 
         public override bool IsContainedIn(WoodSquare square)
         {
-            throw new NotImplementedException();
+            return (square.MayHaveAMonster && _type == DangerType.Monster || square.MayBeARift && _type == DangerType.Rift); 
         }
 
-
-        /// <summary>
-        /// Defini si le fait est egal a un autre objet 
-        /// </summary>
-        /// <param name="obj">L'autre objet propose</param>
-        /// <returns>Vrai si les faits sont equivalent, faux sinon</returns>
         public override bool Equals(Object obj)
         {
             if (!base.Equals(obj)) return false;
