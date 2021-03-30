@@ -260,7 +260,7 @@ namespace MagicWoodWPF
             Debug.WriteLine("probability computation");
             List<List<WoodSquare>> coherentCombinations = GetAllCoherentCombinations(explorableTiles, windyTiles);
 
-            float minRiftProb = 1;
+            float minRiftProb = 2;
             WoodSquare toExplore = new WoodSquare(new Vector2(-1,-1));
             foreach(WoodSquare tile in explorableTiles)
             {
@@ -328,7 +328,7 @@ namespace MagicWoodWPF
         private List<List<WoodSquare>> GetAllCoherentCombinations(List<WoodSquare> explorableTiles, List<WoodSquare> windyTiles)
         {
             List<List<WoodSquare>> combinations = new List<List<WoodSquare>>();
-            for (int i = 1; i < (int)Math.Pow(2, explorableTiles.Count); i++)
+            for (int i = windyTiles.Count/4+1; i < (int)Math.Pow(2, explorableTiles.Count); i++)
             {
                 List<WoodSquare> combination = new List<WoodSquare>();
                 for (uint j = 0; j < explorableTiles.Count; j++)
