@@ -7,7 +7,7 @@ namespace MagicWoodWPF.Facts
 {
 
     [XmlType(TypeName = "EstUneSortie")]
-    class IsAnExit:Fact
+    public class IsAnExit:Fact
     {
         [XmlAttribute(AttributeName = "Actif", DataType = "boolean")]
         public bool _activated = true;

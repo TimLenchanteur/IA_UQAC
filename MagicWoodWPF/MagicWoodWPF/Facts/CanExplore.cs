@@ -8,7 +8,7 @@ namespace MagicWoodWPF.Facts
 {
 
     [XmlType(TypeName = "Explorable")]
-    class CanExplore:Fact
+    public class CanExplore:Fact
     {
         [XmlAttribute(AttributeName = "Actif", DataType = "boolean")]
         public bool _activated = true;
