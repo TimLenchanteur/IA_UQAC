@@ -37,7 +37,7 @@ namespace MagicWoodWPF
         /// Genere un nouveau bois et l'agent qui va essayer de le resoudre 
         /// </summary>
         /// <param name="sqrtSize"> Taille des lignes et colonne du bois genere</param>
-        void GenerateWood(int sqrtSize)
+        public void GenerateWood(int sqrtSize)
         {
             _currentWood = new MagicWood(this, sqrtSize);
             _currentAgent = new WoodTravelerAgent(this, _currentWood);
@@ -47,7 +47,7 @@ namespace MagicWoodWPF
         /// Genere la grille correspondante au bois dans l'application
         /// </summary>
         /// <param name="sqrtSize"></param>
-        public void GenerateAppGrid(int sqrtSize)
+        private void GenerateAppGrid(int sqrtSize)
         {
             ClearImages();
             GridEnvironment.ColumnDefinitions.Clear();

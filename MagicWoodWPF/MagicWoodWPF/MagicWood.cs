@@ -213,7 +213,7 @@ namespace MagicWoodWPF
         public void AgentLeave(Vector2 position)
         {
             _appDisplayer.UpdateAgentPosition(position);
-            if ((_woodGrid[position.X, position.Y] & PORTAL) == PORTAL) _appDisplayer.GenerateAppGrid(_sqrtSize + 1);
+            if ((_woodGrid[position.X, position.Y] & PORTAL) == PORTAL) _appDisplayer.GenerateWood(_sqrtSize + 1);
         }
 
         public void DisplayWood()
