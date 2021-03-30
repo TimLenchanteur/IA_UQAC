@@ -70,13 +70,17 @@ namespace MagicWoodWPF
                 List<Rule> realRules = rule.RelevantsRules(beliefs);
                 // Verifie que les nouvelles regles n'existe pas deja ou ne sont pas deja invalide
                 // Un peu plus long mais seul moyen de s'assurer que les nouvelles regles sont les dernieres ajoute (Pour la recherche en profondeur)
+                List<Rule> toRemove = new List<Rule>();
                 foreach (Rule newRule in realRules){
-                    if (markedRules.Contains(newRule) || currentRelevantRules.Contains(newRule)) realRules.Remove(newRule);
+                    if (markedRules.Contains(newRule) || currentRelevantRules.Contains(newRule)) toRemove.Add(newRule);
                     if (newRule.IsInConflict(beliefs)){
-                        realRules.Remove(newRule);
+                        toRemove.Add(newRule);
                         markedRules.Add(rule);
                     }
                    
+                }
+                foreach (Rule ruleToRemove in toRemove) {
+                    realRules.Remove(ruleToRemove);
                 }
                 currentRelevantRules.AddRange(realRules);
             }
