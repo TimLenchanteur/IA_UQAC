@@ -1,0 +1,8 @@
+<Regle>
+	<Declencheurs>
+		<EstUneSortie Position = "X"/>
+	</Declencheurs>
+	<Corps>
+		<DangerEstSur Position = "X" Type = "Impossible"/>
+	</Corps>
+</Regle>

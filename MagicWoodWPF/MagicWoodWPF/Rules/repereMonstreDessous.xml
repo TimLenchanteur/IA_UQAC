@@ -1,0 +1,11 @@
+<Regle>
+	<Declencheurs>
+		<IndiceEstSur Position = "X" Indice = "Odeur"/>
+		<EstUneSortie Position = "XSous" Actif = "false"/>
+		<Rocher Position = "XSous" Present = "false" >
+		<Explorable Position = "XSous">
+	</Declencheurs>
+	<Corps>
+		<DangerEstSur Position = "XSous" Type = "Monstre"/>
+	</Corps>
+</Regle>

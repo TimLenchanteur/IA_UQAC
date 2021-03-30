@@ -1,0 +1,10 @@
+<Regle>
+	<Declencheurs>
+		<IndiceEstSur Position = "X" Indice = "Vent"/>
+		<EstUneSortie Position = "XDessus" Actif = "false"/>
+		<Explorable Position = "XDessus">
+	</Declencheurs>
+	<Corps>
+		<DangerEstSur Position = "XDessus" Type = "Crevasse"/>
+	</Corps>
+</Regle>

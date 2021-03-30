@@ -12,26 +12,24 @@ namespace MagicWoodWPF
     [XmlRoot(ElementName = "Regle")]
     public class Rule
     {
-        // Indique si les declencheurs doivent disparaitre appres utilisation de la regles
-        [XmlAttribute(DataType = "boolean", AttributeName = "ConsommeDeclencheurs")]
-        public bool _useTriggers;
-
         // Faits declencheurs de la regle
         [XmlArray(ElementName = "Declencheurs")]
         [XmlArrayItem(typeof(Fact))]
-        [XmlArrayItem(typeof(ElementIsOn))]
+        [XmlArrayItem(typeof(HazardIsOn))]
         [XmlArrayItem(typeof(ClueIsOn))]
-        [XmlArrayItem(typeof(Explored))]
+        [XmlArrayItem(typeof(CanExplore))]
         [XmlArrayItem(typeof(RockThrown))]
+        [XmlArrayItem(typeof(IsAnExit))]
         public Fact[] _triggers;
 
         // Faits concluant la regle
         [XmlArray(ElementName = "Corps")]
         [XmlArrayItem(typeof(Fact))]
-        [XmlArrayItem(typeof(ElementIsOn))]
+        [XmlArrayItem(typeof(HazardIsOn))]
         [XmlArrayItem(typeof(ClueIsOn))]
-        [XmlArrayItem(typeof(Explored))]
+        [XmlArrayItem(typeof(CanExplore))]
         [XmlArrayItem(typeof(RockThrown))]
+        [XmlArrayItem(typeof(IsAnExit))]
         public Fact[] _body;
 
         // Defini si une regle est abstraite
@@ -76,29 +74,11 @@ namespace MagicWoodWPF
         /// Applique la regles sur la base de fait renseigner
         /// </summary>
         /// <param name="currentFact">Une base de fait, apres application elle pourra contenir des faits differents</param>
-        public void Apply(ref List<Fact> currentFacts)
+        public void Apply(ref WoodSquare[,] currentFacts)
         {
-            // Si la regle doit consommer les declencheur elle les enleve de la base de fait 
-            if (_useTriggers)
-            {
-                foreach (Fact trigger in _triggers)
-                {
-                    currentFacts.Remove(trigger);
-                }
-            }
-
             foreach (Fact newFact in _body)
             {
-                // Si le fait est deja contenu dans la base de donnees le fusionner (Utile pour le facteur de certitude)
-                if (currentFacts.Contains(newFact))
-                {
-                    int index = currentFacts.IndexOf(newFact);
-                    currentFacts[index].Merge(newFact);
-                }
-                else
-                {
-                    currentFacts.Add(newFact);
-                }
+                newFact.Apply(currentFacts[newFact.GetPosition().X, newFact.GetPosition().Y]);
             }
         }
 
@@ -107,13 +87,13 @@ namespace MagicWoodWPF
         /// </summary>
         /// <param name="currentBeliefs"></param>
         /// <returns></returns>
-        public bool BecameIrrelevant(List<Fact> currentBeliefs, ref bool isInConflict) {
+        public bool BecameIrrelevant(WoodSquare[,] currentBeliefs, ref bool isInConflict) {
             if (IsInConflict(currentBeliefs)) {
                 isInConflict = true;
                 return true;
             }
             foreach(Fact trigger in _triggers){
-                if (!currentBeliefs.Contains(trigger)) return true;
+                if (trigger.IsContainedIn(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y])) return true;
             }
             return false;
         }
@@ -123,11 +103,9 @@ namespace MagicWoodWPF
         /// </summary>
         /// <param name="currentBeliefs">La base de fait a verifie</param>
         /// <returns></returns>
-        protected bool IsInConflict(List<Fact> currentBeliefs) {
-            foreach (Fact trigger in _triggers){
-                foreach (Fact belief in currentBeliefs) {
-                    if (trigger.InConflictWith(belief)) return true;
-                }
+        protected bool IsInConflict(WoodSquare[,] currentBeliefs) {
+            foreach (Fact trigger in _triggers) {
+                if (trigger.InConflictWith(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y])) return true;
             }
             return false;
         }
@@ -137,70 +115,69 @@ namespace MagicWoodWPF
         /// </summary>
         /// <param name="currentBeliefs">Une base de fait</param>
         /// <returns>La liste de toute les regles cree a partir de la regle abstraite</returns>
-        public List<Rule> RelevantsRules(List<Fact> currentBeliefs) {
+        public List<Rule> RelevantsRules(WoodSquare[,] currentBeliefs) {
             List<Rule> relevantRules = new List<Rule>();
             if (_isAbstract) {
                 List<Rule> tempRelevantRule = new List<Rule>();
                 // Pour chaque fait dans les croyances on creer autant de regle concrete que de declencheur equivalent a une croyance dans la regle
-                foreach (Fact fact in currentBeliefs) {
-                    foreach (Fact trigger in _triggers) {
-                        if (fact.IsEquivalent(trigger)) {
-                            // Traduit les faits abstraits
-                            // Le but est de retrouver la valeur de X et non de XDessus ou autre
-                            Vector2 xPosition;
-                            if (trigger.isAbstract())
+                int sqrSize = (int)Math.Sqrt(currentBeliefs.Length);
+                for (int x = 0; x < sqrSize; x++) {
+                    for (int y = 0; y < sqrSize; y++) {
+                        foreach (Fact trigger in _triggers)
+                        {
+                            if (trigger.IsContainedIn(currentBeliefs[x,y]))
                             {
-                                xPosition = fact.GetPosition();
-                                switch (trigger._abstractPos) {
-                                    case AbstractVector.Up:
-                                        xPosition.Y -= 1;
-                                        break;
-                                    case AbstractVector.Down:
-                                        xPosition.Y += 1;
-                                        break;
-                                    case AbstractVector.Right:
-                                        xPosition.X -= 1;
-                                        break;
-                                    case AbstractVector.Left:
-                                        xPosition.X += 1;
-                                        break;
-                                    default:
-                                        break;
+                                // Traduit les faits abstraits
+                                // Le but est de retrouver la valeur de X et non de XDessus ou autre
+                                Vector2 xPosition;
+                                if (trigger.isAbstract())
+                                {
+                                    xPosition = new Vector2(x,y);
+                                    switch (trigger._abstractPos)
+                                    {
+                                        case AbstractVector.Up:
+                                            xPosition.Y -= 1;
+                                            break;
+                                        case AbstractVector.Down:
+                                            xPosition.Y += 1;
+                                            break;
+                                        case AbstractVector.Right:
+                                            xPosition.X -= 1;
+                                            break;
+                                        case AbstractVector.Left:
+                                            xPosition.X += 1;
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
-                            }
-                            else {
-                                xPosition = trigger.GetPosition();
-                            }
+                                else
+                                {
+                                    xPosition = trigger.GetPosition();
+                                }
 
-                            // Creer une regle a partir de la traduction
-                            Rule newRealRule = new Rule(xPosition, _triggers, _body);
-                            // Ajoute cette regle a la liste des regles a tester
-                            tempRelevantRule.Add(newRealRule);
-                        } 
+                                // Creer une regle a partir de la traduction
+                                Rule newRealRule = new Rule(xPosition, _triggers, _body);
+                                // Ajoute cette regle a la liste des regles a tester
+                                tempRelevantRule.Add(newRealRule);
+                            }
+                        }
+                            
                     }
                 }
-     
+
                 // Pour toute les regles qui viennent d'etre creer verifier que la regle peut etre declencher
                 foreach (Rule rule in tempRelevantRule) {
                     bool isRelevant = true;
-                    float triggerCertaintyFactor = float.MaxValue;
-                    bool triggerAreUncertain = false;
                     foreach (Fact trigger in rule._triggers) {
                         //Si le trigger n'existe pas dans les croyances actuelle on peut oublier la regle
-                        if (!currentBeliefs.Contains(trigger)) {
+                        if (trigger.IsContainedIn(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y])) {
                             isRelevant = false;
                             break;
-                        }
-                        // On ajoute si necessaire le facteur de certitude au calcul
-                        Fact realTrigger = currentBeliefs[currentBeliefs.IndexOf(trigger)];
-                        if (realTrigger.isUncertain()) {
-                            triggerAreUncertain = true;
-                            triggerCertaintyFactor = MathF.Min(triggerCertaintyFactor, realTrigger.GetCertaintyFactor());
                         }
                     }
                     // Si la regle peut etre ajouter on l'ajoute au regles pertinente et on calcul le facteur de certitude des faits composant son corp
                     if (isRelevant) {
-                        if(triggerAreUncertain) rule.ComputeBodyCertaintyFactor(triggerCertaintyFactor);
                         relevantRules.Add(rule);
                     }
                 }
@@ -209,7 +186,7 @@ namespace MagicWoodWPF
                 //Verifie que tout les fait necessaire pour valider cette regle sont present dans la base
                 bool relevant = true;
                 foreach (Fact trigger in _triggers) {
-                    if (!currentBeliefs.Contains(trigger)) {
+                    if (trigger.IsContainedIn(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y])) {
                         relevant = false;
                         break;
                     }
@@ -250,38 +227,29 @@ namespace MagicWoodWPF
 
             switch (abstractFact.GetID()) {
                 case FactID.FACTID_ELEMENTS:
-                    ElementIsOn elementIsOn = (ElementIsOn)abstractFact;
-                    if(elementIsOn.isUncertain()) newRealFact = new ElementIsOn(position, elementIsOn._object, elementIsOn.TranslateProbability());
-                    else newRealFact = new ElementIsOn(position, elementIsOn._object);
+                    HazardIsOn elementIsOn = (HazardIsOn)abstractFact;
+                    newRealFact = new HazardIsOn(position, elementIsOn._type);
                     break;
                 case FactID.FACTID_CLUE:
                     ClueIsOn clueIsOn = (ClueIsOn)abstractFact;
-                    if(clueIsOn.isUncertain()) newRealFact = new ClueIsOn(position, clueIsOn._clue, clueIsOn.TranslateProbability());
-                    else newRealFact = new ClueIsOn(position, clueIsOn._clue);
+                    newRealFact = new ClueIsOn(position, clueIsOn._clue);
                     break;
-                case FactID.FACTID_EXPLORE:
-                    Explored explored = (Explored)abstractFact;
-                    // Fait toujours certain
-                    newRealFact = new Explored(position, explored._deathCount);
+                case FactID.FACTID_CANEXPLORE:
+                    CanExplore explored = (CanExplore)abstractFact;
+                    newRealFact = new CanExplore(position, explored._activated);
                     break;
                 case FactID.FACTID_ROCK:
-                    // Fait toujours certain
-                    newRealFact = new RockThrown(position);
+                    RockThrown rock = (RockThrown)abstractFact;
+                    newRealFact = new RockThrown(position, rock._atThisLocation);
+                    break;
+                case FactID.FACTID_EXIT:
+                    IsAnExit exit = (IsAnExit)abstractFact;
+                    newRealFact = new IsAnExit(position, exit._activated);
                     break;
                 default:
                     break;
             }
             return newRealFact;
-        }
-
-        /// <summary>
-        /// Met a jour le facteur de certitude des faits du corps a partir de celui calculer des declencheurs
-        /// </summary>
-        /// <param name="triggerCertaintyFactor">Facteur de certitude calculer sur les declencheurs</param>
-        void ComputeBodyCertaintyFactor(float triggerCertaintyFactor) {
-            foreach (Fact body in _body) {
-                body.UpdateCertaintyFactorBy(triggerCertaintyFactor);
-            }
         }
 
         /// <summary>

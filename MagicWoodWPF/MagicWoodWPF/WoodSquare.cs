@@ -5,7 +5,7 @@ using MagicWoodWPF.Facts;
 
 namespace MagicWoodWPF
 {
-    class WoodSquare
+    public class WoodSquare
     {
         bool _canExplore;
         public bool CanExplore {
@@ -27,18 +27,20 @@ namespace MagicWoodWPF
             get => _explored;
         }
 
-        List<ObjectType> _elementThatCouldBeThere;
+        List<DangerType> _hazardThatCouldBeThere;
         public bool ShouldBeSafe {
-            get => _elementThatCouldBeThere.Count == 0;
+            get => _hazardThatCouldBeThere.Count == 0 || _hazardThatCouldBeThere.Contains(DangerType.Impossible);
         }
         public bool MayHaveAMonster {
-            get => _elementThatCouldBeThere.Contains(ObjectType.Monster);
+            get => _hazardThatCouldBeThere.Contains(DangerType.Monster);
         }
         public bool MayBeARift {
-            get => _elementThatCouldBeThere.Contains(ObjectType.Rift);
+            get => _hazardThatCouldBeThere.Contains(DangerType.Rift);
         }
+
+        bool _isAnExit;
         public bool IsAnExit {
-            get => _elementThatCouldBeThere.Contains(ObjectType.Portal);
+            get => _isAnExit;
         }
 
         List<ClueType> _clues;
@@ -74,8 +76,9 @@ namespace MagicWoodWPF
             _canExplore = false;
             _hasRock = false;
             _explored = false;
+            _isAnExit = false;
 
-            _elementThatCouldBeThere = new List<ObjectType>();
+            _hazardThatCouldBeThere = new List<DangerType>();
             _clues = new List<ClueType>();
 
             _monsterProb = 0;
@@ -94,15 +97,18 @@ namespace MagicWoodWPF
 
         public void ThrowRock() {
             _hasRock = true;
-            if (_elementThatCouldBeThere.Contains(ObjectType.Monster)) _elementThatCouldBeThere.Remove(ObjectType.Monster);
+            if (_hazardThatCouldBeThere.Contains(DangerType.Monster)) _hazardThatCouldBeThere.Remove(DangerType.Monster);
         }
 
-        public void AddElementToPossibility(ObjectType element) {
-            if (!_elementThatCouldBeThere.Contains(element)) {
-                _elementThatCouldBeThere.Add(element);
+        public void AddElementToPossibility(DangerType hazard) {
+            if (!_hazardThatCouldBeThere.Contains(hazard)) {
+                _hazardThatCouldBeThere.Add(hazard);
             }
         }
 
+        public void FoundPortalHere() {
+            _isAnExit = true;
+        }
 
         public void PerceiveNewClue(ClueType clue) {
             if (!_clues.Contains(clue)) {

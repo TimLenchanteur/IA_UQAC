@@ -1,9 +1,0 @@
-<Regle  ConsommeDeclencheurs = "true">
-	<Declencheurs>
-		<ObjetEstSur Position = "X" Objet = "Aucun"/>
-		<Explorer Position = "X" Mort = "0"/>
-	</Declencheurs>
-	<Corps>
-		<Explorer Position = "X" Mort = "0"/>
-	</Corps>
-</Regle>

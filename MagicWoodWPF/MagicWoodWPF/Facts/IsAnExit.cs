@@ -5,28 +5,27 @@ using System.Xml.Serialization;
 
 namespace MagicWoodWPF.Facts
 {
-    [XmlType(TypeName = "Rocher")]
-    public class RockThrown:Fact
-    {
-        [XmlAttribute(AttributeName = "Present", DataType = "boolean")]
-        public bool _atThisLocation = true;
 
-        protected RockThrown() : base()
+    [XmlType(TypeName = "EstUneSortie")]
+    class IsAnExit:Fact
+    {
+        [XmlAttribute(AttributeName = "Actif", DataType = "boolean")]
+        public bool _activated = true;
+
+
+        protected IsAnExit() : base()
         {
-            _id = FactID.FACTID_ROCK;
+            _id = FactID.FACTID_CANEXPLORE;
         }
 
-        /// <summary>
-        /// Constructeur pendant le runtime
-        /// </summary>
-        /// <param name="position">Position a partir duquel le joueur peut partir</param>
-        public RockThrown(Vector2 position, bool wasThrown)
+        public IsAnExit(Vector2 position, bool activated)
         {
-            _id = FactID.FACTID_ROCK;
-            _atThisLocation = wasThrown;
+            _id = FactID.FACTID_CANEXPLORE;
+            _activated = activated;
             _isAbstract = false;
             _position = position;
         }
+
 
         public override bool InConflictWith(WoodSquare otherFact)
         {
@@ -48,6 +47,5 @@ namespace MagicWoodWPF.Facts
         {
             throw new NotImplementedException();
         }
-
     }
 }

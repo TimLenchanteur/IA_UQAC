@@ -28,27 +28,21 @@ namespace MagicWoodWPF.Facts
             _clue = clueType;
         }
 
-        /// <summary>
-        /// Constructeur pendant le runtime
-        /// </summary>
-        /// <param name="position">Position a partir duquel le joueur peut partir</param>
-        public ClueIsOn(Vector2 position, ClueType clueType, float certaintyFactor):base(certaintyFactor)
+
+        public override bool InConflictWith(WoodSquare otherFact)
         {
-            _id = FactID.FACTID_CLUE;
-            _position = position;
-            _clue = clueType;
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Defini si le fait est equivalent a un autre fait
-        /// </summary>
-        /// <param name="fact">L'autre fait</param>
-        /// <returns></returns>
-        public override bool IsEquivalent(Fact otherFact)
+
+        public override void Apply(WoodSquare square)
         {
-            if (!base.IsEquivalent(otherFact)) return false;
-            ClueIsOn otherClueIsOnFact = otherFact as ClueIsOn;
-            return _clue == otherClueIsOnFact._clue;
+            throw new NotImplementedException();
+        }
+
+        public override bool IsContainedIn(WoodSquare square)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

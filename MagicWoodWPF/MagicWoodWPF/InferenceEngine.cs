@@ -15,16 +15,14 @@ namespace MagicWoodWPF
         /// <returns>Les nouvelles croyances de l'agent</returns>
         static public void InferenceCycle(ref WoodSquare[,] beliefs, List<Rule> rules) {
 
-            throw new NotImplementedException();
-           /* List<Rule> markedRules = new List<Rule>();
-            List<Fact> newBeliefs = new List<Fact>(beliefs);
+            List<Rule> markedRules = new List<Rule>();
             List<Rule> relevantRules = new List<Rule>();
 
            // Chainage avant en largeur etant donne qu'on ne peut pas vraiment atteindre le but de l'agent a partir des regles
            // Strategie de recherche en profondeur
 
            // Filtre les regles applicable
-           FilterRules(newBeliefs,rules, markedRules, ref relevantRules);
+           FilterRules(beliefs, rules, ref markedRules, ref relevantRules);
 
             while (relevantRules.Count != 0) {
                 // Choisi la regle
@@ -33,16 +31,15 @@ namespace MagicWoodWPF
                 Rule choosenRule = relevantRules[relevantRules.Count - 1];
 
                 // Applique la regle
-                choosenRule.Apply(ref newBeliefs);
+                choosenRule.Apply(ref beliefs);
 
                 //Marque la regle
                 markedRules.Add(choosenRule);
                 relevantRules.Remove(choosenRule);
 
                 // Filtre les nouvelles regles applicable
-                FilterRules(newBeliefs, rules, markedRules, ref relevantRules);
+                FilterRules(beliefs, rules, ref markedRules, ref relevantRules);
             }
-            return newBeliefs;*/
         }
 
         /// <summary>
@@ -53,7 +50,7 @@ namespace MagicWoodWPF
         /// <param name="markedRules">Regle marque ne pouvant plus etre utilise</param>
         /// <param name="currentRelevantRules">Regles que l'on pourrait utilise mais qui n'on pas encore ete traite</param>
         /// <returns>Les regles qu'il est possible d'execute</returns>
-        static void FilterRules(List<Fact> beliefs, List<Rule> everyAbstractRules, List<Rule> markedRules, ref List<Rule> currentRelevantRules) {
+        static void FilterRules(WoodSquare[,] beliefs, List<Rule> everyAbstractRules,ref List<Rule> markedRules, ref List<Rule> currentRelevantRules) {
 
             // Dans un premier temps on verifie que les regles qui avais ete choisi precedement sont toujours valable
             List<Rule> rulesToRemove = new List<Rule>();
@@ -75,6 +72,12 @@ namespace MagicWoodWPF
                 // Un peu plus long mais seul moyen de s'assurer que les nouvelles regles sont les dernieres ajoute (Pour la recherche en profondeur)
                 foreach (Rule newRule in realRules){
                     if (markedRules.Contains(newRule) || currentRelevantRules.Contains(newRule)) realRules.Remove(newRule);
+                    bool conflict = false;
+                    if (rule.BecameIrrelevant(beliefs, ref conflict)    && conflict){
+                        realRules.Remove(newRule);
+                        markedRules.Add(rule);
+                    }
+                   
                 }
                 currentRelevantRules.AddRange(realRules);
             }

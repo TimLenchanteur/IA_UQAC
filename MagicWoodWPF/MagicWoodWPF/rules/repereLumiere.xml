@@ -1,8 +1,8 @@
-<Regle  ConsommeDeclencheurs = "true">
+<Regle>
 	<Declencheurs>
 		<IndiceEstSur Position = "X" Indice = "Lumiere"/>
 	</Declencheurs>
 	<Corps>
-		<ObjetEstSur Position = "X" Objet = "Portail"/>
+		<EstUneSortie Position = "X"/>
 	</Corps>
 </Regle>
