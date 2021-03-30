@@ -39,6 +39,7 @@ namespace MagicWoodWPF
         /// <param name="sqrtSize"> Taille des lignes et colonne du bois genere</param>
         public void GenerateWood(int sqrtSize)
         {
+            GenerateAppGrid(sqrtSize);
             _currentWood = new MagicWood(this, sqrtSize);
             _currentAgent = new WoodTravelerAgent(this, _currentWood);
         }
@@ -64,8 +65,9 @@ namespace MagicWoodWPF
         /// </summary>
         /// <param name="grid"></param>
         public void DisplayWood(int[,] grid)
-        { 
-            for(int i = 0; i < grid.GetLength(0); i++)
+        {
+            ClearImages();
+            for (int i = 0; i < grid.GetLength(0); i++)
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {

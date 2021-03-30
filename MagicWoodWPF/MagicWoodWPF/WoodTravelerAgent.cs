@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using MagicWoodWPF.Facts;
 
@@ -24,6 +25,8 @@ namespace MagicWoodWPF
         WoodSquare[,] _beliefs;
         // Ensemble de regles qui definisse les croyance de l'agent
         List<Rule> _rules;
+
+        private Queue<Effector> _queuedActions = new Queue<Effector>();
 
         public WoodTravelerAgent(MainWindow appDisplayer, MagicWood environment) {
             _appDisplayer = appDisplayer;
@@ -99,7 +102,7 @@ namespace MagicWoodWPF
         abstract class Effector {
 
             // Position a laquelle on veut effectuer l'action
-            protected Vector2 _position;
+            public Vector2 _position;
 
             /// <summary>
             /// Position a laquelle on veut effectuer l'action
@@ -181,23 +184,23 @@ namespace MagicWoodWPF
             // Met A jour les croyance a partir des nouveaux fait observe et des croyances deja etablie
             InferenceEngine.InferenceCycle(ref _beliefs, _rules);
 
-            // Choisit une action
-            List<Effector> nextActions = PlanNextMove();
-
-            // Exécute les actions
-            foreach(Effector action in nextActions)
+            if(_queuedActions.Count == 0)
             {
-                action.Execute(this);
+                PlanNextMove();
             }
+            Effector action = _queuedActions.Dequeue();
+            Debug.WriteLine("Action effectuée : " + action.GetType() + " Position : "+action._position.X+" "+action._position.Y);
+            action.Execute(this);
         }
 
         /// <summary>
         /// Planifie le prochain effecteur a execute 
         /// </summary>
-        List<Effector> PlanNextMove() {
+        void PlanNextMove() {
             if (_beliefs[_currentPosition.X, _currentPosition.Y].IsAnExit)
             {
-                return new List<Effector>(){new Leave(_currentPosition)};
+                _queuedActions.Enqueue(new Leave(_currentPosition));
+                return;
             }
 
             // Etablit une liste des actions possibles a partir des croyances 
@@ -225,14 +228,23 @@ namespace MagicWoodWPF
             //find safe explorable tiles
             foreach(WoodSquare tile in explorableTiles)
             {
-                if(!tile.MayHaveAMonster && !tile.MayBeARift)
+                if(tile.ShouldBeSafe)
                 {
-                    return new List<Effector>() { new Move(tile.Position) };
+                    _queuedActions.Enqueue(new Move(tile.Position));
+                    return;
                 }
                 else if(tile.MayHaveAMonster && !tile.MayBeARift)
                 {
                     canOnlyHaveMonster.Add(tile);
                 }
+            }
+
+            //no safe tiles, throw rock on one that can only have a monster
+            if (canOnlyHaveMonster.Count != 0)
+            {
+                _queuedActions.Enqueue(new Throw(canOnlyHaveMonster[0].Position));
+                _queuedActions.Enqueue(new Move(canOnlyHaveMonster[0].Position));
+                return;
             }
 
             List<WoodSquare> windyTiles = new List<WoodSquare>();
@@ -244,12 +256,8 @@ namespace MagicWoodWPF
                 }
             }
 
-            //no safe tiles, throw rock on one that can only have a monster
-            if (canOnlyHaveMonster.Count != 0)
-            {
-                return new List<Effector>() { new Throw(canOnlyHaveMonster[0].Position), new Move(canOnlyHaveMonster[0].Position) };
-            }
-
+            
+            Debug.WriteLine("probability computation");
             List<List<WoodSquare>> coherentCombinations = GetAllCoherentCombinations(explorableTiles, windyTiles);
 
             float minRiftProb = 1;
@@ -264,13 +272,12 @@ namespace MagicWoodWPF
                 }
             }
 
-            List<Effector> actions = new List<Effector>();
             if (toExplore.MayHaveAMonster)
             {
-                actions.Add(new Throw(toExplore.Position));
+                _queuedActions.Enqueue(new Throw(toExplore.Position));
             }
-            actions.Add(new Move(toExplore.Position));
-            return actions;
+            _queuedActions.Enqueue(new Move(toExplore.Position));
+            return;
         }
 
         private List<WoodSquare> GetNeighbours(WoodSquare tile)
