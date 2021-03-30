@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using MagicWoodWPF.Facts;
@@ -195,16 +195,86 @@ namespace MagicWoodWPF
         /// Planifie le prochain effecteur a execute 
         /// </summary>
         Effector PlanNextMove() {
-            // Etablis une liste des actions possible a partir des croyances 
+
+            if (_beliefs[_currentPosition.X, _currentPosition.Y].IsAnExit)
+            {
+                return new Leave(_currentPosition);
+            }
+
+            // Etablit une liste des actions possibles a partir des croyances 
+            List<WoodSquare> explorableTiles = new List<WoodSquare>();
+            List<WoodSquare> exploredTiles = new List<WoodSquare>();
+
+            for(int i = 0; i<_environment.SqrtSize; i++)
+            {
+                for (int j = 0; j < _environment.SqrtSize; j++)
+                {
+                    if (_beliefs[i, j].Explored)
+                    {
+                        explorableTiles.Add(_beliefs[i, j]);
+                    }
+                    else if (_beliefs[i, j].CanExplore)
+                    {
+                        explorableTiles.Add(_beliefs[i, j]);
+                    }
+                }
+            }
+
+            //will be used if no perfectly safe tile can be found
+            List<WoodSquare> canOnlyHaveMonster = new List<WoodSquare>();
+
+            //find safe explorable tiles
+            foreach(WoodSquare tile in explorableTiles)
+            {
+                if(!tile.MayHaveAMonster && !tile.MayBeARift)
+                {
+                    return new Move(tile.Position);
+                }
+                else if(tile.MayHaveAMonster && !tile.MayBeARift)
+                {
+                    canOnlyHaveMonster.Add(tile);
+                }
+            }
+
+            //no safe tiles, throw rock on one that can only have a monster
+            if (canOnlyHaveMonster.Count != 0)
+            {
+                return new Throw(canOnlyHaveMonster[0].Position);
+            }
+
+            return new Move(explorableTiles[0].Position);
+
             List<Effector> _actionsDoable;
 
-            // Defini la meilleur actions a partir du but et des performances et des proba
+            // Defini la meilleure actions a partir du but et des performances et des proba
 
-            // Return la meilleur actions
+
+            // Return la meilleure actions
             throw new NotImplementedException();
         }
 
-
+        private List<WoodSquare> GetNeighbours(WoodSquare tile)
+        {
+            List<WoodSquare> neighbours = new List<WoodSquare>();
+            Vector2 pos = tile.Position;
+            if (pos.X > 0)
+            {
+                neighbours.Add(_beliefs[pos.X - 1, pos.Y]);
+            }
+            if (pos.X < _environment.SqrtSize - 1)
+            {
+                neighbours.Add(_beliefs[pos.X + 1, pos.Y]);
+            }
+            if (pos.Y > 0)
+            {
+                neighbours.Add(_beliefs[pos.X, pos.Y - 1]);
+            }
+            if (pos.Y < _environment.SqrtSize - 1)
+            {
+                neighbours.Add(_beliefs[pos.X, pos.Y + 1]);
+            }
+            return neighbours;
+        }
     
     }
 }
