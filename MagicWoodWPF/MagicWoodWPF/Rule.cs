@@ -103,7 +103,7 @@ namespace MagicWoodWPF
         /// </summary>
         /// <param name="currentBeliefs">La base de fait a verifie</param>
         /// <returns></returns>
-        protected bool IsInConflict(WoodSquare[,] currentBeliefs) {
+        public bool IsInConflict(WoodSquare[,] currentBeliefs) {
             foreach (Fact trigger in _triggers) {
                 if (trigger.InConflictWith(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y])) return true;
             }
@@ -117,10 +117,10 @@ namespace MagicWoodWPF
         /// <returns>La liste de toute les regles cree a partir de la regle abstraite</returns>
         public List<Rule> RelevantsRules(WoodSquare[,] currentBeliefs) {
             List<Rule> relevantRules = new List<Rule>();
+            int sqrSize = (int)Math.Sqrt(currentBeliefs.Length);
             if (_isAbstract) {
                 List<Rule> tempRelevantRule = new List<Rule>();
                 // Pour chaque fait dans les croyances on creer autant de regle concrete que de declencheur equivalent a une croyance dans la regle
-                int sqrSize = (int)Math.Sqrt(currentBeliefs.Length);
                 for (int x = 0; x < sqrSize; x++) {
                     for (int y = 0; y < sqrSize; y++) {
                         foreach (Fact trigger in _triggers)
@@ -159,7 +159,8 @@ namespace MagicWoodWPF
                                 // Creer une regle a partir de la traduction
                                 Rule newRealRule = new Rule(xPosition, _triggers, _body);
                                 // Ajoute cette regle a la liste des regles a tester
-                                tempRelevantRule.Add(newRealRule);
+                                if(!tempRelevantRule.Contains(newRealRule)) tempRelevantRule.Add(newRealRule);
+                                break;
                             }
                         }
                             
@@ -171,7 +172,12 @@ namespace MagicWoodWPF
                     bool isRelevant = true;
                     foreach (Fact trigger in rule._triggers) {
                         //Si le trigger n'existe pas dans les croyances actuelle on peut oublier la regle
-                        if (trigger.IsContainedIn(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y])) {
+                        if (!CheckPosition(trigger.GetPosition(), sqrSize)) {
+                            isRelevant = false;
+                            break;
+                        }
+                        else if (!trigger.IsContainedIn(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y]))
+                        {
                             isRelevant = false;
                             break;
                         }
@@ -186,7 +192,11 @@ namespace MagicWoodWPF
                 //Verifie que tout les fait necessaire pour valider cette regle sont present dans la base
                 bool relevant = true;
                 foreach (Fact trigger in _triggers) {
-                    if (trigger.IsContainedIn(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y])) {
+                    if (!CheckPosition(trigger.GetPosition(), sqrSize)) {
+                        relevant = false;
+                        break;
+                    }
+                    else if (!trigger.IsContainedIn(currentBeliefs[trigger.GetPosition().X, trigger.GetPosition().Y])) {
                         relevant = false;
                         break;
                     }
@@ -195,6 +205,10 @@ namespace MagicWoodWPF
                 if (relevant) relevantRules.Add(this);
             }
             return relevantRules;
+        }
+
+        bool CheckPosition(Vector2 position, int SqrSize) {
+            return position.X < SqrSize && position.X >= 0 && position.Y < SqrSize && position.Y >= 0;
         }
 
         /// <summary>

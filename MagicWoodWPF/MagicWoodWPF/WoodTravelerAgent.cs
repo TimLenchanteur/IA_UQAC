@@ -125,11 +125,11 @@ namespace MagicWoodWPF
             /// </summary>
             /// <param name="agent"></param>
             protected void AddExplorablePosition(WoodTravelerAgent agent) {
-
-                agent._beliefs[_position.X + 1, _position.Y].Unblock();
-                agent._beliefs[_position.X - 1, _position.Y].Unblock();
-                agent._beliefs[_position.X, _position.Y + 1].Unblock();
-                agent._beliefs[_position.X, _position.Y - 1].Unblock();
+                int sqrSize = (int)Math.Sqrt(agent._beliefs.Length);
+                if (_position.X + 1 < sqrSize) agent._beliefs[_position.X + 1, _position.Y].Unblock();
+                if (_position.X - 1 >= 0) agent._beliefs[_position.X - 1, _position.Y].Unblock();
+                if (_position.Y + 1 < sqrSize)  agent._beliefs[_position.X, _position.Y + 1].Unblock();
+                if (_position.Y - 1 >= 0) agent._beliefs[_position.X, _position.Y - 1].Unblock();
             }
 
             public override void Execute(WoodTravelerAgent agent)

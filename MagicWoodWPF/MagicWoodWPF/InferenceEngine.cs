@@ -24,7 +24,7 @@ namespace MagicWoodWPF
            // Filtre les regles applicable
            FilterRules(beliefs, rules, ref markedRules, ref relevantRules);
 
-            while (relevantRules.Count != 0) {
+            while (relevantRules.Count > 0) {
                 // Choisi la regle
                 // On choisis la derniere regle ajouter car ce sera celle la plus en profondeur dans l'arbre 
                 // (Elle aura ete debloquer par la regle precedente)
@@ -72,8 +72,7 @@ namespace MagicWoodWPF
                 // Un peu plus long mais seul moyen de s'assurer que les nouvelles regles sont les dernieres ajoute (Pour la recherche en profondeur)
                 foreach (Rule newRule in realRules){
                     if (markedRules.Contains(newRule) || currentRelevantRules.Contains(newRule)) realRules.Remove(newRule);
-                    bool conflict = false;
-                    if (rule.BecameIrrelevant(beliefs, ref conflict)    && conflict){
+                    if (newRule.IsInConflict(beliefs)){
                         realRules.Remove(newRule);
                         markedRules.Add(rule);
                     }
@@ -81,6 +80,7 @@ namespace MagicWoodWPF
                 }
                 currentRelevantRules.AddRange(realRules);
             }
+            return;
         }
     }
 }
