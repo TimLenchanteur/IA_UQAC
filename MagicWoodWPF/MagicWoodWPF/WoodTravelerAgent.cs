@@ -38,7 +38,8 @@ namespace MagicWoodWPF
                     if (x == _currentPosition.X && y == _currentPosition.Y) {
                         _beliefs[x,y].MarkedAsExplored(false);
                     }
-                    if (x == _currentPosition.X - 1 || x == _currentPosition.X + 1 || y == _currentPosition.Y + 1 || y == _currentPosition.Y - 1) {
+                    if (((x == _currentPosition.X - 1 || x == _currentPosition.X + 1) && y== _currentPosition.Y)
+                        || ((y == _currentPosition.Y + 1 || y == _currentPosition.Y - 1) && x==_currentPosition.X)) {
                         _beliefs[x, y].Unblock();
                     }
                 }
@@ -256,7 +257,7 @@ namespace MagicWoodWPF
             foreach(WoodSquare tile in explorableTiles)
             {
                 float riftProb = RiftProbability(tile, coherentCombinations, explorableTiles.Count);
-                if(riftProb < minRiftProb)
+                if(riftProb < minRiftProb && !tile.Deadly)
                 {
                     minRiftProb = riftProb;
                     toExplore = tile;
