@@ -173,7 +173,7 @@ namespace MagicWoodWPF
         /// <summary>
         /// Execute l'effecteur le plus approprie selon l'agent
         /// </summary>
-        public void ExecuteMove() {
+        public void ExecuteMoves() {
             // Observe l’environnement
             CaptureSignals();
 
@@ -181,24 +181,22 @@ namespace MagicWoodWPF
             InferenceEngine.InferenceCycle(ref _beliefs, _rules);
 
             // Choisit une action
-            Effector nextAction = PlanNextMove();
+            List<Effector> nextActions = PlanNextMove();
 
-            // Exécute l’action
-            if (nextAction != null) {
-                nextAction.Execute(this);
+            // Exécute les actions
+            foreach(Effector action in nextActions)
+            {
+                action.Execute(this);
             }
-
-            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Planifie le prochain effecteur a execute 
         /// </summary>
-        Effector PlanNextMove() {
-
+        List<Effector> PlanNextMove() {
             if (_beliefs[_currentPosition.X, _currentPosition.Y].IsAnExit)
             {
-                return new Leave(_currentPosition);
+                return new List<Effector>(){new Leave(_currentPosition)};
             }
 
             // Etablit une liste des actions possibles a partir des croyances 
@@ -211,7 +209,7 @@ namespace MagicWoodWPF
                 {
                     if (_beliefs[i, j].Explored)
                     {
-                        explorableTiles.Add(_beliefs[i, j]);
+                        exploredTiles.Add(_beliefs[i, j]);
                     }
                     else if (_beliefs[i, j].CanExplore)
                     {
@@ -228,7 +226,7 @@ namespace MagicWoodWPF
             {
                 if(!tile.MayHaveAMonster && !tile.MayBeARift)
                 {
-                    return new Move(tile.Position);
+                    return new List<Effector>() { new Move(tile.Position) };
                 }
                 else if(tile.MayHaveAMonster && !tile.MayBeARift)
                 {
@@ -236,21 +234,42 @@ namespace MagicWoodWPF
                 }
             }
 
+            List<WoodSquare> windyTiles = new List<WoodSquare>();
+            foreach(WoodSquare tile in exploredTiles)
+            {
+                if (tile.HasWind)
+                {
+                    windyTiles.Add(tile);
+                }
+            }
+
             //no safe tiles, throw rock on one that can only have a monster
             if (canOnlyHaveMonster.Count != 0)
             {
-                return new Throw(canOnlyHaveMonster[0].Position);
+                return new List<Effector>() { new Throw(canOnlyHaveMonster[0].Position), new Move(canOnlyHaveMonster[0].Position) };
             }
 
-            return new Move(explorableTiles[0].Position);
+            List<List<WoodSquare>> coherentCombinations = GetAllCoherentCombinations(explorableTiles, windyTiles);
 
-            List<Effector> _actionsDoable;
+            float minRiftProb = 1;
+            WoodSquare toExplore = new WoodSquare(new Vector2(-1,-1));
+            foreach(WoodSquare tile in explorableTiles)
+            {
+                float riftProb = RiftProbability(tile, coherentCombinations, explorableTiles.Count);
+                if(riftProb < minRiftProb)
+                {
+                    minRiftProb = riftProb;
+                    toExplore = tile;
+                }
+            }
 
-            // Defini la meilleure actions a partir du but et des performances et des proba
-
-
-            // Return la meilleure actions
-            throw new NotImplementedException();
+            List<Effector> actions = new List<Effector>();
+            if (toExplore.MayHaveAMonster)
+            {
+                actions.Add(new Throw(toExplore.Position));
+            }
+            actions.Add(new Move(toExplore.Position));
+            return actions;
         }
 
         private List<WoodSquare> GetNeighbours(WoodSquare tile)
@@ -274,6 +293,84 @@ namespace MagicWoodWPF
                 neighbours.Add(_beliefs[pos.X, pos.Y + 1]);
             }
             return neighbours;
+        }
+
+        private float RiftProbability(WoodSquare toCompute, List<List<WoodSquare>> coherentCombinations, int explorableTilesCount)
+        {
+            float sumIsRift = 0;
+            float sumIsNotRift = 0;
+            foreach(List<WoodSquare> combination in coherentCombinations)
+            {
+                if (combination.Contains(toCompute))
+                {
+                    sumIsRift += (float)(Math.Pow(0.1, combination.Count) * Math.Pow(0.9, explorableTilesCount - combination.Count));
+                }
+                else
+                {
+                    sumIsNotRift += (float)(Math.Pow(0.1, combination.Count) * Math.Pow(0.9, explorableTilesCount - combination.Count));
+                }
+            }
+
+            sumIsRift *= 0.1f;
+            sumIsNotRift *= 0.9f;
+
+            return sumIsRift / (sumIsRift + sumIsNotRift);
+        }
+
+        private List<List<WoodSquare>> GetAllCoherentCombinations(List<WoodSquare> explorableTiles, List<WoodSquare> windyTiles)
+        {
+            List<List<WoodSquare>> combinations = new List<List<WoodSquare>>();
+            for (int i = 1; i < (int)Math.Pow(2, explorableTiles.Count); i++)
+            {
+                List<WoodSquare> combination = new List<WoodSquare>();
+                for (uint j = 0; j < explorableTiles.Count; j++)
+                {
+                    if ((i & (1u << (int)j)) > 0)
+                    {
+                        combination.Add(explorableTiles[(int)j]);
+                    }
+                }
+                if (IsWindCoherent(windyTiles, combination))
+                {
+                    combinations.Add(combination);
+                }
+            }
+            return combinations;
+        }
+
+
+        private bool IsWindCoherent(List<WoodSquare> windyTiles, List<WoodSquare> supposedRifts)
+        {
+            List<WoodSquare> supposedWindyTiles = new List<WoodSquare>();
+            foreach(WoodSquare supposedRift in supposedRifts)
+            {
+                foreach(WoodSquare neighbour in GetNeighbours(supposedRift))
+                {
+                    if(neighbour.Explored && !supposedWindyTiles.Contains(neighbour))
+                    {
+                        supposedWindyTiles.Add(neighbour);
+                        if (supposedWindyTiles.Count > windyTiles.Count)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            if(supposedWindyTiles.Count != windyTiles.Count)
+            {
+                return false;
+            }
+            else
+            {
+                foreach(WoodSquare tile in windyTiles)
+                {
+                    if (!supposedWindyTiles.Contains(tile))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
     
     }

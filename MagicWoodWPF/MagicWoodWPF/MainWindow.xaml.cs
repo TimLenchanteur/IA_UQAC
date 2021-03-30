@@ -141,7 +141,7 @@ namespace MagicWoodWPF
         /// <param name="e">Parametre supplementaire si necessaire</param>
         private void MoveAgent(object sender, RoutedEventArgs e)
         {
-            _currentAgent.ExecuteMove();
+            _currentAgent.ExecuteMoves();
         }
 
         /// Create an image from a string
