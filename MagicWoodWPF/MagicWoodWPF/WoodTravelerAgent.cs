@@ -203,7 +203,6 @@ namespace MagicWoodWPF
                 return;
             }
 
-            // Etablit une liste des actions possibles a partir des croyances 
             List<WoodSquare> explorableTiles = new List<WoodSquare>();
             List<WoodSquare> exploredTiles = new List<WoodSquare>();
 
@@ -222,10 +221,10 @@ namespace MagicWoodWPF
                 }
             }
 
-            //will be used if no perfectly safe tile can be found
+            //sera utilisée si l'on ne trouve pas de case sûre
             List<WoodSquare> canOnlyHaveMonster = new List<WoodSquare>();
 
-            //find safe explorable tiles
+            //recherche d'une case sûre
             foreach(WoodSquare tile in explorableTiles)
             {
                 if(tile.ShouldBeSafe)
@@ -239,7 +238,7 @@ namespace MagicWoodWPF
                 }
             }
 
-            //no safe tiles, throw rock on one that can only have a monster
+            //pas de case sûre, on cherche donc une case ne pouvant pas contenir de crevasse
             if (canOnlyHaveMonster.Count != 0)
             {
                 _queuedActions.Enqueue(new Throw(canOnlyHaveMonster[0].Position));
@@ -328,16 +327,20 @@ namespace MagicWoodWPF
         private List<List<WoodSquare>> GetAllCoherentCombinations(List<WoodSquare> explorableTiles, List<WoodSquare> windyTiles)
         {
             List<List<WoodSquare>> combinations = new List<List<WoodSquare>>();
+
+            //windyTiles.Count/4+1 parce qu'on ne peut pas avoir moins de crevasses que cela si l'on a autant de cases venteuses
             for (int i = windyTiles.Count/4+1; i < (int)Math.Pow(2, explorableTiles.Count); i++)
             {
                 List<WoodSquare> combination = new List<WoodSquare>();
                 for (uint j = 0; j < explorableTiles.Count; j++)
                 {
+                    //opération binaire pour savoir quelles cases mettre dans la combinaison
                     if ((i & (1u << (int)j)) > 0)
                     {
                         combination.Add(explorableTiles[(int)j]);
                     }
                 }
+                //vérification de la cohérence de la combinaison avec les faits
                 if (IsWindCoherent(windyTiles, combination))
                 {
                     combinations.Add(combination);
@@ -350,6 +353,7 @@ namespace MagicWoodWPF
         private bool IsWindCoherent(List<WoodSquare> windyTiles, List<WoodSquare> supposedRifts)
         {
             List<WoodSquare> supposedWindyTiles = new List<WoodSquare>();
+            //avec cette combinaison de crevasses, quelles seraient les cases venteuses ?
             foreach(WoodSquare supposedRift in supposedRifts)
             {
                 foreach(WoodSquare neighbour in GetNeighbours(supposedRift))
@@ -357,6 +361,7 @@ namespace MagicWoodWPF
                     if(neighbour.Explored && !supposedWindyTiles.Contains(neighbour))
                     {
                         supposedWindyTiles.Add(neighbour);
+                        //si l'on a plus de cases venteuses qu'observé, la combinaison n'est pas cohérente
                         if (supposedWindyTiles.Count > windyTiles.Count)
                         {
                             return false;
@@ -370,6 +375,7 @@ namespace MagicWoodWPF
             }
             else
             {
+                //on vérifie que toutes les cases venteuses observées sont obtenues avec cette combinaison
                 foreach(WoodSquare tile in windyTiles)
                 {
                     if (!supposedWindyTiles.Contains(tile))
