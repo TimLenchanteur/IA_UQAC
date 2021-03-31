@@ -192,6 +192,7 @@ namespace MagicWoodWPF
             if ((_woodGrid[position.X, position.Y] & CREVASSE) == CREVASSE || (_woodGrid[position.X, position.Y] & MONSTER) == MONSTER) {
                 return false;
             }
+            _appDisplayer.NewAction("Se deplacer sur (" + position.X + ", " + position.Y + ")");
             _appDisplayer.UpdateAgentPosition(position);
             return true;
         }
@@ -203,6 +204,7 @@ namespace MagicWoodWPF
         public void AgentThrowRock(Vector2 position)
         {
             if ((_woodGrid[position.X, position.Y] & MONSTER) == MONSTER) _woodGrid[position.X, position.Y] -= MONSTER;
+            _appDisplayer.NewAction("Envoyer un rocher a (" + position.X + ", " + position.Y + ")");
             _appDisplayer.DisplayWood(_woodGrid);
         }
 
@@ -213,7 +215,11 @@ namespace MagicWoodWPF
         public void AgentLeave(Vector2 position)
         {
             _appDisplayer.UpdateAgentPosition(position);
-            if ((_woodGrid[position.X, position.Y] & PORTAL) == PORTAL) _appDisplayer.GenerateWood(_sqrtSize + 1);
+            if ((_woodGrid[position.X, position.Y] & PORTAL) == PORTAL)
+            {
+                _appDisplayer.NewAction("Quitter la foret depuis (" + position.X + ", " + position.Y +")");
+                _appDisplayer.GenerateWood(_sqrtSize + 1);
+            }
         }
 
         public void DisplayWood()

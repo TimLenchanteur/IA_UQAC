@@ -13,6 +13,7 @@
     <None Remove="images\monster.png" />
     <None Remove="images\poopangel.png" />
     <None Remove="images\portal.png" />
+    <None Remove="images\unexplored.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
     <Resource Include="images\monster.png" />
     <Resource Include="images\poopangel.png" />
     <Resource Include="images\portal.png" />
+    <Resource Include="images\unexplored.png" />
   </ItemGroup>
 
   <ItemGroup>

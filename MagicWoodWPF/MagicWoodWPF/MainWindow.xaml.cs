@@ -24,6 +24,8 @@ namespace MagicWoodWPF
         MagicWood _currentWood;
         WoodTravelerAgent _currentAgent;
 
+        Image[,] _backgrounds;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -53,6 +55,7 @@ namespace MagicWoodWPF
             ClearImages();
             GridEnvironment.ColumnDefinitions.Clear();
             GridEnvironment.RowDefinitions.Clear();
+            _backgrounds = new Image[sqrtSize, sqrtSize];
             for (int i = 0; i < sqrtSize; i++)
             {
                 GridEnvironment.ColumnDefinitions.Add(new ColumnDefinition());
@@ -71,8 +74,10 @@ namespace MagicWoodWPF
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
+
+
                     // Monster
-                    if((grid[i,j] & MagicWood.MONSTER) == MagicWood.MONSTER)
+                    if ((grid[i,j] & MagicWood.MONSTER) == MagicWood.MONSTER)
                     {
                         Image monster = CreateImage("monster.png");
                         monster.Visibility = Visibility.Visible;
@@ -116,6 +121,22 @@ namespace MagicWoodWPF
                         Grid.SetRow(portal, i);
                         Grid.SetColumn(portal, j);
                     }
+
+                    // Background
+                    if (_backgrounds[i, j] != null) {
+                        GridEnvironment.Children.Add(_backgrounds[i, j]);
+                        Grid.SetRow(_backgrounds[i, j], i);
+                        Grid.SetColumn(_backgrounds[i, j], j);
+                    }
+                    else {
+                        Image background = CreateImage("unexplored.png");
+                        background.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(background);
+                        Grid.SetRow(background, i);
+                        Grid.SetColumn(background, j);
+                        _backgrounds[i, j] = background;
+                    }
+                   
                 }
             }
         }
@@ -134,7 +155,19 @@ namespace MagicWoodWPF
             Grid.SetRow(AgentImage, newPosition.X);
             Grid.SetColumn(AgentImage, newPosition.Y);
             Grid.SetZIndex(AgentImage, 100);
+            _backgrounds[newPosition.X, newPosition.Y].Visibility = Visibility.Collapsed;
         }
+
+
+
+        public void NewAction(String action) {
+            Action.Text = "Derniere action : " + action;
+        }
+
+        public void UpdatePerformance(float performance) {
+            Performance.Text = " Performance : " + performance;
+        }
+         
 
         /// <summary>
         /// Envoie une instrcution pour specifier a l'agent de se deplacer

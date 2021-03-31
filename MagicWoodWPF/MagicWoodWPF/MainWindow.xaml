@@ -9,8 +9,10 @@
 
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar>
+            <ToolBar Margin="0,0,-53,0">
                 <Button x:Name="Bouger" Click="MoveAgent" Content="Bouger l'agent"/>
+                <TextBlock x:Name="Action"  Text=""/>
+                <TextBlock x:Name="Performance"  Text="Performances : 0"/>
             </ToolBar>
         </ToolBarTray>
         <Grid x:Name="Wood">
