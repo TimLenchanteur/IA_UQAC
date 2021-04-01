@@ -255,9 +255,18 @@ namespace MagicWoodWPF
                 }
             }
 
+            List<WoodSquare> possibleRifts = new List<WoodSquare>();
+            foreach(WoodSquare tile in explorableTiles)
+            {
+                if (tile.MayBeARift)
+                {
+                    possibleRifts.Add(tile);
+                }
+            }
+
             
             Debug.WriteLine("probability computation");
-            List<List<WoodSquare>> coherentCombinations = GetAllCoherentCombinations(explorableTiles, windyTiles);
+            List<List<WoodSquare>> coherentCombinations = GetAllCoherentCombinations(possibleRifts, windyTiles);
 
             float minRiftProb = 2;
             WoodSquare toExplore = new WoodSquare(new Vector2(-1,-1));
@@ -324,20 +333,20 @@ namespace MagicWoodWPF
             return sumIsRift / (sumIsRift + sumIsNotRift);
         }
 
-        private List<List<WoodSquare>> GetAllCoherentCombinations(List<WoodSquare> explorableTiles, List<WoodSquare> windyTiles)
+        private List<List<WoodSquare>> GetAllCoherentCombinations(List<WoodSquare> possibleRifts, List<WoodSquare> windyTiles)
         {
             List<List<WoodSquare>> combinations = new List<List<WoodSquare>>();
 
             //windyTiles.Count/4+1 parce qu'on ne peut pas avoir moins de crevasses que cela si l'on a autant de cases venteuses
-            for (int i = windyTiles.Count/4+1; i < (int)Math.Pow(2, explorableTiles.Count); i++)
+            for (int i = windyTiles.Count/4+1; i < (int)Math.Pow(2, possibleRifts.Count); i++)
             {
                 List<WoodSquare> combination = new List<WoodSquare>();
-                for (uint j = 0; j < explorableTiles.Count; j++)
+                for (uint j = 0; j < possibleRifts.Count; j++)
                 {
                     //opération binaire pour savoir quelles cases mettre dans la combinaison
                     if ((i & (1u << (int)j)) > 0)
                     {
-                        combination.Add(explorableTiles[(int)j]);
+                        combination.Add(possibleRifts[(int)j]);
                     }
                 }
                 //vérification de la cohérence de la combinaison avec les faits

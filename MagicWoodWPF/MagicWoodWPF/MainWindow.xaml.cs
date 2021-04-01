@@ -42,7 +42,12 @@ namespace MagicWoodWPF
         public void GenerateWood(int sqrtSize)
         {
             GenerateAppGrid(sqrtSize);
+            MagicWood previousWood = _currentWood;
             _currentWood = new MagicWood(this, sqrtSize);
+            if (previousWood != null)
+            {
+                _currentWood.agentPerformance = previousWood.agentPerformance;
+            }
             _currentAgent = new WoodTravelerAgent(this, _currentWood);
         }
 
@@ -75,7 +80,22 @@ namespace MagicWoodWPF
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
 
-
+                    // Background
+                    if (_backgrounds[i, j] != null)
+                    {
+                        GridEnvironment.Children.Add(_backgrounds[i, j]);
+                        Grid.SetRow(_backgrounds[i, j], i);
+                        Grid.SetColumn(_backgrounds[i, j], j);
+                    }
+                    else
+                    {
+                        Image background = CreateImage("unexplored.png");
+                        background.Visibility = Visibility.Visible;
+                        GridEnvironment.Children.Add(background);
+                        Grid.SetRow(background, i);
+                        Grid.SetColumn(background, j);
+                        _backgrounds[i, j] = background;
+                    }
                     // Monster
                     if ((grid[i,j] & MagicWood.MONSTER) == MagicWood.MONSTER)
                     {
@@ -122,20 +142,7 @@ namespace MagicWoodWPF
                         Grid.SetColumn(portal, j);
                     }
 
-                    // Background
-                    if (_backgrounds[i, j] != null) {
-                        GridEnvironment.Children.Add(_backgrounds[i, j]);
-                        Grid.SetRow(_backgrounds[i, j], i);
-                        Grid.SetColumn(_backgrounds[i, j], j);
-                    }
-                    else {
-                        Image background = CreateImage("unexplored.png");
-                        background.Visibility = Visibility.Visible;
-                        GridEnvironment.Children.Add(background);
-                        Grid.SetRow(background, i);
-                        Grid.SetColumn(background, j);
-                        _backgrounds[i, j] = background;
-                    }
+                    
                    
                 }
             }

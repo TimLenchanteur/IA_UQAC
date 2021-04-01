@@ -28,6 +28,8 @@ namespace MagicWoodWPF
             get => _woodGrid;
         }
 
+        public int agentPerformance = 0;
+
         // Classe permetant d'afficher l'environement dans l'application
         MainWindow _appDisplayer;
 
@@ -190,8 +192,13 @@ namespace MagicWoodWPF
 
         public bool MoveAgent(Vector2 position) {
             if ((_woodGrid[position.X, position.Y] & CREVASSE) == CREVASSE || (_woodGrid[position.X, position.Y] & MONSTER) == MONSTER) {
+                agentPerformance -= 10 * SqrtSize * SqrtSize;
+                _appDisplayer.UpdatePerformance(agentPerformance);
+                _appDisplayer.NewAction("Mort sur (" + position.X + ", " + position.Y + ")");
                 return false;
             }
+            agentPerformance -= 1;
+            _appDisplayer.UpdatePerformance(agentPerformance);
             _appDisplayer.NewAction("Se deplacer sur (" + position.X + ", " + position.Y + ")");
             _appDisplayer.UpdateAgentPosition(position);
             return true;
@@ -203,6 +210,8 @@ namespace MagicWoodWPF
         /// <param name="position">Position ou le rocher est envoyer</param>
         public void AgentThrowRock(Vector2 position)
         {
+            agentPerformance -= 10;
+            _appDisplayer.UpdatePerformance(agentPerformance);
             if ((_woodGrid[position.X, position.Y] & MONSTER) == MONSTER) _woodGrid[position.X, position.Y] -= MONSTER;
             _appDisplayer.NewAction("Envoyer un rocher a (" + position.X + ", " + position.Y + ")");
             _appDisplayer.DisplayWood(_woodGrid);
@@ -217,6 +226,8 @@ namespace MagicWoodWPF
             _appDisplayer.UpdateAgentPosition(position);
             if ((_woodGrid[position.X, position.Y] & PORTAL) == PORTAL)
             {
+                agentPerformance += 10 * SqrtSize * SqrtSize;
+                _appDisplayer.UpdatePerformance(agentPerformance);
                 _appDisplayer.NewAction("Quitter la foret depuis (" + position.X + ", " + position.Y +")");
                 _appDisplayer.GenerateWood(_sqrtSize + 1);
             }
