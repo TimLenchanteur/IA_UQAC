@@ -34,14 +34,22 @@ namespace MagicWoodWPF
         }
 
         List<DangerType> _hazardThatCouldBeThere;
+        List<DangerType> _hazardImpossible;
         public bool ShouldBeSafe {
-            get => _hazardThatCouldBeThere.Count == 0 || _hazardThatCouldBeThere.Contains(DangerType.Impossible);
+            get => _hazardThatCouldBeThere.Count == 0;
         }
         public bool MayHaveAMonster {
             get => _hazardThatCouldBeThere.Contains(DangerType.Monster);
         }
         public bool MayBeARift {
             get => _hazardThatCouldBeThere.Contains(DangerType.Rift);
+        }
+
+        public bool NoMonster {
+            get => _hazardImpossible.Contains(DangerType.Monster);
+        }
+        public bool NoRift {
+            get => _hazardImpossible.Contains(DangerType.Rift);
         }
 
         bool _isAnExit;
@@ -109,7 +117,7 @@ namespace MagicWoodWPF
         }
 
         public void AddElementToPossibility(DangerType hazard) {
-            if (!_hazardThatCouldBeThere.Contains(hazard)) {
+            if (!_hazardThatCouldBeThere.Contains(hazard) && !_hazardImpossible.Contains(hazard)) {
                 _hazardThatCouldBeThere.Add(hazard);
             }
         }
@@ -130,6 +138,13 @@ namespace MagicWoodWPF
 
         public void RemoveClue(ClueType clue) {
             _clues.Remove(clue);
+        }
+
+        public void RemoveHazard(DangerType hazard) {
+            if (!_hazardImpossible.Contains(hazard)) {
+                _hazardImpossible.Add(hazard);
+                _hazardThatCouldBeThere.Remove(hazard);
+            }
         }
     }
 }

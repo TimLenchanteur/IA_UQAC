@@ -14,6 +14,7 @@ namespace MagicWoodWPF.Facts
         public const int FACTID_ROCK = 4;
         public const int FACTID_EXIT= 5;
         public const int FACTID_NOCLUE = 6;
+        public const int FACTID_NOHAZARD = 7;
     }
 
     public enum AbstractVector
@@ -32,8 +33,6 @@ namespace MagicWoodWPF.Facts
 
     public enum DangerType
     {
-        [XmlEnum(Name = "Impossible")]
-        Impossible,
         [XmlEnum(Name = "Monstre")]
         Monster,
         [XmlEnum(Name = "Crevasse")]

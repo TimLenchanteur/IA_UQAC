@@ -37,7 +37,8 @@ namespace MagicWoodWPF.Facts
         /// <returns></returns>
         public override bool InConflictWith(WoodSquare otherFact)
         {
-            if (otherFact.IsAnExit && (_type == DangerType.Monster || _type == DangerType.Rift)) return true;
+            if (otherFact.IsAnExit) return true;
+            if ((otherFact.NoMonster && _type == DangerType.Monster) || (otherFact.NoRift && _type == DangerType.Rift)) return true;
             if (otherFact.HasRock && _type == DangerType.Monster) return true;
             if (otherFact.Explored && !otherFact.Deadly || !otherFact.CanExplore) return true;
             return false;
@@ -45,13 +46,7 @@ namespace MagicWoodWPF.Facts
 
         public override void Apply(WoodSquare square)
         {
-            if (_type == DangerType.Impossible)
-            {
-                square.CleanPossibility();
-            }
-            else {
-                square.AddElementToPossibility(_type);
-            }
+            square.AddElementToPossibility(_type);
         }
 
         public override bool IsContainedIn(WoodSquare square)

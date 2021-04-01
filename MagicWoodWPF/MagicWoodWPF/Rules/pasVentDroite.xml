@@ -1,0 +1,9 @@
+<Regle>
+	<Declencheurs>
+		<IndiceNePeutPasEtreSur Position = "X" Indice = "Vent" Actif = "true"/>
+		<Explorable Position = "XDroite"/>
+	</Declencheurs>
+	<Corps>
+		<DangerNestPasSur Position = "XDroite" Type = "Crevasse" Valeur = "true"/>
+	</Corps>
+</Regle>

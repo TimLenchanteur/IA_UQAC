@@ -1,0 +1,9 @@
+<Regle>
+	<Declencheurs>
+		<IndiceNePeutPasEtreSur Position = "X" Indice = "Odeur" Actif = "true"/>
+		<Explorable Position = "XDroite"/>
+	</Declencheurs>
+	<Corps>
+		<DangerNestPasSur Position = "XDroite" Type = "Monstre" Valeur = "true"/>
+	</Corps>
+</Regle>

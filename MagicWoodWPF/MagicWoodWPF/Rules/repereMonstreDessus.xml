@@ -1,15 +1,13 @@
 <Regle>
 	<Declencheurs>
-		<IndiceEstSur Position = "XSous" Indice = "Odeur"/>
-		<IndiceNePeutPasEtreSur Position = "XGauche" Indice = "Odeur" Actif = "false"/>
-		<IndiceNePeutPasEtreSur Position = "XDroite" Indice = "Odeur" Actif = "false"/>
-		<IndiceNePeutPasEtreSur Position = "XDessus" Indice = "Odeur" Actif = "false"/>
-
-		<EstUneSortie Position = "X" Actif = "false"/>
-		<Rocher Position = "X" Present = "false"/>
-		<Explorable Position = "X"/>
+		<IndiceEstSur Position = "X" Indice = "Odeur"/>
+		
+		<EstUneSortie Position = "XDessus" Actif = "false"/>
+		<Rocher Position = "XDessus" Present = "false"/>
+		<DangerNestPasSur Position = "XDessus" Type = "Monstre" Valeur = "false"/>
+		<Explorable Position = "XDessus"/>
 	</Declencheurs>
 	<Corps>
-		<DangerEstSur Position = "X" Type = "Monstre"/>
+		<DangerEstSur Position = "XDessus" Type = "Monstre"/>
 	</Corps>
 </Regle>

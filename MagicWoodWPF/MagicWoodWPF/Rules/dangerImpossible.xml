@@ -3,6 +3,7 @@
 		<EstUneSortie Position = "X"/>
 	</Declencheurs>
 	<Corps>
-		<DangerEstSur Position = "X" Type = "Impossible"/>
+		<DangerNestPasSur Position = "X" Type = "Monstre" Valeur = "true"/>
+		<DangerNestPasSur Position = "X" Type = "Crevasse" Valeur = "true"/>
 	</Corps>
 </Regle>

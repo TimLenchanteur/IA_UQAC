@@ -21,6 +21,7 @@ namespace MagicWoodWPF
         [XmlArrayItem(typeof(RockThrown))]
         [XmlArrayItem(typeof(IsAnExit))]
         [XmlArrayItem(typeof(NoClue))]
+        [XmlArrayItem(typeof(HazardCantBeOn))]
         public Fact[] _triggers;
 
         // Faits concluant la regle
@@ -32,6 +33,7 @@ namespace MagicWoodWPF
         [XmlArrayItem(typeof(RockThrown))]
         [XmlArrayItem(typeof(IsAnExit))]
         [XmlArrayItem(typeof(NoClue))]
+        [XmlArrayItem(typeof(HazardCantBeOn))]
         public Fact[] _body;
 
         // Defini si une regle est abstraite
@@ -265,6 +267,10 @@ namespace MagicWoodWPF
                 case FactID.FACTID_NOCLUE:
                     NoClue noClue = (NoClue)abstractFact;
                     newRealFact = new NoClue(position, noClue._clue, noClue._activated);
+                    break;
+                case FactID.FACTID_NOHAZARD:
+                    HazardCantBeOn noHazard = (HazardCantBeOn)abstractFact;
+                    newRealFact = new HazardCantBeOn(position, noHazard._type, noHazard._value);
                     break;
                 default:
                     break;
