@@ -63,10 +63,10 @@ namespace MagicWoodWPF
                 for (int j = 0; j < _sqrtSize; j++)
                 {
                     // Ne rien ajouter sur la case portal
-                    if (_woodGrid[i, j] == PORTAL) continue;
+                    if ((_woodGrid[i, j] & PORTAL) == PORTAL) continue;
 
                     // 1 chance sur 10 d'avoir un monstre
-                    if(rand.Next(0, 10) == 0) 
+                    if (rand.Next(0, 10) == 0) 
                     {
                         _woodGrid[i, j] += MONSTER;
                         AddValueAdjacent(i, j, SMELL);
