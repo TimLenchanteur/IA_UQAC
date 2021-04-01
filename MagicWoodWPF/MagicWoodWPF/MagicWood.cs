@@ -240,6 +240,10 @@ namespace MagicWoodWPF
             {
                 for (int j = 0; j < _sqrtSize; j++)
                 {
+                    if (_woodGrid[i, j] <= 9)
+                    {
+                        result += "0";
+                    }
                     result += _woodGrid[i, j] + "|";
                 }
                 result += "\n";

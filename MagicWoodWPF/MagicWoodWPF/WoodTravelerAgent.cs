@@ -189,7 +189,6 @@ namespace MagicWoodWPF
                 PlanNextMove();
             }
             Effector action = _queuedActions.Dequeue();
-            Debug.WriteLine("Action effectuée : " + action.GetType() + " Position : "+action._position.X+" "+action._position.Y);
             action.Execute(this);
         }
 
