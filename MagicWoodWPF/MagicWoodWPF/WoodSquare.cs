@@ -95,6 +95,7 @@ namespace MagicWoodWPF
             _isAnExit = false;
 
             _hazardThatCouldBeThere = new List<DangerType>();
+            _hazardImpossible = new List<DangerType>();
             _clues = new List<ClueType>();
 
             _monsterProb = 0;
