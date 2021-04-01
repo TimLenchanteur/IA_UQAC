@@ -13,6 +13,7 @@ namespace MagicWoodWPF.Facts
         public const int FACTID_CANEXPLORE = 3;
         public const int FACTID_ROCK = 4;
         public const int FACTID_EXIT= 5;
+        public const int FACTID_NOCLUE = 6;
     }
 
     public enum AbstractVector

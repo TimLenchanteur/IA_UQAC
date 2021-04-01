@@ -127,5 +127,9 @@ namespace MagicWoodWPF
                 _clues.Add(clue);
             }
         }
+
+        public void RemoveClue(ClueType clue) {
+            _clues.Remove(clue);
+        }
     }
 }

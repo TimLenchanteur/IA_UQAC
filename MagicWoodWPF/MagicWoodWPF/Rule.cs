@@ -20,6 +20,7 @@ namespace MagicWoodWPF
         [XmlArrayItem(typeof(CanExplore))]
         [XmlArrayItem(typeof(RockThrown))]
         [XmlArrayItem(typeof(IsAnExit))]
+        [XmlArrayItem(typeof(NoClue))]
         public Fact[] _triggers;
 
         // Faits concluant la regle
@@ -30,6 +31,7 @@ namespace MagicWoodWPF
         [XmlArrayItem(typeof(CanExplore))]
         [XmlArrayItem(typeof(RockThrown))]
         [XmlArrayItem(typeof(IsAnExit))]
+        [XmlArrayItem(typeof(NoClue))]
         public Fact[] _body;
 
         // Defini si une regle est abstraite
@@ -249,8 +251,8 @@ namespace MagicWoodWPF
                     newRealFact = new ClueIsOn(position, clueIsOn._clue);
                     break;
                 case FactID.FACTID_CANEXPLORE:
-                    CanExplore explored = (CanExplore)abstractFact;
-                    newRealFact = new CanExplore(position, explored._activated);
+                    CanExplore canExplore = (CanExplore)abstractFact;
+                    newRealFact = new CanExplore(position, canExplore._activated);
                     break;
                 case FactID.FACTID_ROCK:
                     RockThrown rock = (RockThrown)abstractFact;
@@ -259,6 +261,10 @@ namespace MagicWoodWPF
                 case FactID.FACTID_EXIT:
                     IsAnExit exit = (IsAnExit)abstractFact;
                     newRealFact = new IsAnExit(position, exit._activated);
+                    break;
+                case FactID.FACTID_NOCLUE:
+                    NoClue noClue = (NoClue)abstractFact;
+                    newRealFact = new NoClue(position, noClue._clue, noClue._activated);
                     break;
                 default:
                     break;

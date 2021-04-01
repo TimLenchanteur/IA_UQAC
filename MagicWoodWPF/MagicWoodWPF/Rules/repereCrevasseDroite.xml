@@ -1,10 +1,14 @@
 <Regle>
 	<Declencheurs>
-		<IndiceEstSur Position = "X" Indice = "Vent"/>
-		<EstUneSortie Position = "XDroite" Actif = "false"/>
-		<Explorable Position = "XDroite"/>
+		<IndiceEstSur Position = "XGauche" Indice = "Vent"/>
+		<IndiceNePeutPasEtreSur Position = "XDroite" Indice = "Vent" Actif = "false"/>
+		<IndiceNePeutPasEtreSur Position = "XSous" Indice = "Vent" Actif = "false"/>
+		<IndiceNePeutPasEtreSur Position = "XDessus" Indice = "Vent" Actif = "false"/>
+
+		<EstUneSortie Position = "X" Actif = "false"/>
+		<Explorable Position = "X"/>
 	</Declencheurs>
 	<Corps>
-		<DangerEstSur Position = "XDroite" Type = "Crevasse"/>
+		<DangerEstSur Position = "X" Type = "Crevasse"/>
 	</Corps>
 </Regle>
