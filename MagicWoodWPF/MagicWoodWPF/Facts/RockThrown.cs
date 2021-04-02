@@ -5,6 +5,9 @@ using System.Xml.Serialization;
 
 namespace MagicWoodWPF.Facts
 {
+    /// <summary>
+    /// Fait indiquant si une case a recu un rocher
+    /// </summary>
     [XmlType(TypeName = "Rocher")]
     public class RockThrown:Fact
     {

@@ -5,6 +5,10 @@ using System.Xml.Serialization;
 
 namespace MagicWoodWPF.Facts
 {
+
+    /// <summary>
+    /// Fait indiquant que la case contient un danger
+    /// </summary>
     [XmlType(TypeName = "DangerEstSur")]
     public class HazardIsOn:Fact
     {

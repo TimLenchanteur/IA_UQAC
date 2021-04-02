@@ -6,12 +6,14 @@ using System.Xml.Serialization;
 namespace MagicWoodWPF.Facts
 {
 
+    /// <summary>
+    /// Fait indiquant si la case est une sortie
+    /// </summary>
     [XmlType(TypeName = "EstUneSortie")]
     public class IsAnExit:Fact
     {
         [XmlAttribute(AttributeName = "Actif", DataType = "boolean")]
         public bool _activated = true;
-
 
         protected IsAnExit() : base()
         {

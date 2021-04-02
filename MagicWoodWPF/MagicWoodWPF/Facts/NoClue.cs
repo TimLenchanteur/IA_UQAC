@@ -5,6 +5,9 @@ using System.Xml.Serialization;
 
 namespace MagicWoodWPF.Facts
 {
+    /// <summary>
+    /// Fait indiquant si la case ne peut pas contenir un indice
+    /// </summary>
     [XmlType(TypeName = "IndiceNePeutPasEtreSur")]
     public class NoClue:Fact
     {

@@ -5,6 +5,9 @@ using System.Xml.Serialization;
 
 namespace MagicWoodWPF.Facts
 {
+    /// <summary>
+    /// Fait indiquant que la case contient un indice 
+    /// </summary>
     [XmlType(TypeName = "IndiceEstSur")]
     public class ClueIsOn:Fact
     {

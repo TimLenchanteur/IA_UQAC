@@ -6,7 +6,9 @@ using System.Xml.Serialization;
 
 namespace MagicWoodWPF.Facts
 {
-
+    /// <summary>
+    /// Fait indiquant que la case peut etre explorer ou non 
+    /// </summary>
     [XmlType(TypeName = "Explorable")]
     public class CanExplore:Fact
     {
