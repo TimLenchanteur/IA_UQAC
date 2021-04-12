@@ -8,6 +8,7 @@ namespace ProjetWPF
     {
         public enum TokenColor { White, Black };
         protected TokenColor m_color;
+        public TokenColor Color { get { return m_color; } }
 
         public string image;
 

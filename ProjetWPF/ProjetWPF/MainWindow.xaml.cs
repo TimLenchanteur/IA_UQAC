@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
+using System.Windows.Input;
+using System.Diagnostics;
 
 namespace ProjetWPF
 {
@@ -17,6 +19,7 @@ namespace ProjetWPF
     public partial class MainWindow : Window
     {
         Board m_board = new Board();
+        IInputElement m_selectedItem;
 
         public MainWindow()
         {
@@ -34,16 +37,20 @@ namespace ProjetWPF
                 {
                     if(i % 2 == 0 && j % 2 == 1 || i % 2 == 1 && j % 2 == 0)
                     {
-                        SetRectangle(i, j);
+                        SetRectangle(i, j, Colors.Khaki);
+                    }
+                    else
+                    {
+                        SetRectangle(i, j, Colors.White);
                     }
                 }
             }
         }
 
-        private void SetRectangle(int x, int y)
+        private void SetRectangle(int x, int y, Color color)
         {
             Rectangle rectangle = new Rectangle();
-            rectangle.Fill = new SolidColorBrush(Colors.Khaki);
+            rectangle.Fill = new SolidColorBrush(color);
             GridBoard.Children.Add(rectangle);
             Grid.SetColumn(rectangle, x);
             Grid.SetRow(rectangle, y);
@@ -86,6 +93,25 @@ namespace ProjetWPF
             {
                 if(!(child is Rectangle))
                     GridBoard.Children.Remove(child);
+            }
+        }
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            var element = Mouse.DirectlyOver;
+            if(element != null)
+            {
+                m_selectedItem = element;
+
+                Token token = m_board.Tokens[Grid.GetRow((UIElement)m_selectedItem), Grid.GetColumn((UIElement)m_selectedItem)];
+                if(token != null)
+                {
+                    Debug.WriteLine("Token position = " + token.Position);
+                    foreach (Vector2 move in m_board.PossibleMoves(token))
+                    {
+                        Debug.WriteLine("Move = " + move);
+                    }
+                }
             }
         }
     }

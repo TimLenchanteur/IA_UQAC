@@ -46,5 +46,10 @@ namespace ProjetWPF
         }
 
         public static Vector2 operator -(Vector2 v1, Vector2 v2) => new Vector2(v1._x - v2._x, v1._y - v2._y);
+
+        public override string ToString()
+        {
+            return "X: " + _x + " / Y: " + _y;
+        }
     }
 }
