@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\tokenblack.png" />
+    <None Remove="Images\tokenwhite.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\tokenblack.png" />
+    <Resource Include="Images\tokenwhite.png" />
+  </ItemGroup>
+
+</Project>
