@@ -111,6 +111,10 @@ namespace ProjetWPF
                     {
                         Debug.WriteLine("Move = " + move);
                     }
+                    foreach (Vector2 move in m_board.PossibleCaptures(token))
+                    {
+                        Debug.WriteLine("Capture = " + move);
+                    }
                 }
             }
         }

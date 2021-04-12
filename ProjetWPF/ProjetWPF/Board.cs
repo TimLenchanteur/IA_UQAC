@@ -45,17 +45,22 @@ namespace ProjetWPF
         {
             List<Vector2> moves = new List<Vector2>();
 
+            Vector2 downLeft;
+            Vector2 downRight;
+            Vector2 topLeft;
+            Vector2 topRight;
+
             // Moves
             if (token.Color == Token.TokenColor.Black)
             {
                 // Down left
-                Vector2 downLeft = new Vector2(token.Position.X - 1, token.Position.Y + 1);
+                downLeft = new Vector2(token.Position.X - 1, token.Position.Y + 1);
                 if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.Y, downLeft.X] == null)
                 {
                     moves.Add(downLeft);
                 }
                 // Down right
-                Vector2 downRight = new Vector2(token.Position.X + 1, token.Position.Y + 1);
+                downRight = new Vector2(token.Position.X + 1, token.Position.Y + 1);
                 if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.Y, downRight.X] == null)
                 {
                     moves.Add(downRight);
@@ -64,26 +69,60 @@ namespace ProjetWPF
             else
             {
                 // Top left
-                Vector2 topLeft = new Vector2(token.Position.X - 1, token.Position.Y - 1);
+                topLeft = new Vector2(token.Position.X - 1, token.Position.Y - 1);
                 if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.Y, topLeft.X] == null)
                 {
                     moves.Add(topLeft);
                 }
                 // Top right
-                Vector2 topRight = new Vector2(token.Position.X + 1, token.Position.Y - 1);
+                topRight = new Vector2(token.Position.X + 1, token.Position.Y - 1);
                 if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.Y, topRight.X] == null)
                 {
                     moves.Add(topRight);
                 }
             }
 
-            // Capture
-            // Top left
-            // Top right
-            // Down left
-            // Down right
-
             return moves;
+        }
+
+        public List<Vector2> PossibleCaptures(Token token)
+        {
+            List<Vector2> captures = new List<Vector2>();
+            Vector2 downLeft;
+            Vector2 downRight;
+            Vector2 topLeft;
+            Vector2 topRight;
+
+            // Down left
+            downLeft = new Vector2(token.Position.X - 2, token.Position.Y + 2);
+            if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.Y, downLeft.X] == null &&
+                m_tokens[downLeft.Y - 1, downLeft.X + 1] != null && m_tokens[downLeft.Y - 1, downLeft.X + 1].Color != token.Color)
+            {
+                captures.Add(downLeft);
+            }
+            // Down right
+            downRight = new Vector2(token.Position.X + 2, token.Position.Y + 2);
+            if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.Y, downRight.X] == null &&
+                m_tokens[downRight.Y - 1, downRight.X - 1] != null && m_tokens[downRight.Y - 1, downRight.X - 1].Color != token.Color)
+            {
+                captures.Add(downRight);
+            }
+            // Top left
+            topLeft = new Vector2(token.Position.X - 2, token.Position.Y - 2);
+            if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.Y, topLeft.X] == null &&
+                m_tokens[topLeft.Y + 1, topLeft.X + 1] != null && m_tokens[topLeft.Y + 1, topLeft.X + 1].Color != token.Color)
+            {
+                captures.Add(topLeft);
+            }
+            // Top right
+            topRight = new Vector2(token.Position.X + 2, token.Position.Y - 2);
+            if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.Y, topRight.X] == null &&
+                m_tokens[topRight.Y + 1, topRight.X - 1] != null && m_tokens[topRight.Y + 1, topRight.X - 1].Color != token.Color)
+            {
+                captures.Add(topRight);
+            }
+
+            return captures;
         }
     }
 }
