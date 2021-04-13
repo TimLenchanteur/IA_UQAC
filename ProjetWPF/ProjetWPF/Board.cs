@@ -45,6 +45,8 @@ namespace ProjetWPF
         // Returns a list of all the possible positions the token can move to
         public List<Vector2> PossibleMoves(Token token)
         {
+            if (token is Queen) return PossibleMoves(token as Queen);
+
             List<Vector2> moves = new List<Vector2>();
 
             Vector2 downLeft;
@@ -126,6 +128,62 @@ namespace ProjetWPF
             }
 
             return captures;
+        }
+
+        private List<Vector2> PossibleMoves(Queen queen)
+        {
+            List<Vector2> moves = new List<Vector2>();
+
+            // Down left
+            for (int i = queen.Position.X - 1, j = queen.Position.Y + 1; i >= 0 && j < 10; i--, j++)
+            {
+                if(m_tokens[j, i] == null)
+                {
+                    moves.Add(new Vector2(i, j));
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // Down right
+            for (int i = queen.Position.X + 1, j = queen.Position.Y + 1; i < 10 && j < 10; i++, j++)
+            {
+                if (m_tokens[j, i] == null)
+                {
+                    moves.Add(new Vector2(i, j));
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // Top left
+            for (int i = queen.Position.X - 1, j = queen.Position.Y - 1; i >= 0 && j >= 0; i--, j--)
+            {
+                if (m_tokens[j, i] == null)
+                {
+                    moves.Add(new Vector2(i, j));
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // Top right
+            for (int i = queen.Position.X + 1, j = queen.Position.Y - 1; i < 10 && j >= 0; i++, j--)
+            {
+                if (m_tokens[j, i] == null)
+                {
+                    moves.Add(new Vector2(i, j));
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return moves;
         }
 
         // Move the token to a position

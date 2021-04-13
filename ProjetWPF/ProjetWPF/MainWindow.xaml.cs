@@ -139,6 +139,7 @@ namespace ProjetWPF
 
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
+            if (m_selectedToken == null) return;
             // Reset selected token
             ChangeColorOfCells(m_board.PossibleMoves(m_selectedToken), Colors.Khaki);
             ChangeColorOfCells(m_board.PossibleCaptures(m_selectedToken), Colors.Khaki);
