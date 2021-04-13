@@ -131,8 +131,11 @@ namespace ProjetWPF
                 {
                     // Select the token and mark the possible destinations with a color
                     m_selectedToken = m_board.Tokens[Grid.GetRow((UIElement)element), Grid.GetColumn((UIElement)element)];
-                    ChangeColorOfCells(m_board.PossibleMoves(m_selectedToken), Colors.CadetBlue);
-                    ChangeColorOfCells(m_board.PossibleCaptures(m_selectedToken), Colors.CadetBlue);
+                    if(m_selectedToken != null)
+                    {
+                        ChangeColorOfCells(m_board.PossibleMoves(m_selectedToken), Colors.CadetBlue);
+                        ChangeColorOfCells(m_board.PossibleCaptures(m_selectedToken), Colors.CadetBlue);
+                    }
                 }
             }
         }

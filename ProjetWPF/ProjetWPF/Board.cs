@@ -92,6 +92,8 @@ namespace ProjetWPF
         // Returns a list of all the possible positions the token can move to and the token that was captured
         public List<Tuple<Vector2, Token>> PossibleCaptures(Token token)
         {
+            if (token is Queen) return PossibleCaptures(token as Queen);
+
             List<Tuple<Vector2, Token>> captures = new List<Tuple<Vector2, Token>>();
             Vector2 downLeft;
             Vector2 downRight;
@@ -184,6 +186,110 @@ namespace ProjetWPF
             }
 
             return moves;
+        }
+
+        private List<Tuple<Vector2, Token>> PossibleCaptures(Queen queen)
+        {
+            List<Tuple<Vector2, Token>> captures = new List<Tuple<Vector2, Token>>();
+
+            // Down left
+            Token capture = null;
+            for (int i = queen.Position.X - 1, j = queen.Position.Y + 1; i >= 0 && j < 10; i--, j++)
+            {
+                // A token was captured, find the possible destinations
+                if(capture != null)
+                {
+                    if(m_tokens[j, i] == null)
+                    {
+                        captures.Add(Tuple.Create(new Vector2(i, j), capture));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if (m_tokens[j, i] != null && m_tokens[j, i].Color != queen.Color)
+                    {
+                        capture = m_tokens[j, i];
+                    }
+                }
+            }
+            // Down right
+            capture = null;
+            for (int i = queen.Position.X + 1, j = queen.Position.Y + 1; i < 10 && j < 10; i++, j++)
+            {
+                // A token was captured, find the possible destinations
+                if (capture != null)
+                {
+                    if (m_tokens[j, i] == null)
+                    {
+                        captures.Add(Tuple.Create(new Vector2(i, j), capture));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if (m_tokens[j, i] != null && m_tokens[j, i].Color != queen.Color)
+                    {
+                        capture = m_tokens[j, i];
+                    }
+                }
+            }
+            // Top left
+            capture = null;
+            for (int i = queen.Position.X - 1, j = queen.Position.Y - 1; i >= 0 && j >= 0; i--, j--)
+            {
+                // A token was captured, find the possible destinations
+                if (capture != null)
+                {
+                    if (m_tokens[j, i] == null)
+                    {
+                        captures.Add(Tuple.Create(new Vector2(i, j), capture));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if (m_tokens[j, i] != null && m_tokens[j, i].Color != queen.Color)
+                    {
+                        capture = m_tokens[j, i];
+                    }
+                }
+            }
+            // Top right
+            capture = null;
+            for (int i = queen.Position.X + 1, j = queen.Position.Y - 1; i < 10 && j >= 0; i++, j--)
+            {
+                // A token was captured, find the possible destinations
+                if (capture != null)
+                {
+                    if (m_tokens[j, i] == null)
+                    {
+                        captures.Add(Tuple.Create(new Vector2(i, j), capture));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if (m_tokens[j, i] != null && m_tokens[j, i].Color != queen.Color)
+                    {
+                        capture = m_tokens[j, i];
+                    }
+                }
+            }
+
+            return captures;
         }
 
         // Move the token to a position
