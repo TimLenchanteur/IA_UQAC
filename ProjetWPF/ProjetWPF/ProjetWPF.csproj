@@ -7,11 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\queenblack.png" />
+    <None Remove="Images\queenwhite.png" />
     <None Remove="Images\tokenblack.png" />
     <None Remove="Images\tokenwhite.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\queenblack.png" />
+    <Resource Include="Images\queenwhite.png" />
     <Resource Include="Images\tokenblack.png" />
     <Resource Include="Images\tokenwhite.png" />
   </ItemGroup>

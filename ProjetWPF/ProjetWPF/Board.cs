@@ -132,8 +132,19 @@ namespace ProjetWPF
         public void MoveToken(Token token, Vector2 destination)
         {
             m_tokens[token.Position.Y, token.Position.X] = null;
-            m_tokens[destination.Y, destination.X] = token;
-            token.Position = destination;
+
+            // If token arrived on board edges change token to Queen
+            if((destination.Y == 0 && token.Color == Token.TokenColor.White) || (destination.Y == 9 && token.Color == Token.TokenColor.Black))
+            {
+                Queen queen = new Queen(token.Color);
+                queen.Position = destination;
+                m_tokens[destination.Y, destination.X] = queen;
+            }
+            else
+            {
+                m_tokens[destination.Y, destination.X] = token;
+                token.Position = destination;
+            }
         }
 
         // Remove a token from the board

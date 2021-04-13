@@ -8,6 +8,7 @@ namespace ProjetWPF
     {
         public Queen(TokenColor color) : base(color)
         {
+            SetColor(color);
         }
 
         public override void SetColor(TokenColor color)
