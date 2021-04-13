@@ -100,16 +100,29 @@ namespace ProjetWPF
                 // If a token was already selected, move it if possible
                 if(m_selectedToken != null)
                 {
-                    List<Vector2> possibleActions = new List<Vector2>();
-                    possibleActions.AddRange(m_board.PossibleMoves(m_selectedToken));
-                    possibleActions.AddRange(m_board.PossibleCaptures(m_selectedToken));
                     Vector2 selectedCell = new Vector2(Grid.GetColumn((UIElement)element), Grid.GetRow((UIElement)element));
-                    if(possibleActions.Contains(selectedCell))
+                    List<Vector2> possibleMoves = m_board.PossibleMoves(m_selectedToken);
+                    List<Tuple<Vector2, Token>> possibleCaptures = m_board.PossibleCaptures(m_selectedToken);
+                    if(possibleMoves.Contains(selectedCell))
                     {
                         m_board.MoveToken(m_selectedToken, selectedCell);
-                        ChangeColorOfCells(possibleActions, Colors.Khaki);
+                        ChangeColorOfCells(possibleMoves, Colors.Khaki);
+                        ChangeColorOfCells(possibleCaptures, Colors.Khaki);
                         m_selectedToken = null;
                         DisplayBoard();
+                    }
+                    else
+                    {
+                        Tuple<Vector2, Token> capture = possibleCaptures.Find(e => e.Item1.Equals(selectedCell));
+                        if(capture != null)
+                        {
+                            m_board.MoveToken(m_selectedToken, capture.Item1);
+                            m_board.RemoveToken(capture.Item2);
+                            ChangeColorOfCells(possibleMoves, Colors.Khaki);
+                            ChangeColorOfCells(possibleCaptures, Colors.Khaki);
+                            m_selectedToken = null;
+                            DisplayBoard();
+                        }
                     }
                 }
                 else
@@ -124,10 +137,8 @@ namespace ProjetWPF
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
             // Reset selected token
-            List<Vector2> possibleActions = new List<Vector2>();
-            possibleActions.AddRange(m_board.PossibleMoves(m_selectedToken));
-            possibleActions.AddRange(m_board.PossibleCaptures(m_selectedToken));
-            ChangeColorOfCells(possibleActions, Colors.Khaki);
+            ChangeColorOfCells(m_board.PossibleMoves(m_selectedToken), Colors.Khaki);
+            ChangeColorOfCells(m_board.PossibleCaptures(m_selectedToken), Colors.Khaki);
             m_selectedToken = null;
         }
 
@@ -137,6 +148,19 @@ namespace ProjetWPF
             {
                 var element = GridBoard.Children.Cast<UIElement>().First(e => Grid.GetRow(e) == cell.Y && Grid.GetColumn(e) == cell.X);
                 if(element is Rectangle)
+                {
+                    Rectangle rectangle = element as Rectangle;
+                    rectangle.Fill = new SolidColorBrush(color);
+                }
+            }
+        }
+
+        private void ChangeColorOfCells(List<Tuple<Vector2, Token>> cells, Color color)
+        {
+            foreach (var capture in cells)
+            {
+                var element = GridBoard.Children.Cast<UIElement>().First(e => Grid.GetRow(e) == capture.Item1.Y && Grid.GetColumn(e) == capture.Item1.X);
+                if (element is Rectangle)
                 {
                     Rectangle rectangle = element as Rectangle;
                     rectangle.Fill = new SolidColorBrush(color);
