@@ -10,6 +10,7 @@ namespace ProjetWPF
         Token[,] m_tokens = new Token[10, 10];
         public Token[,] Tokens { get { return m_tokens; } }
 
+        // Initialize the board with black and white tokens
         public void Initialize()
         {
             for(int i = 0; i < 10; i++)
@@ -41,6 +42,7 @@ namespace ProjetWPF
             }
         }
 
+        // Returns a list of all the possible positions the token can move to
         public List<Vector2> PossibleMoves(Token token)
         {
             List<Vector2> moves = new List<Vector2>();
@@ -85,6 +87,7 @@ namespace ProjetWPF
             return moves;
         }
 
+        // Returns a list of all the possible positions the token can move to and the token that was captured
         public List<Tuple<Vector2, Token>> PossibleCaptures(Token token)
         {
             List<Tuple<Vector2, Token>> captures = new List<Tuple<Vector2, Token>>();
@@ -125,6 +128,7 @@ namespace ProjetWPF
             return captures;
         }
 
+        // Move the token to a position
         public void MoveToken(Token token, Vector2 destination)
         {
             m_tokens[token.Position.Y, token.Position.X] = null;
@@ -132,6 +136,7 @@ namespace ProjetWPF
             token.Position = destination;
         }
 
+        // Remove a token from the board
         public void RemoveToken(Token token)
         {
             m_tokens[token.Position.Y, token.Position.X] = null;

@@ -105,6 +105,7 @@ namespace ProjetWPF
                     List<Tuple<Vector2, Token>> possibleCaptures = m_board.PossibleCaptures(m_selectedToken);
                     if(possibleMoves.Contains(selectedCell))
                     {
+                        // Move the token and reset the colors of the board
                         m_board.MoveToken(m_selectedToken, selectedCell);
                         ChangeColorOfCells(possibleMoves, Colors.Khaki);
                         ChangeColorOfCells(possibleCaptures, Colors.Khaki);
@@ -116,6 +117,7 @@ namespace ProjetWPF
                         Tuple<Vector2, Token> capture = possibleCaptures.Find(e => e.Item1.Equals(selectedCell));
                         if(capture != null)
                         {
+                            // Move the selected token, capture the token and reset the colors of the board
                             m_board.MoveToken(m_selectedToken, capture.Item1);
                             m_board.RemoveToken(capture.Item2);
                             ChangeColorOfCells(possibleMoves, Colors.Khaki);
@@ -127,6 +129,7 @@ namespace ProjetWPF
                 }
                 else
                 {
+                    // Select the token and mark the possible destinations with a color
                     m_selectedToken = m_board.Tokens[Grid.GetRow((UIElement)element), Grid.GetColumn((UIElement)element)];
                     ChangeColorOfCells(m_board.PossibleMoves(m_selectedToken), Colors.CadetBlue);
                     ChangeColorOfCells(m_board.PossibleCaptures(m_selectedToken), Colors.CadetBlue);
