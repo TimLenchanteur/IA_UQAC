@@ -124,5 +124,12 @@ namespace ProjetWPF
 
             return captures;
         }
+
+        public void MoveToken(Token token, Vector2 destination)
+        {
+            m_tokens[token.Position.Y, token.Position.X] = null;
+            m_tokens[destination.Y, destination.X] = token;
+            token.Position = destination;
+        }
     }
 }

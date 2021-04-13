@@ -19,7 +19,7 @@ namespace ProjetWPF
     public partial class MainWindow : Window
     {
         Board m_board = new Board();
-        IInputElement m_selectedItem;
+        Token m_selectedToken;
 
         public MainWindow()
         {
@@ -38,10 +38,6 @@ namespace ProjetWPF
                     if(i % 2 == 0 && j % 2 == 1 || i % 2 == 1 && j % 2 == 0)
                     {
                         SetRectangle(i, j, Colors.Khaki);
-                    }
-                    else
-                    {
-                        SetRectangle(i, j, Colors.White);
                     }
                 }
             }
@@ -101,20 +97,49 @@ namespace ProjetWPF
             var element = Mouse.DirectlyOver;
             if(element != null)
             {
-                m_selectedItem = element;
-
-                Token token = m_board.Tokens[Grid.GetRow((UIElement)m_selectedItem), Grid.GetColumn((UIElement)m_selectedItem)];
-                if(token != null)
+                // If a token was already selected, move it if possible
+                if(m_selectedToken != null)
                 {
-                    Debug.WriteLine("Token position = " + token.Position);
-                    foreach (Vector2 move in m_board.PossibleMoves(token))
+                    List<Vector2> possibleActions = new List<Vector2>();
+                    possibleActions.AddRange(m_board.PossibleMoves(m_selectedToken));
+                    possibleActions.AddRange(m_board.PossibleCaptures(m_selectedToken));
+                    Vector2 selectedCell = new Vector2(Grid.GetColumn((UIElement)element), Grid.GetRow((UIElement)element));
+                    if(possibleActions.Contains(selectedCell))
                     {
-                        Debug.WriteLine("Move = " + move);
+                        m_board.MoveToken(m_selectedToken, selectedCell);
+                        ChangeColorOfCells(possibleActions, Colors.Khaki);
+                        m_selectedToken = null;
+                        DisplayBoard();
                     }
-                    foreach (Vector2 move in m_board.PossibleCaptures(token))
-                    {
-                        Debug.WriteLine("Capture = " + move);
-                    }
+                }
+                else
+                {
+                    m_selectedToken = m_board.Tokens[Grid.GetRow((UIElement)element), Grid.GetColumn((UIElement)element)];
+                    ChangeColorOfCells(m_board.PossibleMoves(m_selectedToken), Colors.CadetBlue);
+                    ChangeColorOfCells(m_board.PossibleCaptures(m_selectedToken), Colors.CadetBlue);
+                }
+            }
+        }
+
+        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
+            // Reset selected token
+            List<Vector2> possibleActions = new List<Vector2>();
+            possibleActions.AddRange(m_board.PossibleMoves(m_selectedToken));
+            possibleActions.AddRange(m_board.PossibleCaptures(m_selectedToken));
+            ChangeColorOfCells(possibleActions, Colors.Khaki);
+            m_selectedToken = null;
+        }
+
+        private void ChangeColorOfCells(List<Vector2> cells, Color color)
+        {
+            foreach(Vector2 cell in cells)
+            {
+                var element = GridBoard.Children.Cast<UIElement>().First(e => Grid.GetRow(e) == cell.Y && Grid.GetColumn(e) == cell.X);
+                if(element is Rectangle)
+                {
+                    Rectangle rectangle = element as Rectangle;
+                    rectangle.Fill = new SolidColorBrush(color);
                 }
             }
         }
