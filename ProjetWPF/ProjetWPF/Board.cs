@@ -10,10 +10,17 @@ namespace ProjetWPF
         Token[,] m_tokens = new Token[10, 10];
         public Token[,] Tokens { get { return m_tokens; } }
 
+        // Tous les pions en jeu d'une certaine couleur
+        List<Token> m_whiteTokens;
+        List<Token> m_blackTokens;
+
         // Initialize the board with black and white tokens
         public void Initialize()
         {
-            for(int i = 0; i < 10; i++)
+            m_blackTokens = new List<Token>();
+            m_whiteTokens = new List<Token>();
+
+            for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
                 {
@@ -25,6 +32,7 @@ namespace ProjetWPF
                             Token token = new Token(Token.TokenColor.Black);
                             token.Position = new Vector2(j, i);
                             m_tokens[i, j] = token;
+                            m_blackTokens.Add(token);
                         }
                         // White
                         else if (i >= 6)
@@ -32,6 +40,7 @@ namespace ProjetWPF
                             Token token = new Token(Token.TokenColor.White);
                             token.Position = new Vector2(j, i);
                             m_tokens[i, j] = token;
+                            m_whiteTokens.Add(token);
                         }
                         else
                         {
@@ -42,164 +51,280 @@ namespace ProjetWPF
             }
         }
 
-        // Returns a list of all the possible positions the token can move to
-        public List<Vector2> PossibleMoves(Token token)
-        {
-            if (token is Queen) return PossibleMoves(token as Queen);
+        /// <summary>
+        /// Effectue le mouvement decrit sur le tableau de jeu
+        /// </summary>
+        /// <param name="tokenToMove">Le pion a bouger</param>
+        /// <param name="move">Le mouvement d'un pion</param>
+        public void ExecuteTokenMove(Token tokenToMove, TokenMove move) {
 
-            List<Vector2> moves = new List<Vector2>();
+            m_tokens[tokenToMove.Position.Y, tokenToMove.Position.X] = null;
 
-            Vector2 downLeft;
-            Vector2 downRight;
-            Vector2 topLeft;
-            Vector2 topRight;
-
-            // Moves
-            if (token.Color == Token.TokenColor.Black)
+            // Si le pion arrive sur les bord, changer le pion en reine
+            if ((move.Position.Y == 0 && tokenToMove.Color == Token.TokenColor.White) || (move.Position.Y == 9 && tokenToMove.Color == Token.TokenColor.Black))
             {
-                // Down left
-                downLeft = new Vector2(token.Position.X - 1, token.Position.Y + 1);
-                if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.Y, downLeft.X] == null)
+                Queen queen = new Queen(tokenToMove.Color);
+                queen.Position = move.Position;
+                m_tokens[move.Position.Y, move.Position.X] = queen;
+                if (tokenToMove.Color == Token.TokenColor.White)
                 {
-                    moves.Add(downLeft);
+                    m_whiteTokens.Remove(tokenToMove);
+                    m_whiteTokens.Add(queen);
                 }
-                // Down right
-                downRight = new Vector2(token.Position.X + 1, token.Position.Y + 1);
-                if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.Y, downRight.X] == null)
+                else
                 {
-                    moves.Add(downRight);
+                    m_blackTokens.Remove(tokenToMove);
+                    m_blackTokens.Add(queen);
                 }
             }
             else
             {
-                // Top left
-                topLeft = new Vector2(token.Position.X - 1, token.Position.Y - 1);
-                if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.Y, topLeft.X] == null)
-                {
-                    moves.Add(topLeft);
-                }
-                // Top right
-                topRight = new Vector2(token.Position.X + 1, token.Position.Y - 1);
-                if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.Y, topRight.X] == null)
-                {
-                    moves.Add(topRight);
-                }
+                m_tokens[move.Position.Y, move.Position.X] = tokenToMove;
+                tokenToMove.Position = move.Position;
             }
 
-            return moves;
+            // Si le mouvement est une capture de pion enlever tout les pions capturer
+            if (move.Capture) {
+                foreach (Token token in move.TokenAttached) {
+                    m_tokens[token.Position.Y, token.Position.X] = null;
+                    if (token.Color == Token.TokenColor.Black) m_blackTokens.Remove(token);
+                    else m_whiteTokens.Remove(token);
+                }
+            }
         }
 
-        // Returns a list of all the possible positions the token can move to and the token that was captured
-        public List<Tuple<Vector2, Token>> PossibleCaptures(Token token)
+        /// <summary>
+        /// Les pions prioritaires à bouger pour cette couleur
+        /// </summary>
+        /// <param name="color">La couleur du joueur</param>
+        /// <returns>Une liste de tous les pions que le joueur doit bouger avec la plus haute priorites </returns>
+        public Dictionary<Token, List<TokenMoveSequence>> PrioritaryTokens(Token.TokenColor color) {
+
+            // Recuperer tous les pions de la couleur correspondante encore en jeu
+            List<Token> tokens = new List<Token>();
+            if (color == Token.TokenColor.White) tokens = m_whiteTokens;
+            else tokens = m_blackTokens;
+
+            // Pour chaque pions recuperer le nombre de pion qu'il peut capturer et garder uniquement ceux qui peuvent capturer le plus de pions
+            int maxCapture = 0;
+            Dictionary<Token, List<TokenMoveSequence>> prioritaryTokens = new Dictionary<Token, List<TokenMoveSequence>>();
+            foreach (Token token in tokens) {
+                List<TokenMoveSequence> captureSequence = BestMovesSequences(token);
+                if (captureSequence.Count > 0) {
+                    int canCapture = captureSequence[0].HowManyCaptured;
+                    if (canCapture > maxCapture)
+                    {
+                        maxCapture = canCapture;
+                        prioritaryTokens.Clear();
+                        prioritaryTokens.Add(token, captureSequence);
+                    }
+                    else if (canCapture == maxCapture) prioritaryTokens.Add(token, captureSequence);
+                }
+            }
+
+            return prioritaryTokens;
+        }
+
+        /// <summary>
+        /// Meilleur sequences possible pour le prochain mouvement d'un pion
+        /// </summary>
+        /// <param name="token">Le pion attache a la sequence</param>
+        /// <returns>Les meilleurs sequence de mouvement possible pour ce pions</returns>
+        public List<TokenMoveSequence> BestMovesSequences(Token token)
         {
-            if (token is Queen) return PossibleCaptures(token as Queen);
+            if (token is Queen) return BestMovesSequences(token as Queen);
 
-            List<Tuple<Vector2, Token>> captures = new List<Tuple<Vector2, Token>>();
-            Vector2 downLeft;
-            Vector2 downRight;
-            Vector2 topLeft;
-            Vector2 topRight;
+            List<TokenMoveSequence> possibleSequence = new List<TokenMoveSequence>();
 
+            // Si capture possible on recupere les sequences permettant d'obtenir le plus de capture
+            Vector2 downLeft = new Vector2(token.Position.X - 2, token.Position.Y + 2);
+            Vector2 downRight = new Vector2(token.Position.X + 2, token.Position.Y + 2);
+            Vector2 topLeft = new Vector2(token.Position.X - 2, token.Position.Y - 2);
+            Vector2 topRight = new Vector2(token.Position.X + 2, token.Position.Y - 2);
             // Down left
-            downLeft = new Vector2(token.Position.X - 2, token.Position.Y + 2);
             if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.Y, downLeft.X] == null &&
-                m_tokens[downLeft.Y - 1, downLeft.X + 1] != null && m_tokens[downLeft.Y - 1, downLeft.X + 1].Color != token.Color)
-            {
-                captures.Add(Tuple.Create(downLeft, m_tokens[downLeft.Y - 1, downLeft.X + 1]));
+                   m_tokens[downLeft.Y - 1, downLeft.X + 1] != null && m_tokens[downLeft.Y - 1, downLeft.X + 1].Color != token.Color) {
+
+                TokenMove newMove = new TokenMove(downLeft, m_tokens[downLeft.Y - 1, downLeft.X + 1]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, downLeft));
             }
             // Down right
-            downRight = new Vector2(token.Position.X + 2, token.Position.Y + 2);
             if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.Y, downRight.X] == null &&
                 m_tokens[downRight.Y - 1, downRight.X - 1] != null && m_tokens[downRight.Y - 1, downRight.X - 1].Color != token.Color)
             {
-                captures.Add(Tuple.Create(downRight, m_tokens[downRight.Y - 1, downRight.X - 1]));
+                TokenMove newMove = new TokenMove(downRight, m_tokens[downRight.Y - 1, downRight.X - 1]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, downRight));
             }
             // Top left
-            topLeft = new Vector2(token.Position.X - 2, token.Position.Y - 2);
             if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.Y, topLeft.X] == null &&
                 m_tokens[topLeft.Y + 1, topLeft.X + 1] != null && m_tokens[topLeft.Y + 1, topLeft.X + 1].Color != token.Color)
             {
-                captures.Add(Tuple.Create(topLeft, m_tokens[topLeft.Y + 1, topLeft.X + 1]));
+                TokenMove newMove = new TokenMove(topLeft, m_tokens[topLeft.Y + 1, topLeft.X + 1]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, topLeft));
             }
             // Top right
-            topRight = new Vector2(token.Position.X + 2, token.Position.Y - 2);
             if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.Y, topRight.X] == null &&
                 m_tokens[topRight.Y + 1, topRight.X - 1] != null && m_tokens[topRight.Y + 1, topRight.X - 1].Color != token.Color)
             {
-                captures.Add(Tuple.Create(topRight, m_tokens[topRight.Y + 1, topRight.X - 1]));
+                TokenMove newMove = new TokenMove(topRight, m_tokens[topRight.Y + 1, topRight.X - 1]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, topRight));
             }
 
-            return captures;
+            // Tri le nombre de capture par sequence et garde uniquement les sequence permettant le plus de capture
+            List<TokenMoveSequence> toRemove = new List<TokenMoveSequence>();
+            int maxCapture = 0;
+            foreach (TokenMoveSequence sequence in possibleSequence) {
+                if (maxCapture < sequence.HowManyCaptured) {
+                    maxCapture = sequence.HowManyCaptured;
+                }
+            }
+            if (maxCapture > 0)
+            {
+                foreach (TokenMoveSequence sequence in possibleSequence)
+                {
+                    if (maxCapture > sequence.HowManyCaptured) toRemove.Add(sequence);
+                }
+                foreach (TokenMoveSequence sequence in toRemove)
+                {
+                    possibleSequence.Remove(sequence);
+                }
+
+            }
+            else {
+                // Sinon on renvoie tout les mouvements possibles
+                // Down left
+                downLeft = new Vector2(token.Position.X - 1, token.Position.Y + 1);
+                downRight = new Vector2(token.Position.X + 1, token.Position.Y + 1);
+                topLeft = new Vector2(token.Position.X - 1, token.Position.Y - 1);
+                topRight = new Vector2(token.Position.X + 1, token.Position.Y - 1);
+                if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.Y, downLeft.X] == null)
+                {
+                    TokenMove newMove = new TokenMove(downLeft);
+                    TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                    newSequence.AddMove(newMove);
+                    possibleSequence.Add(newSequence);
+                }
+                // Down right    
+                if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.Y, downRight.X] == null)
+                {
+                    TokenMove newMove = new TokenMove(downRight);
+                    TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                    newSequence.AddMove(newMove);
+                    possibleSequence.Add(newSequence);
+                }
+                // Top left
+                if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.Y, topLeft.X] == null)
+                {
+                    TokenMove newMove = new TokenMove(topLeft);
+                    TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                    newSequence.AddMove(newMove);
+                    possibleSequence.Add(newSequence);
+                }
+                // Top right    
+                if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.Y, topRight.X] == null)
+                {
+                    TokenMove newMove = new TokenMove(topRight);
+                    TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                    newSequence.AddMove(newMove);
+                    possibleSequence.Add(newSequence);
+                }
+            }
+
+            return possibleSequence;
         }
 
-        private List<Vector2> PossibleMoves(Queen queen)
-        {
-            List<Vector2> moves = new List<Vector2>();
+        /// <summary>
+        /// Rempli la sequence de mouvement du pion jusqu'a ce qu'il n'y ai plus de capture possibles
+        /// </summary>
+        /// <param name="tokenSequence">Sequence de mouvement possible pour un pion</param>
+        /// <param name="tokenPosition">Position du pion</param>
+        /// <returns></returns>
+        public List<TokenMoveSequence> TravelSequence(TokenMoveSequence tokenSequence, Vector2 tokenPosition) {
 
+            List<TokenMoveSequence> possibleSequence = new List<TokenMoveSequence>();
+            Token token = tokenSequence.TokenAttached;
+
+
+
+            // Si capture possible on recupere les sequences permettant d'obtenir le plus de capture
+            bool captured = false;
+            Vector2 downLeft = new Vector2(tokenPosition.X - 2, tokenPosition.Y + 2);
+            Vector2 downRight = new Vector2(tokenPosition.X + 2, tokenPosition.Y + 2);
+            Vector2 topLeft = new Vector2(tokenPosition.X - 2, tokenPosition.Y - 2);
+            Vector2 topRight = new Vector2(tokenPosition.X + 2, tokenPosition.Y - 2);
             // Down left
-            for (int i = queen.Position.X - 1, j = queen.Position.Y + 1; i >= 0 && j < 10; i--, j++)
+            if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.Y, downLeft.X] == null &&
+                   m_tokens[downLeft.Y - 1, downLeft.X + 1] != null && !tokenSequence.AlreadyCaptured(new Vector2(downLeft.X + 1, downLeft.Y - 1)) && m_tokens[downLeft.Y - 1, downLeft.X + 1].Color != token.Color)
             {
-                if(m_tokens[j, i] == null)
-                {
-                    moves.Add(new Vector2(i, j));
-                }
-                else
-                {
-                    break;
-                }
+
+                TokenMove newMove = new TokenMove(downLeft, m_tokens[downLeft.Y - 1, downLeft.X + 1]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, downLeft));
+                captured = true;
             }
             // Down right
-            for (int i = queen.Position.X + 1, j = queen.Position.Y + 1; i < 10 && j < 10; i++, j++)
+            if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.Y, downRight.X] == null &&
+                m_tokens[downRight.Y - 1, downRight.X - 1] != null && !tokenSequence.AlreadyCaptured(new Vector2(downRight.X - 1, downRight.Y - 1)) && m_tokens[downRight.Y - 1, downRight.X - 1].Color != token.Color)
             {
-                if (m_tokens[j, i] == null)
-                {
-                    moves.Add(new Vector2(i, j));
-                }
-                else
-                {
-                    break;
-                }
+                TokenMove newMove = new TokenMove(downRight, m_tokens[downRight.Y - 1, downRight.X - 1]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, downRight));
+                captured = true;
             }
             // Top left
-            for (int i = queen.Position.X - 1, j = queen.Position.Y - 1; i >= 0 && j >= 0; i--, j--)
+            if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.Y, topLeft.X] == null &&
+                m_tokens[topLeft.Y + 1, topLeft.X + 1] != null && !tokenSequence.AlreadyCaptured(new Vector2(topLeft.X + 1, topLeft.Y + 1)) && m_tokens[topLeft.Y + 1, topLeft.X + 1].Color != token.Color)
             {
-                if (m_tokens[j, i] == null)
-                {
-                    moves.Add(new Vector2(i, j));
-                }
-                else
-                {
-                    break;
-                }
+                TokenMove newMove = new TokenMove(topLeft, m_tokens[topLeft.Y + 1, topLeft.X + 1]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, topLeft));
+                captured = true;
             }
             // Top right
-            for (int i = queen.Position.X + 1, j = queen.Position.Y - 1; i < 10 && j >= 0; i++, j--)
+            if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.Y, topRight.X] == null &&
+                m_tokens[topRight.Y + 1, topRight.X - 1] != null && !tokenSequence.AlreadyCaptured(new Vector2(topRight.X - 1, topRight.Y + 1)) && m_tokens[topRight.Y + 1, topRight.X - 1].Color != token.Color)
             {
-                if (m_tokens[j, i] == null)
-                {
-                    moves.Add(new Vector2(i, j));
-                }
-                else
-                {
-                    break;
-                }
+                TokenMove newMove = new TokenMove(topRight, m_tokens[topRight.Y + 1, topRight.X - 1]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, topRight));
+                captured = true;
             }
-
-            return moves;
+            if (!captured) {
+                possibleSequence.Add(tokenSequence);
+            }
+            return possibleSequence;
         }
 
-        private List<Tuple<Vector2, Token>> PossibleCaptures(Queen queen)
+        /// <summary>
+        /// Meilleur sequences possible pour le prochain mouvement d'une reine
+        /// </summary>
+        /// <param name="token">La reine attachee a la sequence</param>
+        /// <returns>Les meilleurs sequence de mouvement possible pour cette reine</returns>
+        public List<TokenMoveSequence> BestMovesSequences(Queen queen)
         {
-            List<Tuple<Vector2, Token>> captures = new List<Tuple<Vector2, Token>>();
+            /*List<Vector2> moves = new List<Vector2>();
 
+            // Si capture possible on recupere les sequences permettant d'obtenir le plus de capture
             // Down left
             Token capture = null;
             for (int i = queen.Position.X - 1, j = queen.Position.Y + 1; i >= 0 && j < 10; i--, j++)
             {
                 // A token was captured, find the possible destinations
-                if(capture != null)
+                if (capture != null)
                 {
-                    if(m_tokens[j, i] == null)
+                    if (m_tokens[j, i] == null)
                     {
                         captures.Add(Tuple.Create(new Vector2(i, j), capture));
                     }
@@ -289,32 +414,187 @@ namespace ProjetWPF
                 }
             }
 
-            return captures;
+            // Sinon on renvoie tout les mouvements possibles
+            // Down left
+            for (int i = queen.Position.X - 1, j = queen.Position.Y + 1; i >= 0 && j < 10; i--, j++)
+            {
+                if (m_tokens[j, i] == null)
+                {
+                    moves.Add(new Vector2(i, j));
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // Down right
+            for (int i = queen.Position.X + 1, j = queen.Position.Y + 1; i < 10 && j < 10; i++, j++)
+            {
+                if (m_tokens[j, i] == null)
+                {
+                    moves.Add(new Vector2(i, j));
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // Top left
+            for (int i = queen.Position.X - 1, j = queen.Position.Y - 1; i >= 0 && j >= 0; i--, j--)
+            {
+                if (m_tokens[j, i] == null)
+                {
+                    moves.Add(new Vector2(i, j));
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // Top right
+            for (int i = queen.Position.X + 1, j = queen.Position.Y - 1; i < 10 && j >= 0; i++, j--)
+            {
+                if (m_tokens[j, i] == null)
+                {
+                    moves.Add(new Vector2(i, j));
+                }
+                else
+                {
+                    break;
+                }
+            }*/
+
+
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Une sequence de mouvement possible effectuer par un pion
+    /// </summary>
+    class TokenMoveSequence {
+
+        // Combien de pions seront captures apres la sequence
+        int m_howManyCaptured;
+        public int HowManyCaptured {
+            get => m_howManyCaptured;
+        }
+        public bool IsCaptureSequence {
+            get => m_howManyCaptured != 0;
         }
 
-        // Move the token to a position
-        public void MoveToken(Token token, Vector2 destination)
-        {
-            m_tokens[token.Position.Y, token.Position.X] = null;
-
-            // If token arrived on board edges change token to Queen
-            if((destination.Y == 0 && token.Color == Token.TokenColor.White) || (destination.Y == 9 && token.Color == Token.TokenColor.Black))
-            {
-                Queen queen = new Queen(token.Color);
-                queen.Position = destination;
-                m_tokens[destination.Y, destination.X] = queen;
-            }
-            else
-            {
-                m_tokens[destination.Y, destination.X] = token;
-                token.Position = destination;
-            }
+        // Le pion qui effectuera la sequence
+        Token m_tokenAttached;
+        public Token TokenAttached {
+            get => m_tokenAttached;
         }
 
-        // Remove a token from the board
-        public void RemoveToken(Token token)
+        // La sequence de mouvement
+        List<TokenMove> m_moveQueue;
+
+        public TokenMoveSequence(Token token) {
+            m_tokenAttached = token;
+            m_moveQueue = new List<TokenMove>();
+            m_howManyCaptured = 0;
+        }
+
+        public TokenMoveSequence(TokenMoveSequence tokenSequence)
         {
-            m_tokens[token.Position.Y, token.Position.X] = null;
+            m_tokenAttached = tokenSequence.TokenAttached;
+            m_moveQueue = new List<TokenMove>(tokenSequence.m_moveQueue);
+            m_howManyCaptured = tokenSequence.m_howManyCaptured;
+        }
+
+        // Ajoute un mouvement a la sequence
+        public bool AddMove(TokenMove move) {
+            if (m_moveQueue.Count == 0) {
+                if (move.Capture) m_howManyCaptured = move.TokenAttached.Count;
+            }
+            else if (IsCaptureSequence) {
+                m_howManyCaptured += move.TokenAttached.Count;
+            }
+            m_moveQueue.Add(move);
+            return true;
+        }
+
+        // Regarde le prochain mouvement possible
+        public TokenMove PeekMove() {
+            if (m_moveQueue.Count == 0) return null;
+            return m_moveQueue[0];
+        }
+
+        // Joue le prochain mouvement de la sequence
+        public TokenMove PlayMove() {
+            TokenMove move = m_moveQueue[0];
+            m_moveQueue.RemoveAt(0);
+            return move;
+        }
+
+        public bool Empty() {
+            return m_moveQueue.Count == 0;
+        }
+
+        public bool AlreadyCaptured(Vector2 position) {
+            if (!IsCaptureSequence) return false;
+            FindToken findPredicate = new FindToken(position);
+            foreach (TokenMove move in m_moveQueue) {
+                if (move.Capture && move.TokenAttached.Find(findPredicate.Match) != null) return true;
+            }
+            return false;
+        }
+    }
+
+    class FindToken {
+        Vector2 m_position;
+
+        public FindToken(Vector2 position) {
+            m_position = position;
+        }
+
+        public bool Match(Token token) {
+            return token.Position.Equals(m_position);
+        }
+    }
+
+
+    /// <summary>
+    /// Movement possible pour un pion
+    /// </summary>
+    class TokenMove {
+
+        // Position a laquelle se trouvera apres le mouvement
+        Vector2 m_position;
+        public Vector2 Position{
+            get => m_position;
+        }
+
+        // Pion qui auront ete capturer apres le mouvement
+        List<Token> m_tokenAttached;
+        public List<Token> TokenAttached {
+            get => m_tokenAttached;
+        }
+        // Le mouvement permet t'il la capture d'un ou plusieurs pions ?
+        public bool Capture { 
+            get => m_tokenAttached != null;
+        }
+
+        public TokenMove(Vector2 position, Token tokenAttached)
+        {
+            m_position = position;
+            m_tokenAttached = new List<Token>();
+            m_tokenAttached.Add(tokenAttached);
+        }
+
+        public TokenMove(Vector2 position, List<Token> tokenAttached = null) {
+            m_position = position;
+            m_tokenAttached = tokenAttached;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is TokenMove)) return false;
+            TokenMove move = obj as TokenMove;
+            return m_position.Equals(move.m_position);
         }
     }
 }

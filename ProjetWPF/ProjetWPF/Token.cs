@@ -36,5 +36,12 @@ namespace ProjetWPF
                 image = "tokenwhite.png";
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Token)) return false;
+            Token token = obj as Token;
+            return m_color == token.m_color && m_position.Equals(token.m_position);
+        }
     }
 }
