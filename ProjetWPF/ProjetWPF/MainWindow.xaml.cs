@@ -126,6 +126,15 @@ namespace ProjetWPF
         /// <returns>Vrai si il a gagne, faux sinon </returns>
         bool CheckWin(Token.TokenColor player)
         {
+
+            switch (player)
+            {
+                case Token.TokenColor.White: return m_board.BlackCount == 0;
+                case Token.TokenColor.Black: return m_board.WhiteCount == 0;
+                default: break;
+            }
+            return false;
+
             throw new NotImplementedException();
         }
 
@@ -191,7 +200,7 @@ namespace ProjetWPF
                 }
 
                 // On verifie si apres c'est mouvement le joueur a gagné
-                //lastPlayerWon = CheckWin(currentPlayer);
+                lastPlayerWon = CheckWin(currentPlayer);
                 // C'est le tour du joueur suivant
                 currentPlayer = SwitchPlayer(currentPlayer);
             }
