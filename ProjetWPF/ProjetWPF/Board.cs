@@ -17,7 +17,6 @@ namespace ProjetWPF
         {
             get => m_whiteTokens.Count;
         }
-
         public int BlackCount {
             get => m_blackTokens.Count;
         }
