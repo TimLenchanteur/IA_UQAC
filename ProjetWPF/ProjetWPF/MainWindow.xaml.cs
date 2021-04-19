@@ -134,8 +134,6 @@ namespace ProjetWPF
                 default: break;
             }
             return false;
-
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -174,6 +172,11 @@ namespace ProjetWPF
                         m_playerTurn = true;
                         // Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
                         m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
+                        if (m_playerPossibleMove.Count == 0)
+                        {
+                            m_playerTurn = false;
+                            break;
+                        }
                         m_sequenceEngaged = new List<TokenMoveSequence>();
                         while (m_playerTurn)
                         {
@@ -188,6 +191,11 @@ namespace ProjetWPF
                         m_playerTurn = true;
                         // Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
                         m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
+                        if (m_playerPossibleMove.Count == 0)
+                        {
+                            m_playerTurn = false;
+                            break;
+                        }
                         m_sequenceEngaged = new List<TokenMoveSequence>();
                         while (m_playerTurn)
                         {
@@ -238,34 +246,46 @@ namespace ProjetWPF
                         {
                             // Move the token and reset the colors of the board
                             ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.Khaki);
-                            m_board.ExecuteTokenMove(m_selectedToken, tokenMove);
+                            Queen newQueen = m_board.ExecuteTokenMove(m_selectedToken, tokenMove);
                             DisplayBoard();
 
-                            //Calcul les captures possible restante
-                            if (m_sequenceEngaged.Count > 0)
+                            if (newQueen == null)
                             {
-                                List<TokenMoveSequence> toRemove = new List<TokenMoveSequence>();
-                                foreach (TokenMoveSequence sequence in m_sequenceEngaged)
+                                //Calcul les captures possible restante
+                                if (m_sequenceEngaged.Count > 0)
                                 {
-                                    TokenMove movePlayed = sequence.PlayMove();
-                                    if (sequence.Empty() || !movePlayed.Equals(tokenMove)) toRemove.Add(sequence);
+                                    List<TokenMoveSequence> toRemove = new List<TokenMoveSequence>();
+                                    foreach (TokenMoveSequence sequence in m_sequenceEngaged)
+                                    {
+                                        TokenMove movePlayed = sequence.PlayMove();
+                                        if (sequence.Empty() || !movePlayed.Equals(tokenMove)) toRemove.Add(sequence);
+                                    }
+                                    foreach (TokenMoveSequence sequence in toRemove)
+                                    {
+                                        m_sequenceEngaged.Remove(sequence);
+                                    }
                                 }
-                                foreach (TokenMoveSequence sequence in toRemove)
+                                else
                                 {
-                                    m_sequenceEngaged.Remove(sequence);
-                                }
-                            }
-                            else
-                            {
-                                foreach (TokenMoveSequence sequence in m_playerPossibleMove[m_selectedToken])
-                                {
-                                    TokenMove movePlayed = sequence.PlayMove();
-                                    if (!sequence.Empty() && movePlayed.Equals(tokenMove)){
-                                        m_sequenceEngaged.Add(sequence);
+                                    foreach (TokenMoveSequence sequence in m_playerPossibleMove[m_selectedToken])
+                                    {
+                                        TokenMove movePlayed = sequence.PlayMove();
+                                        if (!sequence.Empty() && movePlayed.Equals(tokenMove))
+                                        {
+                                            m_sequenceEngaged.Add(sequence);
+                                        }
                                     }
                                 }
                             }
+                            else {
+                                m_selectedToken = newQueen;
+                                m_sequenceEngaged = m_board.BestMovesSequences(newQueen);
+                                if (m_sequenceEngaged.Count > 0 && !m_sequenceEngaged[0].IsCaptureSequence) m_sequenceEngaged.Clear();
+                                m_playerPossibleMove.Add(m_selectedToken, m_sequenceEngaged);
+                            }  
 
+
+                            // Fini le tour du joueur ou affiche les prochains mouvement possible
                             if (m_sequenceEngaged.Count == 0)
                             {
                                 m_playerTurn = false;

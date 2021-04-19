@@ -28,6 +28,11 @@ namespace ProjetWPF
         /// </summary>
         int[,] CaptureSignals()
         {
+
+            foreach (Token token in m_board.Tokens) { 
+                
+            }
+
             throw new NotImplementedException();
         }
         #endregion
@@ -36,8 +41,6 @@ namespace ProjetWPF
         // Signature d'un effecteur
         abstract class Effector
         {
-
-
             public Effector(Vector2 position)
             { }
 
@@ -57,7 +60,6 @@ namespace ProjetWPF
             int[,] currentState = CaptureSignals();
 
             // Construit l'arbre ?
-
 
             // Recupere toute les actions possible
             // Defini le but actuel prioritaire

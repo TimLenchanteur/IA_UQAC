@@ -64,14 +64,16 @@ namespace ProjetWPF
         /// </summary>
         /// <param name="tokenToMove">Le pion a bouger</param>
         /// <param name="move">Le mouvement d'un pion</param>
-        public void ExecuteTokenMove(Token tokenToMove, TokenMove move) {
+        /// <returns>Le pion transformer en reine et ses sequences associes si transformation il y a eu</returns>
+        public Queen ExecuteTokenMove(Token tokenToMove, TokenMove move) {
 
             m_tokens[tokenToMove.Position.Y, tokenToMove.Position.X] = null;
+            Queen queen = null;
 
             // Si le pion arrive sur les bord, changer le pion en reine
             if ((move.Position.Y == 0 && tokenToMove.Color == Token.TokenColor.White) || (move.Position.Y == 9 && tokenToMove.Color == Token.TokenColor.Black))
             {
-                Queen queen = new Queen(tokenToMove.Color);
+                queen = new Queen(tokenToMove.Color);
                 queen.Position = move.Position;
                 m_tokens[move.Position.Y, move.Position.X] = queen;
                 if (tokenToMove.Color == Token.TokenColor.White)
@@ -99,6 +101,8 @@ namespace ProjetWPF
                     else m_whiteTokens.Remove(token);
                 }
             }
+
+            return queen;
         }
 
         /// <summary>
@@ -209,40 +213,46 @@ namespace ProjetWPF
             else {
                 // Sinon on renvoie tout les mouvements possibles
                 // Down left
-                downLeft = new Vector2(token.Position.X - 1, token.Position.Y + 1);
-                downRight = new Vector2(token.Position.X + 1, token.Position.Y + 1);
-                topLeft = new Vector2(token.Position.X - 1, token.Position.Y - 1);
-                topRight = new Vector2(token.Position.X + 1, token.Position.Y - 1);
-                if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.Y, downLeft.X] == null)
+                if (token.Color == Token.TokenColor.Black)
                 {
-                    TokenMove newMove = new TokenMove(downLeft);
-                    TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                    newSequence.AddMove(newMove);
-                    possibleSequence.Add(newSequence);
+                    downLeft = new Vector2(token.Position.X - 1, token.Position.Y + 1);
+                    downRight = new Vector2(token.Position.X + 1, token.Position.Y + 1);
+                    if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.Y, downLeft.X] == null)
+                    {
+                        TokenMove newMove = new TokenMove(downLeft);
+                        TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                        newSequence.AddMove(newMove);
+                        possibleSequence.Add(newSequence);
+                    }
+                    // Down right    
+                    if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.Y, downRight.X] == null)
+                    {
+                        TokenMove newMove = new TokenMove(downRight);
+                        TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                        newSequence.AddMove(newMove);
+                        possibleSequence.Add(newSequence);
+                    }
                 }
-                // Down right    
-                if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.Y, downRight.X] == null)
-                {
-                    TokenMove newMove = new TokenMove(downRight);
-                    TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                    newSequence.AddMove(newMove);
-                    possibleSequence.Add(newSequence);
-                }
-                // Top left
-                if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.Y, topLeft.X] == null)
-                {
-                    TokenMove newMove = new TokenMove(topLeft);
-                    TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                    newSequence.AddMove(newMove);
-                    possibleSequence.Add(newSequence);
-                }
-                // Top right    
-                if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.Y, topRight.X] == null)
-                {
-                    TokenMove newMove = new TokenMove(topRight);
-                    TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                    newSequence.AddMove(newMove);
-                    possibleSequence.Add(newSequence);
+                else {
+                    topLeft = new Vector2(token.Position.X - 1, token.Position.Y - 1);
+                    topRight = new Vector2(token.Position.X + 1, token.Position.Y - 1);
+
+                    // Top left
+                    if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.Y, topLeft.X] == null)
+                    {
+                        TokenMove newMove = new TokenMove(topLeft);
+                        TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                        newSequence.AddMove(newMove);
+                        possibleSequence.Add(newSequence);
+                    }
+                    // Top right    
+                    if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.Y, topRight.X] == null)
+                    {
+                        TokenMove newMove = new TokenMove(topRight);
+                        TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                        newSequence.AddMove(newMove);
+                        possibleSequence.Add(newSequence);
+                    }
                 }
             }
 
