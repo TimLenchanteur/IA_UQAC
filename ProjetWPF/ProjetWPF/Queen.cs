@@ -11,6 +11,10 @@ namespace ProjetWPF
             SetColor(color);
         }
 
+        public Queen(Queen otherQueen) : base(otherQueen) {
+            SetColor(Color);
+        } 
+
         public override void SetColor(TokenColor color)
         {
             m_color = color;

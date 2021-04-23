@@ -160,7 +160,7 @@ namespace ProjetWPF
 
             Token.TokenColor currentPlayer = Token.TokenColor.White;
             bool lastPlayerWon = false;
-            CheckersSolver opponent = new CheckersSolver(this, m_board);
+            CheckersSolver opponent = new CheckersSolver(this, m_board, 8);
 
             while (!lastPlayerWon)
             {

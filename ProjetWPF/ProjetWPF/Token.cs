@@ -24,6 +24,11 @@ namespace ProjetWPF
             SetColor(color);
         }
 
+        public Token(Token otherToken) {
+            SetColor(otherToken.m_color);
+            m_position = otherToken.Position;
+        }   
+
         public virtual void SetColor(TokenColor color)
         {
             m_color = color;
