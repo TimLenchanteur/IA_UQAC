@@ -537,6 +537,14 @@ namespace ProjetWPF
         Token m_tokenAttached;
         public Token TokenAttached {
             get => m_tokenAttached;
+            set => m_tokenAttached = value;
+        }
+
+        // La position initiale du pion avant de démarrer la séquence
+        Vector2 m_origin;
+        public Vector2 OriginPosition
+        {
+            get => m_origin;
         }
 
         // La sequence de mouvement
@@ -546,6 +554,7 @@ namespace ProjetWPF
             m_tokenAttached = token;
             m_moveQueue = new List<TokenMove>();
             m_howManyCaptured = 0;
+            m_origin = token.Position;
         }
 
         public TokenMoveSequence(TokenMoveSequence tokenSequence)
@@ -553,6 +562,7 @@ namespace ProjetWPF
             m_tokenAttached = tokenSequence.TokenAttached;
             m_moveQueue = new List<TokenMove>(tokenSequence.m_moveQueue);
             m_howManyCaptured = tokenSequence.m_howManyCaptured;
+            m_origin = tokenSequence.OriginPosition;
         }
 
         // Ajoute un mouvement a la sequence

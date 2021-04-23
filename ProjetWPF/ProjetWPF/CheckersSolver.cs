@@ -32,7 +32,7 @@ namespace ProjetWPF
         CheckersState CaptureSignals()
         {
             // L'etat associe au dernier coup du joueur adverse
-            CheckersState currentState = new CheckersState(m_board, Token.TokenColor.White);
+            CheckersState currentState = new CheckersState(m_board, Token.TokenColor.Black);
             return currentState;
         }
         #endregion
@@ -52,9 +52,12 @@ namespace ProjetWPF
             /// </summary>
             public void Execute(Board board)
             {
-                while(m_sequence != null && !m_sequence.Empty())
+                // On veut garder intacte la séquence initiale
+                TokenMoveSequence copySequence = new TokenMoveSequence(m_sequence);
+                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                while(copySequence != null && !copySequence.Empty())
                 {
-                    board.ExecuteTokenMove(m_sequence.TokenAttached, m_sequence.PlayMove());
+                    board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
                 }
             }
         }
@@ -84,8 +87,8 @@ namespace ProjetWPF
         /// </summary>
         /// /// <param name="currentState">L'etat dans lequel l'environnement est actuellement</param>
         /// <returns>L'action la plus logique par rapport a l'etat donne</returns>
-        Effector MinimaxDecision(CheckersState currentState) {
-
+        Effector MinimaxDecision(CheckersState currentState)
+        {
             CheckersState bestNextState = MaxValue(currentState, 0);
             // On retourne l'action dans les successeurs de l'etat qui retourne la valeur la plus importante
             return bestNextState.Action;
