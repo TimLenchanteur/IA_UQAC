@@ -11,10 +11,10 @@ namespace ProjetWPF
         Token[,] m_board = new Token[10, 10];
         public Token[,] Board { get { return m_board; } }
 
-        // Le joueur qui a jouer pour atteindre cette etat
+        // Le joueur qui a joué pour atteindre cet etat
         Token.TokenColor m_playerColor;
 
-        // Pions restant sur le plateau pour chaque joueur
+        // Pions restants sur le plateau pour chaque joueur
         List<Token> m_whiteTokens;
         List<Token> m_blackTokens;
 
@@ -23,13 +23,13 @@ namespace ProjetWPF
             get => m_whiteTokens.Count == 0 || m_blackTokens.Count == 0;
         }
 
-        // L'utilite associe a cette etat pour l'agent
+        // L'utilite associe a cet etat pour l'agent
         int m_utility;
         public int Utility {
             get => m_utility;
         }
 
-        // Action qui a permis d'atteindre cette etat
+        // Action qui a permis d'atteindre cet etat
         CheckersSolver.Effector m_action;
         public CheckersSolver.Effector Action { 
             get =>  m_action;
@@ -69,7 +69,7 @@ namespace ProjetWPF
         /// <summary>
         /// Copie un plateau de jeu dans la memoire interne de l'etat
         /// </summary>
-        /// <param name="board">Le plateau a copie</param>
+        /// <param name="board">Le plateau a copier</param>
         void CopyBoard(Token[,] board) {
             for (int i = 0; i < 10; i++)
             {
@@ -102,9 +102,9 @@ namespace ProjetWPF
         /// </summary>
         /// <returns>Tous les successeurs d'un etat</returns>
         public List<CheckersState> Successors() {
-            // Cherche tous les mouvements possible pour le joueur actuel
+            // Cherche tous les mouvements possibles pour le joueur actuel
 
-            // Creer chaque etats pour chaque mouvements possible du joueur
+            // Creer chaque etat pour chaque mouvement possible du joueur
 
             throw new NotImplementedException();
         }
@@ -114,8 +114,15 @@ namespace ProjetWPF
         /// </summary>
         /// <returns>L'utilite associe a l'etat</returns>
         int ComputeUtility() {
-            // Heuristic de base
-            return m_blackTokens.Count - m_whiteTokens.Count;
+            // Heuristique de base
+            if(m_playerColor == Token.TokenColor.Black)
+            {
+                return m_blackTokens.Count - m_whiteTokens.Count;
+            }
+            else
+            {
+                return m_whiteTokens.Count - m_blackTokens.Count;
+            }
         }
     }
 }

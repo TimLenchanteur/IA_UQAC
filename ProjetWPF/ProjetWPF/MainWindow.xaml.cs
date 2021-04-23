@@ -186,6 +186,7 @@ namespace ProjetWPF
                     case Token.TokenColor.Black:
                         // On attend les instructions de l'agent intelligent
                         // opponent.ExecuteAMove();
+                        // Dispatcher.Invoke(() => DisplayBoard());
                         // On attend les instructions du joueur
 
                         m_playerTurn = true;
