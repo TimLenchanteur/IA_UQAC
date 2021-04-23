@@ -39,15 +39,24 @@ namespace ProjetWPF
 
         #region Effecteurs
         // Signature d'un effecteur
-        public abstract class Effector
+        public class Effector
         {
-            public Effector(Vector2 position)
-            { }
+            TokenMoveSequence m_sequence;
+            public Effector(TokenMoveSequence sequence)
+            {
+                m_sequence = sequence;
+            }
 
             /// <summary>
             /// Execute l'action
             /// </summary>
-            public abstract void Execute();
+            public void Execute(Board board)
+            {
+                while(m_sequence != null && !m_sequence.Empty())
+                {
+                    board.ExecuteTokenMove(m_sequence.TokenAttached, m_sequence.PlayMove());
+                }
+            }
         }
         #endregion
 
@@ -67,7 +76,7 @@ namespace ProjetWPF
             Effector nextMove = MinimaxDecision(currentState);
 
             // Execute le mouvement
-            nextMove.Execute();
+            nextMove.Execute(m_board);
         }
 
         /// <summary>
@@ -95,7 +104,7 @@ namespace ProjetWPF
 
             int utility = int.MinValue;
             CheckersState bestSuccessor = null;
-            // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
+            // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
             foreach (CheckersState nextState in state.Successors()) {
                 int successorUtility = MinValue(nextState, depth + 1).Utility;
                 if (utility < successorUtility) {

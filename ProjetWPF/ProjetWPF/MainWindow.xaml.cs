@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Threading;
+using System.ComponentModel;
 
 namespace ProjetWPF
 {
@@ -27,12 +28,12 @@ namespace ProjetWPF
         bool m_playerTurn;
         Dictionary<Token, List<TokenMoveSequence>> m_playerPossibleMove;
 
+        bool m_stopGame = false;
 
         public MainWindow()
         {
             InitializeComponent();
             FillBoardColor();
-            m_board.Initialize();
             DisplayBoard();
 
             // Lance la boucle de jeu
@@ -126,7 +127,6 @@ namespace ProjetWPF
         /// <returns>Vrai si il a gagne, faux sinon </returns>
         bool CheckWin(Token.TokenColor player)
         {
-
             switch (player)
             {
                 case Token.TokenColor.White: return m_board.BlackCount == 0;
@@ -157,14 +157,12 @@ namespace ProjetWPF
         /// </summary>
         void GameLoop()
         {
-
             Token.TokenColor currentPlayer = Token.TokenColor.White;
             bool lastPlayerWon = false;
-            CheckersSolver opponent = new CheckersSolver(this, m_board, 8);
+            CheckersSolver opponent = new CheckersSolver(this, m_board, 1);
 
-            while (!lastPlayerWon)
+            while (!lastPlayerWon && !m_stopGame)
             {
-
                 switch (currentPlayer)
                 {
                     case Token.TokenColor.White:
@@ -178,30 +176,30 @@ namespace ProjetWPF
                             break;
                         }
                         m_sequenceEngaged = new List<TokenMoveSequence>();
-                        while (m_playerTurn)
+                        while (m_playerTurn && !m_stopGame)
                         {
                             Thread.Sleep(0);
                         }
                         break;
                     case Token.TokenColor.Black:
                         // On attend les instructions de l'agent intelligent
-                        // opponent.ExecuteAMove();
-                        // Dispatcher.Invoke(() => DisplayBoard());
-                        // On attend les instructions du joueur
+                        opponent.ExecuteAMove();
+                        Dispatcher.Invoke(() => DisplayBoard());
 
-                        m_playerTurn = true;
-                        // Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
-                        m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
-                        if (m_playerPossibleMove.Count == 0)
-                        {
-                            m_playerTurn = false;
-                            break;
-                        }
-                        m_sequenceEngaged = new List<TokenMoveSequence>();
-                        while (m_playerTurn)
-                        {
-                            Thread.Sleep(0);
-                        }
+                        // On attend les instructions du joueur
+                        //m_playerTurn = true;
+                        //// Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
+                        //m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
+                        //if (m_playerPossibleMove.Count == 0)
+                        //{
+                        //    m_playerTurn = false;
+                        //    break;
+                        //}
+                        //m_sequenceEngaged = new List<TokenMoveSequence>();
+                        //while (m_playerTurn)
+                        //{
+                        //    Thread.Sleep(0);
+                        //}
 
                         break;
                     default:
@@ -349,6 +347,11 @@ namespace ProjetWPF
                     ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.Khaki);
                 }
             }
+        }
+
+        private void MainWindowClosing(object sender, CancelEventArgs e)
+        {
+            m_stopGame = true;
         }
 
         private List<TokenMove> ComputeCells(List<TokenMoveSequence> moveSequences) {

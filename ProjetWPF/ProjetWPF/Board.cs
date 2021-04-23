@@ -21,9 +21,35 @@ namespace ProjetWPF
             get => m_blackTokens.Count;
         }
 
+        /// <summary>
+        /// Copie un plateau de jeu dans la memoire interne de l'etat
+        /// </summary>
+        /// <param name="board">Le plateau a copier</param>
+        public Board(Board copy)
+        {
+            m_blackTokens = new List<Token>();
+            m_whiteTokens = new List<Token>();
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (copy.Tokens[i, j] != null)
+                    {
+                        Token newToken;
+                        if (copy.Tokens[i, j] is Queen) newToken = new Queen(copy.Tokens[i, j] as Queen);
+                        else newToken = new Token(copy.Tokens[i, j]);
+
+                        if (newToken.Color == Token.TokenColor.White) m_whiteTokens.Add(newToken);
+                        else if (newToken.Color == Token.TokenColor.Black) m_blackTokens.Add(newToken);
+                        m_tokens[i, j] = newToken;
+                    }
+                    else m_tokens[i, j] = null;
+                }
+            }
+        }
 
         // Initialize the board with black and white tokens
-        public void Initialize()
+        public Board()
         {
             m_blackTokens = new List<Token>();
             m_whiteTokens = new List<Token>();
