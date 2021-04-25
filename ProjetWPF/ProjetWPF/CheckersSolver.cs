@@ -94,7 +94,7 @@ namespace ProjetWPF
             // Recupere toute les actions possible
             // Defini le but actuel prioritaire
             // Pour toute les actions possible on recupere celle qui est associe a la mesure d'utilite la plus forte
-            Effector nextMove = MinimaxDecision(currentState);
+            Effector nextMove = AlphaBetaSearch(currentState);//MinimaxDecision(currentState);
 
             // Execute le mouvement
             nextMove.Execute(m_board);
@@ -107,8 +107,24 @@ namespace ProjetWPF
         /// <returns>L'action la plus logique par rapport a l'etat donne</returns>
         Effector MinimaxDecision(CheckersState currentState)
         {
+            Stopwatch stopwatch = new Stopwatch();
+
+            stopwatch.Start();
             CheckersState bestNextState = MaxValue(currentState, 0);
+            stopwatch.Stop();
+            Debug.WriteLine("Elapsed Time is {0} s", stopwatch.ElapsedMilliseconds / 1000f);
             // On retourne l'action dans les successeurs de l'etat qui retourne la valeur la plus importante
+            return bestNextState.Action;
+        }
+
+        Effector AlphaBetaSearch(CheckersState currentState)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+            CheckersState bestNextState = MaxValue(currentState, int.MinValue, int.MaxValue, 0);
+            stopwatch.Stop();
+            Debug.WriteLine("Elapsed Time is {0} s", stopwatch.ElapsedMilliseconds/1000f);
             return bestNextState.Action;
         }
 
@@ -136,6 +152,31 @@ namespace ProjetWPF
             return bestSuccessor;
         }
 
+        CheckersState MaxValue(CheckersState state, int alpha, int beta, int depth)
+        {
+            // Si l'etat est un etat terminal de l'arbre on retourne une valeur
+            if (state.Terminal || depth >= m_depthMax) { return state; }
+
+            int utility = int.MinValue;
+            CheckersState bestSuccessor = state;
+            // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
+            foreach (CheckersState nextState in state.Successors())
+            {
+                int successorUtility = MinValue(nextState, alpha, beta, depth + 1).Utility;
+                if (utility < successorUtility)
+                {
+                    utility = successorUtility;
+                    bestSuccessor = nextState;
+                }
+                if (utility > beta)
+                {
+                    return bestSuccessor;
+                }
+                alpha = Math.Max(alpha, utility);
+            }
+            return bestSuccessor;
+        }
+
         /// <summary>
         /// Retourne le pire etat successeurs(pour l'agent) a l'etat propose
         /// </summary>
@@ -157,6 +198,30 @@ namespace ProjetWPF
                     utility = successorUtility;
                     bestSuccessor = nextState;
                 }
+            }
+            return bestSuccessor;
+        }
+
+        CheckersState MinValue(CheckersState state, int alpha, int beta, int depth)
+        {   // Si l'etat est un etat terminal de l'arbre on retourne une valeur
+            if (state.Terminal || depth >= m_depthMax) { return state; }
+
+            int utility = int.MaxValue;
+            CheckersState bestSuccessor = state;
+            // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus petite utilite maximum
+            foreach (CheckersState nextState in state.Successors())
+            {
+                int successorUtility = MaxValue(nextState, depth + 1).Utility;
+                if (utility > successorUtility)
+                {
+                    utility = successorUtility;
+                    bestSuccessor = nextState;
+                }
+                if (utility > alpha)
+                {
+                    return bestSuccessor;
+                }
+                beta = Math.Min(utility, beta);
             }
             return bestSuccessor;
         }
