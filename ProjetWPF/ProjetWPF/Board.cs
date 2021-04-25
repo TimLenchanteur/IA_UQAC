@@ -447,7 +447,7 @@ namespace ProjetWPF
                     captured.Add(m_tokens[j, i]);
                 }
                 else if (m_tokens[j, i] != null && m_tokens[j, i].Color == queen.Color) break;
-                else if (m_tokens[j, i] == null && captured.Count > 0)
+                else if (m_tokens[j, i] == null && captured.Count == 1)
                 {
                     Vector2 capturePosition = new Vector2(i, j);
                     TokenMove move = new TokenMove(capturePosition, new List<Token>(captured));
