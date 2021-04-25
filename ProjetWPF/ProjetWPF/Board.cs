@@ -505,7 +505,7 @@ namespace ProjetWPF
                     captured.Add(m_tokens[j, i]);
                 }
                 else if (m_tokens[j, i] != null && m_tokens[j, i].Color == queen.Color) break;
-                else if (m_tokens[j, i] == null && !startSequence.AlreadyCaptured(new Vector2(i, j)) && captured.Count > 0)
+                else if (m_tokens[j, i] == null && !startSequence.AlreadyCaptured(new Vector2(i, j)) && captured.Count == 1)
                 {
                     capture = true;
                     Vector2 capturePosition = new Vector2(i, j);
