@@ -35,7 +35,7 @@ namespace ProjetWPF
             InitializeComponent();
             FillBoardColor();
             DisplayBoard();
-
+            
             // Lance la boucle de jeu
             m_playerTurn = false;
             Thread gameThread = new Thread(new ThreadStart(GameLoop));
@@ -75,6 +75,13 @@ namespace ProjetWPF
         }
 
         /// <summary>
+        /// Display board from the loop thread
+        /// </summary>
+        public void DisplayBoardFromThread() {
+            Dispatcher.Invoke(() => DisplayBoard());
+        }
+
+        /// <summary>
         /// Creer une nouvelle image a integrer a l'application
         /// </summary>
         /// <param name="imageName">Chemin vers l'image</param>
@@ -90,7 +97,7 @@ namespace ProjetWPF
             return image;
         }
 
-        private void DisplayBoard()
+        void DisplayBoard()
         {
             ClearImages();
             for(int i = 0; i < 10; i++)
@@ -159,7 +166,7 @@ namespace ProjetWPF
         {
             Token.TokenColor currentPlayer = Token.TokenColor.White;
             bool lastPlayerWon = false;
-            CheckersSolver opponent = new CheckersSolver(this, m_board, 1);
+            CheckersSolver opponent = new CheckersSolver(this, m_board, 6);
 
             while (!lastPlayerWon && !m_stopGame)
             {
@@ -184,7 +191,6 @@ namespace ProjetWPF
                     case Token.TokenColor.Black:
                         // On attend les instructions de l'agent intelligent
                         opponent.ExecuteAMove();
-                        Dispatcher.Invoke(() => DisplayBoard());
 
                         // On attend les instructions du joueur
                         //m_playerTurn = true;

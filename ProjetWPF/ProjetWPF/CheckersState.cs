@@ -67,7 +67,7 @@ namespace ProjetWPF
         /// </summary>
         void ExecuteAction()
         {
-            m_action.Execute(m_board);
+            m_action.MockExecute(m_board);
         }
 
         /// <summary>

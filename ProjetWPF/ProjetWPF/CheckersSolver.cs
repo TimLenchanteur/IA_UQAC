@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Diagnostics;
 
 namespace ProjetWPF
 {
@@ -13,7 +15,7 @@ namespace ProjetWPF
         Board m_board;
 
         // Classe permetant d'afficher l'environement dans l'application
-        MainWindow m_appDisplayer;
+        static MainWindow m_appDisplayer;
 
         // Profondeur maximum que l'agent peut parcourir dans l'arbre de decision
         int m_depthMax;
@@ -56,6 +58,22 @@ namespace ProjetWPF
                 TokenMoveSequence copySequence = new TokenMoveSequence(m_sequence);
                 copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
                 while(copySequence != null && !copySequence.Empty())
+                {
+                    Thread.Sleep(250);
+                    board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
+                    m_appDisplayer.DisplayBoardFromThread();
+                }
+            }
+
+            /// <summary>
+            /// Execute l'action pour tester ses consequences
+            /// </summary>
+            public void MockExecute(Board board)
+            {
+                // On veut garder intacte la séquence initiale
+                TokenMoveSequence copySequence = new TokenMoveSequence(m_sequence);
+                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                while (copySequence != null && !copySequence.Empty())
                 {
                     board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
                 }
@@ -106,7 +124,7 @@ namespace ProjetWPF
             if (state.Terminal || depth >= m_depthMax) { return state; }
 
             int utility = int.MinValue;
-            CheckersState bestSuccessor = null;
+            CheckersState bestSuccessor = state;
             // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
             foreach (CheckersState nextState in state.Successors()) {
                 int successorUtility = MinValue(nextState, depth + 1).Utility;
@@ -129,7 +147,7 @@ namespace ProjetWPF
             if (state.Terminal || depth >= m_depthMax) { return state; }
 
             int utility = int.MaxValue;
-            CheckersState bestSuccessor = null;
+            CheckersState bestSuccessor = state;
             // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus petite utilite maximum
             foreach (CheckersState nextState in state.Successors())
             {
