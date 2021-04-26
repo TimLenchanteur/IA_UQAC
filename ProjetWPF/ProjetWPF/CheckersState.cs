@@ -122,7 +122,68 @@ namespace ProjetWPF
         /// <returns>L'utilite associe a l'etat</returns>
         int ComputeUtility() {
             // Heuristique de base
-            if(m_playerColor == Token.TokenColor.Black)
+            int blackPawns = 0;
+            int blackQueens = 0;
+            float avgAdvance = 0;
+            int whitePawns = 0;
+            int whiteQueens = 0;
+            foreach(Token t in m_board.BlackTokens)
+            {
+                if(t is Queen)
+                {
+                    blackQueens += 1;
+                }
+                else
+                {
+                    blackPawns += 1;
+                }
+                avgAdvance += t.Position.Y;
+            }
+            foreach (Token t in m_board.WhiteTokens)
+            {
+                if (t is Queen)
+                {
+                    whiteQueens += 1;
+                }
+                else
+                {
+                    whitePawns += 1;
+                }
+                avgAdvance += t.Position.Y;
+            }
+            avgAdvance /= -(m_board.BlackCount + m_board.WhiteCount);
+            avgAdvance += 4.5f;
+            if (m_playerColor == Token.TokenColor.Black)
+            {
+                if(m_board.BlackCount == 0)
+                {
+                    return int.MinValue;
+                }
+                else if (m_board.WhiteCount == 0)
+                {
+                    return int.MaxValue;
+                }
+                return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
+            }
+            else
+            {
+                if (m_board.BlackCount == 0)
+                {
+                    return int.MaxValue;
+                }
+                else if (m_board.WhiteCount == 0)
+                {
+                    return int.MinValue;
+                }
+                return -(int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
+            }
+        }
+
+        /*int ComputeUtility()
+        {
+            int 
+            // Heuristique de base
+            if (m_playerColor == Token.TokenColor.Black)
             {
                 return m_board.BlackCount - m_board.WhiteCount;
             }
@@ -130,6 +191,6 @@ namespace ProjetWPF
             {
                 return m_board.WhiteCount - m_board.BlackCount;
             }
-        }
+        }*/
     }
 }
