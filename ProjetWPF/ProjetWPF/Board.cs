@@ -20,6 +20,14 @@ namespace ProjetWPF
         public int BlackCount {
             get => m_blackTokens.Count;
         }
+        public List<Token> WhiteTokens
+        {
+            get => m_whiteTokens;
+        }
+        public List<Token> BlackTokens
+        {
+            get => m_blackTokens;
+        }
 
         /// <summary>
         /// Copie un plateau de jeu dans la memoire interne de l'etat
