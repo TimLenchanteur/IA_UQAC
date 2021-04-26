@@ -153,30 +153,15 @@ namespace ProjetWPF
             }
             avgAdvance /= -(m_board.BlackCount + m_board.WhiteCount);
             avgAdvance += 4.5f;
-            if (m_playerColor == Token.TokenColor.Black)
+            if(m_board.BlackCount == 0)
             {
-                if(m_board.BlackCount == 0)
-                {
-                    return int.MinValue;
-                }
-                else if (m_board.WhiteCount == 0)
-                {
-                    return int.MaxValue;
-                }
-                return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
+                return int.MinValue;
             }
-            else
+            else if (m_board.WhiteCount == 0)
             {
-                if (m_board.BlackCount == 0)
-                {
-                    return int.MaxValue;
-                }
-                else if (m_board.WhiteCount == 0)
-                {
-                    return int.MinValue;
-                }
-                return -(int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
+                return int.MaxValue;
             }
+            return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
         }
 
         /*int ComputeUtility()
