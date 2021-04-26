@@ -124,7 +124,8 @@ namespace ProjetWPF
         /// <summary>
         /// Execute l'effecteur le plus approprie selon l'agent
         /// </summary>
-        public void ExecuteAMove()
+        /// <returns>Faux si l'agent n'a plus de mouvement</returns>
+        public bool ExecuteAMove()
         {
             // Observe l’environnement
             CheckersState currentState = CaptureSignals();
@@ -137,7 +138,9 @@ namespace ProjetWPF
             Effector nextMove = AlphaBetaSearch(currentState);//MinimaxDecision(currentState);
 
             // Execute le mouvement
+            if (nextMove == null) return false;
             nextMove.Execute(m_board);
+            return true;
         }
 
         /// <summary>

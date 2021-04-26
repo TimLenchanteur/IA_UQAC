@@ -177,11 +177,7 @@ namespace ProjetWPF
                         m_playerTurn = true;
                         // Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
                         m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
-                        if (m_playerPossibleMove.Count == 0)
-                        {
-                            m_playerTurn = false;
-                            break;
-                        }
+                        if (m_playerPossibleMove.Count == 0) lastPlayerWon = true;
                         m_sequenceEngaged = new List<TokenMoveSequence>();
                         while (m_playerTurn && !m_stopGame)
                         {
@@ -190,8 +186,7 @@ namespace ProjetWPF
                         break;
                     case Token.TokenColor.Black:
                         // On attend les instructions de l'agent intelligent
-                        opponent.ExecuteAMove();
-
+                        lastPlayerWon = !opponent.ExecuteAMove();
                         // On attend les instructions du joueur
                         //m_playerTurn = true;
                         //// Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
@@ -212,6 +207,7 @@ namespace ProjetWPF
                         break;
                 }
 
+                if (lastPlayerWon) break;
                 // On verifie si apres c'est mouvement le joueur a gagné
                 lastPlayerWon = CheckWin(currentPlayer);
                 // C'est le tour du joueur suivant
