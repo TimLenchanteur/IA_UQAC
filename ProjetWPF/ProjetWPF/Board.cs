@@ -97,7 +97,7 @@ namespace ProjetWPF
             Queen queen = null;
 
             // Si le pion arrive sur les bord, changer le pion en reine
-            if ((move.Position.Y == 0 && tokenToMove.Color == Token.TokenColor.White) || (move.Position.Y == 9 && tokenToMove.Color == Token.TokenColor.Black))
+            if (!(tokenToMove is Queen) && (move.Position.Y == 0 && tokenToMove.Color == Token.TokenColor.White) || (move.Position.Y == 9 && tokenToMove.Color == Token.TokenColor.Black))
             {
                 queen = new Queen(tokenToMove.Color);
                 queen.Position = move.Position;
@@ -439,18 +439,19 @@ namespace ProjetWPF
         /// <param name="xOperation">L'operation a effectue sur les x (+ ou - un certains chiffre)</param>
         /// <param name="yOperation">L'operation a effectue sur les y (+ ou - un certains chiffre)</param>
         public void CheckCaptureInDiag(in List<TokenMoveSequence> possibleSequence, Queen queen, int xOperation, int yOperation) {
-            List<Token> captured = new List<Token>();
+            Token captured = null;
             for (int i = queen.Position.X + xOperation, j = queen.Position.Y + yOperation; i >= 0 && i < 10 && j >= 0 && j < 10; i = i + xOperation, j = j + yOperation)
             {
-                if (m_tokens[j, i] != null && m_tokens[j, i].Color != queen.Color)
+                if (m_tokens[j, i] != null && m_tokens[j, i].Color != queen.Color && captured == null)
                 {
-                    captured.Add(m_tokens[j, i]);
+                    captured = m_tokens[j, i];
                 }
-                else if (m_tokens[j, i] != null && m_tokens[j, i].Color == queen.Color) break;
-                else if (m_tokens[j, i] == null && captured.Count == 1)
+                else if (m_tokens[j, i] != null && (m_tokens[j, i].Color == queen.Color ||
+                   (m_tokens[j, i].Color != queen.Color && captured != null))) break;
+                else if (m_tokens[j, i] == null && captured != null)
                 {
                     Vector2 capturePosition = new Vector2(i, j);
-                    TokenMove move = new TokenMove(capturePosition, new List<Token>(captured));
+                    TokenMove move = new TokenMove(capturePosition, captured);
                     TokenMoveSequence newSequence = new TokenMoveSequence(queen);
                     newSequence.AddMove(move);
                     possibleSequence.AddRange(TravelQueenSequence(newSequence, capturePosition));
@@ -496,26 +497,25 @@ namespace ProjetWPF
         /// <returns>Si la reine a reussi a cpaturer un pion</returns>
         public bool CheckCaptureInDiag(in List<TokenMoveSequence> possibleSequence, Queen queen, TokenMoveSequence startSequence, int currentX, int currentY, int xOperation, int yOperation)
         {
-            List<Token> captured = new List<Token>();
-            bool capture = false;
+            Token captured = null;
             for (int i = currentX + xOperation, j = currentY + yOperation; i >= 0 && i < 10 && j >= 0 && j < 10; i = i + xOperation, j = j + yOperation)
             {
-                if (m_tokens[j, i] != null && m_tokens[j, i].Color != queen.Color && !startSequence.AlreadyCaptured(new Vector2(i, j)))
+                if (m_tokens[j, i] != null && m_tokens[j, i].Color != queen.Color && !startSequence.AlreadyCaptured(new Vector2(i, j)) && captured == null)
                 {
-                    captured.Add(m_tokens[j, i]);
+                    captured = m_tokens[j, i];
                 }
-                else if (m_tokens[j, i] != null && m_tokens[j, i].Color == queen.Color) break;
-                else if (m_tokens[j, i] == null && !startSequence.AlreadyCaptured(new Vector2(i, j)) && captured.Count == 1)
+                else if (m_tokens[j, i] != null && (m_tokens[j, i].Color == queen.Color ||
+                   (m_tokens[j, i].Color != queen.Color && captured != null))) break;
+                else if (m_tokens[j, i] == null && !startSequence.AlreadyCaptured(new Vector2(i, j)) && captured!=null)
                 {
-                    capture = true;
                     Vector2 capturePosition = new Vector2(i, j);
-                    TokenMove move = new TokenMove(capturePosition, new List<Token>(captured));
+                    TokenMove move = new TokenMove(capturePosition, captured);
                     TokenMoveSequence newSequence = new TokenMoveSequence(startSequence);
                     newSequence.AddMove(move);
                     possibleSequence.AddRange(TravelQueenSequence(newSequence, capturePosition));
                 }
             }
-            return capture;
+            return captured != null;
         }
     }
 

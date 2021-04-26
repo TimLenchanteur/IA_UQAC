@@ -44,9 +44,18 @@ namespace ProjetWPF
         public class Effector
         {
             TokenMoveSequence m_sequence;
+
+            // Sequence de mouvement associe a une reine creer pendant le mouvement dans m_sequence
+            TokenMoveSequence m_newQueenSequence;
+
             public Effector(TokenMoveSequence sequence)
             {
                 m_sequence = sequence;
+                m_newQueenSequence = null;
+            }
+
+            public void AddNewQueenSequence(TokenMoveSequence newQueenSequence) {
+                m_newQueenSequence = newQueenSequence;
             }
 
             /// <summary>
@@ -60,18 +69,49 @@ namespace ProjetWPF
                 while(copySequence != null && !copySequence.Empty())
                 {
                     Thread.Sleep(250);
-                    board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
+                    Queen newQueen = board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
+                    if (newQueen != null)
+                    {
+                        break;
+                    }
                     m_appDisplayer.DisplayBoardFromThread();
+                }
+                // Si une reine a ete cree pendant les mouvements precedent on execute les nouveaux mouvements possible
+                if (m_newQueenSequence != null) {
+                    copySequence = new TokenMoveSequence(m_newQueenSequence);
+                    copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                    while (copySequence != null && !copySequence.Empty())
+                    {
+                        Thread.Sleep(250);
+                        board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
+                        m_appDisplayer.DisplayBoardFromThread();
+                    }
                 }
             }
 
             /// <summary>
             /// Execute l'action pour tester ses consequences
             /// </summary>
-            public void MockExecute(Board board)
+            public Queen MockExecute(Board board)
             {
                 // On veut garder intacte la séquence initiale
                 TokenMoveSequence copySequence = new TokenMoveSequence(m_sequence);
+                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                while (copySequence != null && !copySequence.Empty())
+                {
+                    Queen newQueen = board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
+                    if (newQueen != null) return newQueen;
+                }
+                return null;
+            }
+
+            /// <summary>
+            /// Execute la sequence d'action associe a une nouvelleReine pour tester ses consequences
+            /// </summary>
+            public void NewQueenMockExecute(Board board)
+            {
+                // On veut garder intacte la séquence initiale
+                TokenMoveSequence copySequence = new TokenMoveSequence(m_newQueenSequence);
                 copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
                 while (copySequence != null && !copySequence.Empty())
                 {

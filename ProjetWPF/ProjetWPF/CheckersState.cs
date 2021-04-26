@@ -48,26 +48,48 @@ namespace ProjetWPF
         /// <summary>
         /// Constructeur interne utilise pour creer les successeurs d'un etat
         /// </summary>
-        /// <param name="parent">L'etat precedent cet etat</param>
-        /// <param name="action">L'action a execute sur cet etat</param>
-        CheckersState(CheckersState parent, CheckersSolver.Effector action)
+        /// <param name="board">Le plateau de jeu apres le dernier coup</param>
+        /// <param name="playerColor">Le joueur qui a joue le dernier coup</param>
+        /// <param name="action">Le dernier coup jouer</param>
+        CheckersState(Board board, Token.TokenColor playerColor, CheckersSolver.Effector action)
         {
             m_action = action;
+            m_board = board;
             // On change la couleur du joueur
-            if(parent.m_playerColor == Token.TokenColor.Black) m_playerColor = Token.TokenColor.White;
-            else if (parent.m_playerColor == Token.TokenColor.White) m_playerColor = Token.TokenColor.Black;
-            m_board = new Board(parent.Board);
-            // On effectue l'action 
-            ExecuteAction();
+            if (playerColor == Token.TokenColor.Black) m_playerColor = Token.TokenColor.White;
+            else if (playerColor == Token.TokenColor.White) m_playerColor = Token.TokenColor.Black;
             m_utility = ComputeUtility();
         }
 
         /// <summary>
         /// Execute une action dans l'etat
         /// </summary>
-        void ExecuteAction()
+        /// <param name="sequence">La sequence de mouvement a execute</param>
+       /// <returns>Tous les tableau qui peuvent resulter de cette etat (plusieurs car transformation en reine)</returns>
+        List<KeyValuePair<Board, CheckersSolver.Effector>> ExecuteAction(TokenMoveSequence sequence)
         {
-            m_action.MockExecute(m_board);
+            List<KeyValuePair<Board, CheckersSolver.Effector>> boards = new List<KeyValuePair<Board, CheckersSolver.Effector>>();
+
+            Board originalBoard = new Board(m_board);
+            CheckersSolver.Effector action = new CheckersSolver.Effector(sequence);
+            Queen newQueen = action.MockExecute(originalBoard);
+            // Si jamais le pion est devenue une reine pendant le test on doit tester toute les nouveaux mouvements possible avec la reine
+            if (newQueen != null) {
+                List<TokenMoveSequence> newQueenSequence = originalBoard.BestMovesSequences(newQueen);
+                if (newQueenSequence.Count > 0 && newQueenSequence[0].IsCaptureSequence){
+                    foreach (TokenMoveSequence queenSequence in newQueenSequence) {
+                        CheckersSolver.Effector newAction = new CheckersSolver.Effector(sequence);
+                        newAction.AddNewQueenSequence(queenSequence);
+                        Board sonBoard = new Board(originalBoard);
+                        newAction.NewQueenMockExecute(sonBoard);
+                        boards.Add(new KeyValuePair<Board, CheckersSolver.Effector>(sonBoard, newAction));
+                    }
+                    return boards;
+                }
+            }
+            boards.Add(new KeyValuePair<Board, CheckersSolver.Effector>(originalBoard, action));
+
+            return boards;
         }
 
         /// <summary>
@@ -85,7 +107,9 @@ namespace ProjetWPF
             {
                 foreach(var sequence in sequences)
                 {
-                    nextStates.Add(new CheckersState(this, new CheckersSolver.Effector(sequence)));
+                    foreach (KeyValuePair<Board, CheckersSolver.Effector> state in ExecuteAction(sequence)) {
+                        nextStates.Add(new CheckersState(state.Key, m_playerColor, state.Value));
+                    }
                 }
             }
 
