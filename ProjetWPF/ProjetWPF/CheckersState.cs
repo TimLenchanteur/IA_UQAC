@@ -155,11 +155,11 @@ namespace ProjetWPF
             avgAdvance += 4.5f;
             if(m_board.BlackCount == 0)
             {
-                return int.MinValue;
+                return int.MinValue+1;
             }
             else if (m_board.WhiteCount == 0)
             {
-                return int.MaxValue;
+                return int.MaxValue-1;
             }
             return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
         }

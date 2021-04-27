@@ -65,7 +65,7 @@ namespace ProjetWPF
             {
                 // On veut garder intacte la séquence initiale
                 TokenMoveSequence copySequence = new TokenMoveSequence(m_sequence);
-                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.X, copySequence.OriginPosition.Y];
                 while(copySequence != null && !copySequence.Empty())
                 {
                     Thread.Sleep(250);
@@ -79,7 +79,7 @@ namespace ProjetWPF
                 // Si une reine a ete cree pendant les mouvements precedent on execute les nouveaux mouvements possible
                 if (m_newQueenSequence != null) {
                     copySequence = new TokenMoveSequence(m_newQueenSequence);
-                    copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                    copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.X, copySequence.OriginPosition.Y];
                     while (copySequence != null && !copySequence.Empty())
                     {
                         Thread.Sleep(250);
@@ -96,7 +96,7 @@ namespace ProjetWPF
             {
                 // On veut garder intacte la séquence initiale
                 TokenMoveSequence copySequence = new TokenMoveSequence(m_sequence);
-                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.X, copySequence.OriginPosition.Y];
                 while (copySequence != null && !copySequence.Empty())
                 {
                     Queen newQueen = board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
@@ -112,7 +112,7 @@ namespace ProjetWPF
             {
                 // On veut garder intacte la séquence initiale
                 TokenMoveSequence copySequence = new TokenMoveSequence(m_newQueenSequence);
-                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.X, copySequence.OriginPosition.Y];
                 while (copySequence != null && !copySequence.Empty())
                 {
                     board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());

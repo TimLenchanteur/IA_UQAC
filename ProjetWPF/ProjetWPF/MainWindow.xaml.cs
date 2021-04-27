@@ -109,8 +109,8 @@ namespace ProjetWPF
                         Image token = CreateImage(m_board.Tokens[i,j].image);
                         token.Visibility = Visibility.Visible;
                         GridBoard.Children.Add(token);
-                        Grid.SetRow(token, i);
-                        Grid.SetColumn(token, j);
+                        Grid.SetRow(token, j);
+                        Grid.SetColumn(token, i);
                     }
                 }
             }
@@ -315,7 +315,7 @@ namespace ProjetWPF
                         if (m_sequenceEngaged.Count == 0)
                         {
                             // Select the token and mark the possible destinations with a color
-                            m_selectedToken = m_board.Tokens[Grid.GetRow((UIElement)element), Grid.GetColumn((UIElement)element)];
+                            m_selectedToken = m_board.Tokens[Grid.GetColumn((UIElement)element), Grid.GetRow((UIElement)element)];
                             if (m_selectedToken != null && m_playerPossibleMove.ContainsKey(m_selectedToken))
                             {
                                 m_selectedTokenPossibleMove = ComputeCells(m_playerPossibleMove[m_selectedToken]);
@@ -323,7 +323,7 @@ namespace ProjetWPF
                             }
                         }
                         else {
-                            if (m_board.Tokens[Grid.GetRow((UIElement)element), Grid.GetColumn((UIElement)element)] == m_selectedToken) {
+                            if (m_board.Tokens[Grid.GetColumn((UIElement)element), Grid.GetRow((UIElement)element)] == m_selectedToken) {
                                 ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.CadetBlue);
                             }
                         }
