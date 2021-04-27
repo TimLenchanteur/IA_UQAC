@@ -183,46 +183,14 @@ namespace ProjetWPF
             List<TokenMoveSequence> possibleSequence = new List<TokenMoveSequence>();
 
             // Si capture possible on recupere les sequences permettant d'obtenir le plus de capture
-            Vector2 downLeft = new Vector2(token.Position.X - 2, token.Position.Y + 2);
-            Vector2 downRight = new Vector2(token.Position.X + 2, token.Position.Y + 2);
-            Vector2 topLeft = new Vector2(token.Position.X - 2, token.Position.Y - 2);
-            Vector2 topRight = new Vector2(token.Position.X + 2, token.Position.Y - 2);
-            // Down left
-            if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.X, downLeft.Y] == null &&
-                   m_tokens[downLeft.X + 1, downLeft.Y - 1] != null && m_tokens[downLeft.X + 1, downLeft.Y - 1].Color != token.Color) {
-
-                TokenMove newMove = new TokenMove(downLeft, m_tokens[downLeft.X + 1, downLeft.Y - 1]);
-                TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                newSequence.AddMove(newMove);
-                possibleSequence.AddRange(TravelSequence(newSequence, downLeft));
-            }
-            // Down right
-            if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.X, downRight.Y] == null &&
-                m_tokens[downRight.X - 1, downRight.Y - 1] != null && m_tokens[downRight.X - 1, downRight.Y - 1].Color != token.Color)
-            {
-                TokenMove newMove = new TokenMove(downRight, m_tokens[downRight.X - 1, downRight.Y - 1]);
-                TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                newSequence.AddMove(newMove);
-                possibleSequence.AddRange(TravelSequence(newSequence, downRight));
-            }
-            // Top left
-            if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.X, topLeft.Y] == null &&
-                m_tokens[topLeft.X + 1, topLeft.Y + 1] != null && m_tokens[topLeft.X + 1, topLeft.Y + 1].Color != token.Color)
-            {
-                TokenMove newMove = new TokenMove(topLeft, m_tokens[topLeft.X + 1, topLeft.Y + 1]);
-                TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                newSequence.AddMove(newMove);
-                possibleSequence.AddRange(TravelSequence(newSequence, topLeft));
-            }
-            // Top right
-            if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.X, topRight.Y] == null &&
-                m_tokens[topRight.X - 1, topRight.Y + 1] != null && m_tokens[topRight.X - 1, topRight.Y + 1].Color != token.Color)
-            {
-                TokenMove newMove = new TokenMove(topRight, m_tokens[topRight.X - 1, topRight.Y + 1]);
-                TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                newSequence.AddMove(newMove);
-                possibleSequence.AddRange(TravelSequence(newSequence, topRight));
-            }
+            // haut gauche
+            CheckTokenCapture(in possibleSequence, token, new Vector2(-1,1));
+            // haut droite
+            CheckTokenCapture(in possibleSequence, token, new Vector2(1, 1));
+            // bas gauche
+            CheckTokenCapture(in possibleSequence, token, new Vector2(1, -1));
+            // bas droite
+            CheckTokenCapture(in possibleSequence, token, new Vector2(-1, -1));
 
             // Tri le nombre de capture par sequence et garde uniquement les sequence permettant le plus de capture
             List<TokenMoveSequence> toRemove = new List<TokenMoveSequence>();
@@ -246,47 +214,18 @@ namespace ProjetWPF
             }
             else {
                 // Sinon on renvoie tout les mouvements possibles
-                // Down left
                 if (token.Color == Token.TokenColor.White)
                 {
-                    downLeft = new Vector2(token.Position.X - 1, token.Position.Y - 1);
-                    downRight = new Vector2(token.Position.X + 1, token.Position.Y - 1);
-                    if (downLeft.X >= 0 && downLeft.Y >= 0 && m_tokens[downLeft.X, downLeft.Y] == null)
-                    {
-                        TokenMove newMove = new TokenMove(downLeft);
-                        TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                        newSequence.AddMove(newMove);
-                        possibleSequence.Add(newSequence);
-                    }
-                    // Down right    
-                    if (downRight.X < 10 && downLeft.Y >= 0 && m_tokens[downRight.X, downRight.Y] == null)
-                    {
-                        TokenMove newMove = new TokenMove(downRight);
-                        TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                        newSequence.AddMove(newMove);
-                        possibleSequence.Add(newSequence);
-                    }
+                    // bas gauche
+                    AddTokenPosition(possibleSequence, token, new Vector2(-1, -1));
+                    // bas droite
+                    AddTokenPosition(possibleSequence, token, new Vector2(1, -1));
                 }
                 else {
-                    topLeft = new Vector2(token.Position.X - 1, token.Position.Y + 1);
-                    topRight = new Vector2(token.Position.X + 1, token.Position.Y + 1);
-
-                    // Top left
-                    if (topLeft.X >= 0 && topLeft.Y < 10 && m_tokens[topLeft.X, topLeft.Y] == null)
-                    {
-                        TokenMove newMove = new TokenMove(topLeft);
-                        TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                        newSequence.AddMove(newMove);
-                        possibleSequence.Add(newSequence);
-                    }
-                    // Top right    
-                    if (topRight.X < 10 && topRight.Y < 10 && m_tokens[topRight.X, topRight.Y] == null)
-                    {
-                        TokenMove newMove = new TokenMove(topRight);
-                        TokenMoveSequence newSequence = new TokenMoveSequence(token);
-                        newSequence.AddMove(newMove);
-                        possibleSequence.Add(newSequence);
-                    }
+                    // haut gauche
+                    AddTokenPosition(possibleSequence, token, new Vector2(-1, 1));
+                    // haut droite
+                    AddTokenPosition(possibleSequence, token, new Vector2(1, 1));
                 }
             }
 
@@ -306,55 +245,82 @@ namespace ProjetWPF
 
             // Si capture possible on recupere les sequences permettant d'obtenir le plus de capture
             bool captured = false;
-            Vector2 downLeft = new Vector2(tokenPosition.X - 2, tokenPosition.Y + 2);
-            Vector2 downRight = new Vector2(tokenPosition.X + 2, tokenPosition.Y + 2);
-            Vector2 topLeft = new Vector2(tokenPosition.X - 2, tokenPosition.Y - 2);
-            Vector2 topRight = new Vector2(tokenPosition.X + 2, tokenPosition.Y - 2);
-            // Down left
-            if (downLeft.X >= 0 && downLeft.Y < 10 && m_tokens[downLeft.X, downLeft.Y] == null &&
-                   m_tokens[downLeft.X + 1, downLeft.Y - 1] != null && !tokenSequence.AlreadyCaptured(new Vector2(downLeft.X + 1, downLeft.Y - 1)) && m_tokens[downLeft.X + 1, downLeft.Y - 1].Color != token.Color)
-            {
-
-                TokenMove newMove = new TokenMove(downLeft, m_tokens[downLeft.X + 1, downLeft.Y - 1]);
-                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
-                newSequence.AddMove(newMove);
-                possibleSequence.AddRange(TravelSequence(newSequence, downLeft));
-                captured = true;
-            }
-            // Down right
-            if (downRight.X < 10 && downLeft.Y < 10 && m_tokens[downRight.X, downRight.Y] == null &&
-                m_tokens[downRight.X - 1, downRight.Y - 1] != null && !tokenSequence.AlreadyCaptured(new Vector2(downRight.X - 1, downRight.Y - 1)) && m_tokens[downRight.X - 1, downRight.Y - 1].Color != token.Color)
-            {
-                TokenMove newMove = new TokenMove(downRight, m_tokens[downRight.X - 1, downRight.Y - 1]);
-                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
-                newSequence.AddMove(newMove);
-                possibleSequence.AddRange(TravelSequence(newSequence, downRight));
-                captured = true;
-            }
-            // Top left
-            if (topLeft.X >= 0 && topLeft.Y >= 0 && m_tokens[topLeft.X, topLeft.Y] == null &&
-                m_tokens[topLeft.X + 1, topLeft.Y + 1] != null && !tokenSequence.AlreadyCaptured(new Vector2(topLeft.X + 1, topLeft.Y + 1)) && m_tokens[topLeft.X + 1, topLeft.Y + 1].Color != token.Color)
-            {
-                TokenMove newMove = new TokenMove(topLeft, m_tokens[topLeft.X + 1, topLeft.Y + 1]);
-                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
-                newSequence.AddMove(newMove);
-                possibleSequence.AddRange(TravelSequence(newSequence, topLeft));
-                captured = true;
-            }
-            // Top right
-            if (topRight.X < 10 && topRight.Y >= 0 && m_tokens[topRight.X, topRight.Y] == null &&
-                m_tokens[topRight.X - 1, topRight.Y + 1] != null && !tokenSequence.AlreadyCaptured(new Vector2(topRight.X - 1, topRight.Y + 1)) && m_tokens[topRight.X - 1, topRight.Y + 1].Color != token.Color)
-            {
-                TokenMove newMove = new TokenMove(topRight, m_tokens[topRight.X - 1, topRight.Y + 1]);
-                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
-                newSequence.AddMove(newMove);
-                possibleSequence.AddRange(TravelSequence(newSequence, topRight));
-                captured = true;
-            }
+            // bas gauche
+            captured |= CheckTokenCaptureRec(possibleSequence, tokenSequence, tokenPosition, new Vector2(-1, -1));
+            // bas droite
+            captured |= CheckTokenCaptureRec(possibleSequence, tokenSequence, tokenPosition, new Vector2(1,-1));
+            // haut gauche
+            captured |= CheckTokenCaptureRec(possibleSequence, tokenSequence, tokenPosition, new Vector2(-1, 1));
+            // haut droite
+            captured |= CheckTokenCaptureRec(possibleSequence, tokenSequence, tokenPosition, new Vector2(1, 1));
             if (!captured) {
                 possibleSequence.Add(tokenSequence);
             }
             return possibleSequence;
+        }
+
+        /// <summary>
+        /// Ajoute une position possible au mouvement d'un pion
+        /// </summary>
+        /// <param name="possibleSequence">Les sequence de mouvement possible pour ce pion</param>
+        /// <param name="token">Le pion en question</param>
+        /// <param name="diagonal">La diagonale concerner par le mouvement (Doit etre defini a partir de 1 et -1)</param>
+        public void AddTokenPosition(in List<TokenMoveSequence> possibleSequence, Token token, Vector2 diagonal) {
+            Vector2 target = new Vector2(token.Position.X + diagonal.X, token.Position.Y + diagonal.Y);
+            if (target.X >= 0 && target.Y >= 0  && target.X<10 && target.Y <10 && m_tokens[target.X, target.Y] == null)
+            {
+                TokenMove newMove = new TokenMove(target);
+                TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                newSequence.AddMove(newMove);
+                possibleSequence.Add(newSequence);
+            }
+        }
+
+        /// <summary>
+        /// Verifie si une capture est possible sur l'une des diagonale du pion
+        /// </summary>
+        /// <param name="possibleSequence">Les sequence de mouvement possible pour ce pion</param>
+        /// <param name="token">Le pion en question</param>
+        /// <param name="diagonal">La diagonale concerner par le mouvement (Doit etre defini a partir de 1 et -1)</param>
+        public void CheckTokenCapture(in List<TokenMoveSequence> possibleSequence, Token token, Vector2 diagonal) {
+            Vector2 capture = new Vector2(token.Position.X + diagonal.X, token.Position.Y + diagonal.Y);
+            Vector2 target = new Vector2(token.Position.X + diagonal.X * 2, token.Position.Y + diagonal.Y * 2);
+            
+            // Si on peut atteindre la case apres la capture on peut forcement atteindre la capture
+            if (target.X >= 0 && target.Y >= 0 && target.Y < 10  && target.X <10 &&  m_tokens[target.X, target.Y] == null &&
+                      m_tokens[capture.X, capture.Y] != null && m_tokens[capture.X, capture.Y].Color != token.Color){
+                TokenMove newMove = new TokenMove(target, m_tokens[capture.X, capture.Y]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(token);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, target));
+            }
+        }
+
+        /// <summary>
+        /// Verifie si une capture est possible sur l'une des diagonales du pion
+        /// </summary>
+        /// <param name="possibleSequence">Les sequence de mouvement possible pour ce pion</param>
+        /// <param name="tokenSequence">La sequence que l'on est en train de parcourir</param>
+        /// <param name="position">La position du pion actuel dans la sequence</param>
+        /// <param name="diagonal">La diagonale concerner par le mouvement (Doit etre defini a partir de 1 et -1)</param>
+        /// <returns>Vrai si l'on a trouver une capture, faux sinon</returns>
+        public bool CheckTokenCaptureRec(in List<TokenMoveSequence> possibleSequence, TokenMoveSequence tokenSequence, Vector2 position, Vector2 diagonal)
+        {
+            Vector2 capture = new Vector2(position.X + diagonal.X, position.Y + diagonal.Y);
+            Vector2 target = new Vector2(position.X + diagonal.X * 2, position.Y + diagonal.Y * 2);
+
+            // Si on peut atteindre la case apres la capture on peut forcement atteindre la capture
+            if (target.X >= 0 && target.Y >= 0 && target.X < 10 && target.Y < 10 && m_tokens[target.X, target.Y] == null &&
+                   m_tokens[capture.X, capture.Y ] != null && !tokenSequence.AlreadyCaptured(new Vector2(capture.X, capture.Y)) && m_tokens[capture.X, capture.Y].Color != tokenSequence.TokenAttached.Color)
+            {
+
+                TokenMove newMove = new TokenMove(target, m_tokens[capture.X, capture.Y]);
+                TokenMoveSequence newSequence = new TokenMoveSequence(tokenSequence);
+                newSequence.AddMove(newMove);
+                possibleSequence.AddRange(TravelSequence(newSequence, target));
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -481,13 +447,13 @@ namespace ProjetWPF
             // Si capture possible on recupere les sequences permettant d'obtenir le plus de capture
             bool captured = false;
             // Down left
-            captured |= CheckCaptureInDiag(possibleSequence, queen, tokenSequence, tokenPosition.X, tokenPosition.Y, -1, 1);
+            captured |= CheckCaptureInDiagRec(possibleSequence, queen, tokenSequence, tokenPosition.X, tokenPosition.Y, -1, 1);
             // Down right
-            captured |= CheckCaptureInDiag(possibleSequence, queen, tokenSequence, tokenPosition.X, tokenPosition.Y, 1, 1);
+            captured |= CheckCaptureInDiagRec(possibleSequence, queen, tokenSequence, tokenPosition.X, tokenPosition.Y, 1, 1);
             // Top left
-            captured |= CheckCaptureInDiag(possibleSequence, queen, tokenSequence, tokenPosition.X, tokenPosition.Y, -1, -1);
+            captured |= CheckCaptureInDiagRec(possibleSequence, queen, tokenSequence, tokenPosition.X, tokenPosition.Y, -1, -1);
             // Top right
-            captured |= CheckCaptureInDiag(possibleSequence, queen, tokenSequence, tokenPosition.X, tokenPosition.Y, 1, -1);
+            captured |= CheckCaptureInDiagRec(possibleSequence, queen, tokenSequence, tokenPosition.X, tokenPosition.Y, 1, -1);
             if (!captured) possibleSequence.Add(tokenSequence);
             return possibleSequence;
         }
@@ -503,9 +469,10 @@ namespace ProjetWPF
         /// <param name="xOperation">L'operation a effectue sur les x (+ ou - un certains chiffre)</param>
         /// <param name="yOperation">L'operation a effectue sur les y (+ ou - un certains chiffre)</param>
         /// <returns>Si la reine a reussi a cpaturer un pion</returns>
-        public bool CheckCaptureInDiag(in List<TokenMoveSequence> possibleSequence, Queen queen, TokenMoveSequence startSequence, int currentX, int currentY, int xOperation, int yOperation)
+        public bool CheckCaptureInDiagRec(in List<TokenMoveSequence> possibleSequence, Queen queen, TokenMoveSequence startSequence, int currentX, int currentY, int xOperation, int yOperation)
         {
             Token captured = null;
+            bool capture = false;
             for (int i = currentX + xOperation, j = currentY + yOperation; i >= 0 && i < 10 && j >= 0 && j < 10; i = i + xOperation, j = j + yOperation)
             {
                 if (m_tokens[i, j] != null && m_tokens[i, j].Color != queen.Color && !startSequence.AlreadyCaptured(new Vector2(i, j)) && captured == null)
@@ -521,9 +488,10 @@ namespace ProjetWPF
                     TokenMoveSequence newSequence = new TokenMoveSequence(startSequence);
                     newSequence.AddMove(move);
                     possibleSequence.AddRange(TravelQueenSequence(newSequence, capturePosition));
+                    capture = true;
                 }
             }
-            return captured != null;
+            return capture;
         }
     }
 

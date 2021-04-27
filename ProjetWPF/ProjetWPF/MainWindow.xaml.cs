@@ -188,19 +188,14 @@ namespace ProjetWPF
                         // On attend les instructions de l'agent intelligent
                         lastPlayerWon = !opponent.ExecuteAMove();
                         // On attend les instructions du joueur
-                        //m_playerTurn = true;
-                        //// Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
-                        //m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
-                        //if (m_playerPossibleMove.Count == 0)
-                        //{
-                        //    m_playerTurn = false;
-                        //    break;
-                        //}
-                        //m_sequenceEngaged = new List<TokenMoveSequence>();
-                        //while (m_playerTurn)
-                        //{
-                        //    Thread.Sleep(0);
-                        //}
+                        /*m_playerTurn = true;
+                        m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
+                        if (m_playerPossibleMove.Count == 0) lastPlayerWon = true;
+                        m_sequenceEngaged = new List<TokenMoveSequence>();
+                        while (m_playerTurn && !m_stopGame)
+                        {
+                            Thread.Sleep(0);
+                        }*/
 
                         break;
                     default:
