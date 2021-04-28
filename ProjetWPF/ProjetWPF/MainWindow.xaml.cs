@@ -278,6 +278,7 @@ namespace ProjetWPF
                                 if (!(m_selectedToken is Queen) &&  (m_selectedToken.Position.Y == 0))
                                 {
                                     m_board.Crown(m_selectedToken);
+                                    DisplayBoard();
                                 }
                                 m_playerTurn = false;
                                 m_selectedToken = null;
