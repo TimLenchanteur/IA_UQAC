@@ -225,7 +225,7 @@ namespace ProjetWPF
             // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus petite utilite maximum
             foreach (CheckersState nextState in state.Successors())
             {
-                int successorUtility = MaxValue(nextState, depth + 1).Utility;
+                int successorUtility = MaxValue(nextState, alpha, beta, depth + 1).Utility;
                 if (utility > successorUtility)
                 {
                     utility = successorUtility;
