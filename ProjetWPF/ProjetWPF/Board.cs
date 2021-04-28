@@ -99,13 +99,13 @@ namespace ProjetWPF
         /// <param name="tokenToMove">Le pion a bouger</param>
         /// <param name="move">Le mouvement d'un pion</param>
         /// <returns>Le pion transformer en reine et ses sequences associes si transformation il y a eu</returns>
-        public Queen ExecuteTokenMove(Token tokenToMove, TokenMove move) {
+        public void ExecuteTokenMove(Token tokenToMove, TokenMove move, bool endOfSequence) {
 
             m_tokens[tokenToMove.Position.X, tokenToMove.Position.Y] = null;
             Queen queen = null;
 
             // Si le pion arrive sur les bord, changer le pion en reine
-            if (!(tokenToMove is Queen) && (move.Position.Y == 0 && tokenToMove.Color == Token.TokenColor.White) || (move.Position.Y == 9 && tokenToMove.Color == Token.TokenColor.Black))
+            if (!(tokenToMove is Queen) && endOfSequence && (move.Position.Y == 0 && tokenToMove.Color == Token.TokenColor.White) || (move.Position.Y == 9 && tokenToMove.Color == Token.TokenColor.Black))
             {
                 queen = new Queen(tokenToMove.Color);
                 queen.Position = move.Position;
@@ -135,8 +135,6 @@ namespace ProjetWPF
                     else m_whiteTokens.Remove(token);
                 }
             }
-
-            return queen;
         }
 
         /// <summary>
@@ -492,6 +490,26 @@ namespace ProjetWPF
                 }
             }
             return capture;
+        }
+
+        public void Crown(Token token)
+        {
+            if (!(token is Queen))
+            {
+                Queen queen = new Queen(token.Color);
+                queen.Position = token.Position;
+                m_tokens[token.Position.X, token.Position.Y] = queen;
+                if (token.Color == Token.TokenColor.White)
+                {
+                    m_whiteTokens.Remove(token);
+                    m_whiteTokens.Add(queen);
+                }
+                else
+                {
+                    m_blackTokens.Remove(token);
+                    m_blackTokens.Add(queen);
+                }
+            }
         }
     }
 

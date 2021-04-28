@@ -72,21 +72,7 @@ namespace ProjetWPF
 
             Board originalBoard = new Board(m_board);
             CheckersSolver.Effector action = new CheckersSolver.Effector(sequence);
-            Queen newQueen = action.MockExecute(originalBoard);
-            // Si jamais le pion est devenue une reine pendant le test on doit tester toute les nouveaux mouvements possible avec la reine
-            if (newQueen != null) {
-                List<TokenMoveSequence> newQueenSequence = originalBoard.BestMovesSequences(newQueen);
-                if (newQueenSequence.Count > 0 && newQueenSequence[0].IsCaptureSequence){
-                    foreach (TokenMoveSequence queenSequence in newQueenSequence) {
-                        CheckersSolver.Effector newAction = new CheckersSolver.Effector(sequence);
-                        newAction.AddNewQueenSequence(queenSequence);
-                        Board sonBoard = new Board(originalBoard);
-                        newAction.NewQueenMockExecute(sonBoard);
-                        boards.Add(new KeyValuePair<Board, CheckersSolver.Effector>(sonBoard, newAction));
-                    }
-                    return boards;
-                }
-            }
+            action.MockExecute(originalBoard);
             boards.Add(new KeyValuePair<Board, CheckersSolver.Effector>(originalBoard, action));
 
             return boards;

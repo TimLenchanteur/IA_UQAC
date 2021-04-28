@@ -242,48 +242,43 @@ namespace ProjetWPF
                         {
                             // Move the token and reset the colors of the board
                             ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.Khaki);
-                            Queen newQueen = m_board.ExecuteTokenMove(m_selectedToken, tokenMove);
+                            m_board.ExecuteTokenMove(m_selectedToken, tokenMove, false);
                             DisplayBoard();
-
-                            if (newQueen == null)
+                            
+                            //Calcul les captures possible restante
+                            if (m_sequenceEngaged.Count > 0)
                             {
-                                //Calcul les captures possible restante
-                                if (m_sequenceEngaged.Count > 0)
+                                List<TokenMoveSequence> toRemove = new List<TokenMoveSequence>();
+                                foreach (TokenMoveSequence sequence in m_sequenceEngaged)
                                 {
-                                    List<TokenMoveSequence> toRemove = new List<TokenMoveSequence>();
-                                    foreach (TokenMoveSequence sequence in m_sequenceEngaged)
-                                    {
-                                        TokenMove movePlayed = sequence.PlayMove();
-                                        if (sequence.Empty() || !movePlayed.Equals(tokenMove)) toRemove.Add(sequence);
-                                    }
-                                    foreach (TokenMoveSequence sequence in toRemove)
-                                    {
-                                        m_sequenceEngaged.Remove(sequence);
-                                    }
+                                    TokenMove movePlayed = sequence.PlayMove();
+                                    if (sequence.Empty() || !movePlayed.Equals(tokenMove)) toRemove.Add(sequence);
                                 }
-                                else
+                                foreach (TokenMoveSequence sequence in toRemove)
                                 {
-                                    foreach (TokenMoveSequence sequence in m_playerPossibleMove[m_selectedToken])
+                                    m_sequenceEngaged.Remove(sequence);
+                                }
+                            }
+                            else
+                            {
+                                foreach (TokenMoveSequence sequence in m_playerPossibleMove[m_selectedToken])
+                                {
+                                    TokenMove movePlayed = sequence.PlayMove();
+                                    if (!sequence.Empty() && movePlayed.Equals(tokenMove))
                                     {
-                                        TokenMove movePlayed = sequence.PlayMove();
-                                        if (!sequence.Empty() && movePlayed.Equals(tokenMove))
-                                        {
-                                            m_sequenceEngaged.Add(sequence);
-                                        }
+                                        m_sequenceEngaged.Add(sequence);
                                     }
                                 }
                             }
-                            else {
-                                m_selectedToken = newQueen;
-                                m_sequenceEngaged = m_board.BestMovesSequences(newQueen);
-                                if (m_sequenceEngaged.Count > 0 && !m_sequenceEngaged[0].IsCaptureSequence) m_sequenceEngaged.Clear();
-                                m_playerPossibleMove.Add(m_selectedToken, m_sequenceEngaged);
-                            }  
 
 
                             // Fini le tour du joueur ou affiche les prochains mouvement possible
                             if (m_sequenceEngaged.Count == 0)
                             {
+                                if (!(m_selectedToken is Queen) &&  (m_selectedToken.Position.Y == 0))
+                                {
+                                    m_board.Crown(m_selectedToken);
+                                }
                                 m_playerTurn = false;
                                 m_selectedToken = null;
                                 m_selectedTokenPossibleMove = null;
