@@ -65,12 +65,17 @@ namespace ProjetWPF
             {
                 // On veut garder intacte la séquence initiale
                 TokenMoveSequence copySequence = new TokenMoveSequence(m_sequence);
-                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.X, copySequence.OriginPosition.Y];
-                while(copySequence != null && !copySequence.Empty())
+                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
+                while (copySequence != null && !copySequence.Empty())
                 {
                     Thread.Sleep(250);
-                    TokenMove move = copySequence.PlayMove();
-                    board.ExecuteTokenMove(copySequence.TokenAttached, move, copySequence.Empty());
+                    board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
+                    m_appDisplayer.DisplayBoardFromThread();
+                }
+                if ((copySequence.TokenAttached.Color == Token.TokenColor.White && copySequence.TokenAttached.Position.Y == 0) ||
+                   (copySequence.TokenAttached.Color == Token.TokenColor.Black && copySequence.TokenAttached.Position.Y == 9))
+                {
+                    board.Crown(copySequence.TokenAttached);
                     m_appDisplayer.DisplayBoardFromThread();
                 }
             }
@@ -82,11 +87,15 @@ namespace ProjetWPF
             {
                 // On veut garder intacte la séquence initiale
                 TokenMoveSequence copySequence = new TokenMoveSequence(m_sequence);
-                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.X, copySequence.OriginPosition.Y];
+                copySequence.TokenAttached = board.Tokens[copySequence.OriginPosition.Y, copySequence.OriginPosition.X];
                 while (copySequence != null && !copySequence.Empty())
                 {
-                    TokenMove move = copySequence.PlayMove();
-                    board.ExecuteTokenMove(copySequence.TokenAttached, move, copySequence.Empty());
+                    board.ExecuteTokenMove(copySequence.TokenAttached, copySequence.PlayMove());
+                }
+                if((copySequence.TokenAttached.Color == Token.TokenColor.White && copySequence.TokenAttached.Position.Y==0) ||
+                   (copySequence.TokenAttached.Color == Token.TokenColor.Black && copySequence.TokenAttached.Position.Y == 9))
+                {
+                    board.Crown(copySequence.TokenAttached);
                 }
             }
         }

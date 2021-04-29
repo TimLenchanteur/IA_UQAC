@@ -66,16 +66,15 @@ namespace ProjetWPF
         /// </summary>
         /// <param name="sequence">La sequence de mouvement a execute</param>
        /// <returns>Tous les tableau qui peuvent resulter de cette etat (plusieurs car transformation en reine)</returns>
-        List<KeyValuePair<Board, CheckersSolver.Effector>> ExecuteAction(TokenMoveSequence sequence)
+        KeyValuePair<Board, CheckersSolver.Effector> ExecuteAction(TokenMoveSequence sequence)
         {
             List<KeyValuePair<Board, CheckersSolver.Effector>> boards = new List<KeyValuePair<Board, CheckersSolver.Effector>>();
 
             Board originalBoard = new Board(m_board);
             CheckersSolver.Effector action = new CheckersSolver.Effector(sequence);
             action.MockExecute(originalBoard);
-            boards.Add(new KeyValuePair<Board, CheckersSolver.Effector>(originalBoard, action));
-
-            return boards;
+            
+            return new KeyValuePair<Board, CheckersSolver.Effector>(originalBoard, action);
         }
 
         /// <summary>
@@ -93,9 +92,8 @@ namespace ProjetWPF
             {
                 foreach(var sequence in sequences)
                 {
-                    foreach (KeyValuePair<Board, CheckersSolver.Effector> state in ExecuteAction(sequence)) {
-                        nextStates.Add(new CheckersState(state.Key, m_playerColor, state.Value));
-                    }
+                    KeyValuePair<Board, CheckersSolver.Effector> state = ExecuteAction(sequence);
+                    nextStates.Add(new CheckersState(state.Key, m_playerColor, state.Value));
                 }
             }
 
@@ -141,11 +139,11 @@ namespace ProjetWPF
             avgAdvance += 4.5f;
             if(m_board.BlackCount == 0)
             {
-                return int.MinValue+1;
+                return int.MinValue;
             }
             else if (m_board.WhiteCount == 0)
             {
-                return int.MaxValue-1;
+                return int.MaxValue;
             }
             return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
         }

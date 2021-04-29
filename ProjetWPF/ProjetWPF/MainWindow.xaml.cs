@@ -109,8 +109,8 @@ namespace ProjetWPF
                         Image token = CreateImage(m_board.Tokens[i,j].image);
                         token.Visibility = Visibility.Visible;
                         GridBoard.Children.Add(token);
-                        Grid.SetRow(token, j);
-                        Grid.SetColumn(token, i);
+                        Grid.SetRow(token, i);
+                        Grid.SetColumn(token, j);
                     }
                 }
             }
@@ -188,14 +188,19 @@ namespace ProjetWPF
                         // On attend les instructions de l'agent intelligent
                         lastPlayerWon = !opponent.ExecuteAMove();
                         // On attend les instructions du joueur
-                        /*m_playerTurn = true;
-                        m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
-                        if (m_playerPossibleMove.Count == 0) lastPlayerWon = true;
-                        m_sequenceEngaged = new List<TokenMoveSequence>();
-                        while (m_playerTurn && !m_stopGame)
-                        {
-                            Thread.Sleep(0);
-                        }*/
+                        //m_playerTurn = true;
+                        //// Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
+                        //m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
+                        //if (m_playerPossibleMove.Count == 0)
+                        //{
+                        //    m_playerTurn = false;
+                        //    break;
+                        //}
+                        //m_sequenceEngaged = new List<TokenMoveSequence>();
+                        //while (m_playerTurn)
+                        //{
+                        //    Thread.Sleep(0);
+                        //}
 
                         break;
                     default:
@@ -242,53 +247,55 @@ namespace ProjetWPF
                         {
                             // Move the token and reset the colors of the board
                             ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.Khaki);
-                            m_board.ExecuteTokenMove(m_selectedToken, tokenMove, false);
-                            DisplayBoard();
-                            
-                            //Calcul les captures possible restante
-                            if (m_sequenceEngaged.Count > 0)
+                            if (m_selectedToken != null)
                             {
-                                List<TokenMoveSequence> toRemove = new List<TokenMoveSequence>();
-                                foreach (TokenMoveSequence sequence in m_sequenceEngaged)
+                                m_board.ExecuteTokenMove(m_selectedToken, tokenMove);
+                                DisplayBoard();
+                                //Calcul les captures possible restante
+                                if (m_sequenceEngaged.Count > 0)
                                 {
-                                    TokenMove movePlayed = sequence.PlayMove();
-                                    if (sequence.Empty() || !movePlayed.Equals(tokenMove)) toRemove.Add(sequence);
-                                }
-                                foreach (TokenMoveSequence sequence in toRemove)
-                                {
-                                    m_sequenceEngaged.Remove(sequence);
-                                }
-                            }
-                            else
-                            {
-                                foreach (TokenMoveSequence sequence in m_playerPossibleMove[m_selectedToken])
-                                {
-                                    TokenMove movePlayed = sequence.PlayMove();
-                                    if (!sequence.Empty() && movePlayed.Equals(tokenMove))
+                                    List<TokenMoveSequence> toRemove = new List<TokenMoveSequence>();
+                                    foreach (TokenMoveSequence sequence in m_sequenceEngaged)
                                     {
-                                        m_sequenceEngaged.Add(sequence);
+                                        TokenMove movePlayed = sequence.PlayMove();
+                                        if (sequence.Empty() || !movePlayed.Equals(tokenMove)) toRemove.Add(sequence);
+                                    }
+                                    foreach (TokenMoveSequence sequence in toRemove)
+                                    {
+                                        m_sequenceEngaged.Remove(sequence);
                                     }
                                 }
-                            }
-
-
-                            // Fini le tour du joueur ou affiche les prochains mouvement possible
-                            if (m_sequenceEngaged.Count == 0)
-                            {
-                                if (!(m_selectedToken is Queen) &&  (m_selectedToken.Position.Y == 0))
+                                else
                                 {
-                                    m_board.Crown(m_selectedToken);
-                                    DisplayBoard();
+                                    foreach (TokenMoveSequence sequence in m_playerPossibleMove[m_selectedToken])
+                                    {
+                                        TokenMove movePlayed = sequence.PlayMove();
+                                        if (!sequence.Empty() && movePlayed.Equals(tokenMove))
+                                        {
+                                            m_sequenceEngaged.Add(sequence);
+                                        }
+                                    }
                                 }
-                                m_playerTurn = false;
-                                m_selectedToken = null;
-                                m_selectedTokenPossibleMove = null;
-                                m_sequenceEngaged = null;
-                            }
-                            else
-                            {
-                                m_selectedTokenPossibleMove = ComputeCells(m_sequenceEngaged);
-                                ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.CadetBlue);
+
+
+                                // Fini le tour du joueur ou affiche les prochains mouvement possible
+                                if (m_sequenceEngaged.Count == 0)
+                                {
+                                    if (m_selectedToken.Position.Y == 0)
+                                    {
+                                        m_board.Crown(m_selectedToken);
+                                    }
+                                    DisplayBoard();
+                                    m_playerTurn = false;
+                                    m_selectedToken = null;
+                                    m_selectedTokenPossibleMove = null;
+                                    m_sequenceEngaged = null;
+                                }
+                                else
+                                {
+                                    m_selectedTokenPossibleMove = ComputeCells(m_sequenceEngaged);
+                                    ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.CadetBlue);
+                                }
                             }
                         }
                         // Sinon on deselectionne le pion
@@ -297,7 +304,7 @@ namespace ProjetWPF
                                 // Reset selected token
                                 ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.Khaki);
                                 m_selectedToken = null;
-                          }
+                        }
                         
                     }
                     else
@@ -306,7 +313,7 @@ namespace ProjetWPF
                         if (m_sequenceEngaged.Count == 0)
                         {
                             // Select the token and mark the possible destinations with a color
-                            m_selectedToken = m_board.Tokens[Grid.GetColumn((UIElement)element), Grid.GetRow((UIElement)element)];
+                            m_selectedToken = m_board.Tokens[Grid.GetRow((UIElement)element), Grid.GetColumn((UIElement)element)];
                             if (m_selectedToken != null && m_playerPossibleMove.ContainsKey(m_selectedToken))
                             {
                                 m_selectedTokenPossibleMove = ComputeCells(m_playerPossibleMove[m_selectedToken]);
@@ -314,7 +321,7 @@ namespace ProjetWPF
                             }
                         }
                         else {
-                            if (m_board.Tokens[Grid.GetColumn((UIElement)element), Grid.GetRow((UIElement)element)] == m_selectedToken) {
+                            if (m_board.Tokens[Grid.GetRow((UIElement)element), Grid.GetColumn((UIElement)element)] == m_selectedToken) {
                                 ChangeColorOfCells(m_selectedTokenPossibleMove, Colors.CadetBlue);
                             }
                         }
