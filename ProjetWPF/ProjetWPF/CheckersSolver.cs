@@ -183,7 +183,12 @@ namespace ProjetWPF
             int utility = int.MinValue;
             CheckersState bestSuccessor = state;
             // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
-            foreach (CheckersState nextState in state.Successors())
+            List<CheckersState> successors = state.Successors();
+            if(successors.Count == 1)
+            {
+                return successors[0];
+            }
+            foreach (CheckersState nextState in successors)
             {
                 int successorUtility = MinValue(nextState, alpha, beta, depth + 1).Utility;
                 if (utility < successorUtility)
@@ -232,7 +237,12 @@ namespace ProjetWPF
             int utility = int.MaxValue;
             CheckersState bestSuccessor = state;
             // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus petite utilite maximum
-            foreach (CheckersState nextState in state.Successors())
+            List<CheckersState> successors = state.Successors();
+            if (successors.Count == 1)
+            {
+                return successors[0];
+            }
+            foreach (CheckersState nextState in successors)
             {
                 int successorUtility = MaxValue(nextState, alpha, beta, depth + 1).Utility;
                 if (utility > successorUtility)
