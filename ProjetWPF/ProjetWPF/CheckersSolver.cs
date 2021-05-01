@@ -167,7 +167,8 @@ namespace ProjetWPF
             // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
             foreach (CheckersState nextState in state.Successors()) {
                 int successorUtility = MinValue(nextState, depth + 1).Utility;
-                if (utility < successorUtility) {
+                if (utility < successorUtility)
+                {
                     utility = successorUtility;
                     bestSuccessor = nextState;
                 }
@@ -180,6 +181,7 @@ namespace ProjetWPF
             // Si l'etat est un etat terminal de l'arbre on retourne une valeur
             if (state.Terminal || depth >= m_depthMax) { return state; }
 
+            Random rand = new Random();
             int utility = int.MinValue;
             CheckersState bestSuccessor = state;
             // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
@@ -195,6 +197,11 @@ namespace ProjetWPF
                 {
                     utility = successorUtility;
                     bestSuccessor = nextState;
+                }
+                else if (utility == successorUtility)
+                {
+                    int choose = rand.Next(0, 2);
+                    bestSuccessor = choose > 0 ? bestSuccessor : nextState;
                 }
                 if (utility > beta)
                 {
@@ -234,6 +241,7 @@ namespace ProjetWPF
         {   // Si l'etat est un etat terminal de l'arbre on retourne une valeur
             if (state.Terminal || depth >= m_depthMax) { return state; }
 
+            Random rand = new Random();
             int utility = int.MaxValue;
             CheckersState bestSuccessor = state;
             // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus petite utilite maximum
@@ -249,6 +257,11 @@ namespace ProjetWPF
                 {
                     utility = successorUtility;
                     bestSuccessor = nextState;
+                }
+                else if (utility == successorUtility)
+                {
+                    int choose = rand.Next(0, 2);
+                    bestSuccessor = choose > 0 ? bestSuccessor : nextState;
                 }
                 if (utility > alpha)
                 {

@@ -7,33 +7,41 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="800"
         Closing="MainWindowClosing">
-
-    <Grid x:Name="GridRoot">
-        <Grid  Grid.Column="0" ShowGridLines="True" x:Name="GridBoard">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
+    <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar Margin="0,0,-53,0">
+                <TextBlock x:Name="Player"  Text="Joueur actuel : Blanc"/>
+                <TextBlock x:Name="EndGameText"  Text=" Victoire des blancs !" Foreground="ForestGreen"/>
+                <Button x:Name="ReplayButton" Click="Replay" Content="Rejouer"/>
+            </ToolBar>
+        </ToolBarTray>
+        <Grid x:Name="GridRoot">
+            <Grid  Grid.Column="0" ShowGridLines="True" x:Name="GridBoard">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+            </Grid>
         </Grid>
-    </Grid>
+    </DockPanel>
 </Window>

@@ -146,20 +146,53 @@ namespace ProjetWPF
                 return int.MaxValue;
             }
             return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
+
+            // Heuristique 2
+            /*float blackPawns = 0;
+            float blackQueens = 0;
+            float whitePawns = 0;
+            float whiteQueens = 0;
+            foreach (Token t in m_board.BlackTokens)
+            {
+                float positionWeight = Math.Abs(t.Position.Y)/2.5f;
+                if (t is Queen)
+                {
+                    blackQueens += 1;
+                }
+                else
+                {
+                    blackPawns += 1 * positionWeight;
+                }
+            }
+            foreach (Token t in m_board.WhiteTokens)
+            {
+                float positionWeight = Math.Abs(t.Position.Y - 9f)/2.5f;
+                if (t is Queen)
+                {
+                    whiteQueens += 1;
+                }
+                else
+                {
+                    whitePawns += 1 * positionWeight;
+                }
+            }
+            if (m_board.BlackCount == 0)
+            {
+                return int.MinValue+1;
+            }
+            else if (m_board.WhiteCount == 0)
+            {
+                return int.MaxValue-1;
+            }
+            // We want queen to be more important than a token so its weigth must at least superior to the weight of a token, 
+            return (int)(10*(blackPawns - whitePawns) + 60 * (blackQueens - whiteQueens));*/
         }
 
         /*int ComputeUtility()
         {
-            int 
             // Heuristique de base
-            if (m_playerColor == Token.TokenColor.Black)
-            {
-                return m_board.BlackCount - m_board.WhiteCount;
-            }
-            else
-            {
-                return m_board.WhiteCount - m_board.BlackCount;
-            }
+            return m_board.BlackCount - m_board.WhiteCount;
+
         }*/
     }
 }

@@ -152,11 +152,29 @@ namespace ProjetWPF
         {
             switch (current)
             {
-                case Token.TokenColor.White: return Token.TokenColor.Black;
-                case Token.TokenColor.Black: return Token.TokenColor.White;
+                case Token.TokenColor.White:
+                    Dispatcher.Invoke(() => Player.Text = "Joueur actuel : Noir");
+                    return Token.TokenColor.Black;
+                case Token.TokenColor.Black:
+                    Dispatcher.Invoke(() => Player.Text = "Joueur actuel : Blanc");
+                    return Token.TokenColor.White;
                 default: break;
             }
             return current;
+        }
+
+
+        void StartGame() {
+            ReplayButton.Visibility = Visibility.Hidden;
+            EndGameText.Visibility = Visibility.Hidden;
+        }
+
+        void EndGame(Token.TokenColor player) {
+            string victory = "Victoire des blanc";
+            if (player == Token.TokenColor.Black) victory = "Victoire des noirs";
+            ReplayButton.Visibility = Visibility.Visible;
+            EndGameText.Visibility = Visibility.Visible;
+            EndGameText.Text = victory;
         }
 
         /// <summary>
@@ -164,9 +182,13 @@ namespace ProjetWPF
         /// </summary>
         void GameLoop()
         {
+            Dispatcher.Invoke(() => StartGame());
+
             Token.TokenColor currentPlayer = Token.TokenColor.White;
             bool lastPlayerWon = false;
             CheckersSolver opponent = new CheckersSolver(this, m_board, 6);
+
+            Dispatcher.Invoke(() => Player.Text = "Joueur actuel : Blanc");
 
             while (!lastPlayerWon && !m_stopGame)
             {
@@ -207,13 +229,20 @@ namespace ProjetWPF
                         break;
                 }
 
-                if (lastPlayerWon) break;
+                if (lastPlayerWon) {
+                    // C'est le joueur precedent qui a gagne
+                    currentPlayer = SwitchPlayer(currentPlayer);
+                    break;
+                }
+
                 // On verifie si apres c'est mouvement le joueur a gagné
                 lastPlayerWon = CheckWin(currentPlayer);
-                // C'est le tour du joueur suivant
-                currentPlayer = SwitchPlayer(currentPlayer);
+                if (!lastPlayerWon) {
+                    // C'est le tour du joueur suivant
+                    currentPlayer = SwitchPlayer(currentPlayer);
+                }
             }
-
+            Dispatcher.Invoke(() => EndGame(currentPlayer));
         }
 
         class FindMove {
@@ -381,6 +410,11 @@ namespace ProjetWPF
             }
         }
 
-        
+        private void Replay(object sender, RoutedEventArgs e){
+            m_board = new Board();
+            DisplayBoard();
+            Thread gameThread = new Thread(new ThreadStart(GameLoop));
+            gameThread.Start();
+        }
     }
 }
