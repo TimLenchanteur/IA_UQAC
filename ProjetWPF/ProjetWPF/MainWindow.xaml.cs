@@ -186,7 +186,7 @@ namespace ProjetWPF
 
             Token.TokenColor currentPlayer = Token.TokenColor.White;
             bool lastPlayerWon = false;
-            CheckersSolver opponent = new CheckersSolver(this, m_board, 4);
+            CheckersSolver opponent = new CheckersSolver(this, m_board, 7);
 
             Dispatcher.Invoke(() => Player.Text = "Joueur actuel : Blanc");
 

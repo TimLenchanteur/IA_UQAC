@@ -133,7 +133,7 @@ namespace ProjetWPF
             Stopwatch stopwatch = new Stopwatch();
 
             stopwatch.Start();
-            CheckersState bestNextState = MaxValue(currentState, 0);
+            CheckersState bestNextState = MaxValue(currentState, 0).Value;
             stopwatch.Stop();
             Debug.WriteLine("Elapsed Time is {0} s", stopwatch.ElapsedMilliseconds / 1000f);
             // On retourne l'action dans les successeurs de l'etat qui retourne la valeur la plus importante
@@ -145,7 +145,7 @@ namespace ProjetWPF
             Stopwatch stopwatch = new Stopwatch();
 
             stopwatch.Start();
-            CheckersState bestNextState = MaxValue(currentState, int.MinValue, int.MaxValue, 0);
+            CheckersState bestNextState = MaxValue(currentState, int.MinValue, int.MaxValue, 0).Value;
             stopwatch.Stop();
             Debug.WriteLine("Elapsed Time is {0} s", stopwatch.ElapsedMilliseconds/1000f);
             return bestNextState.Action;
@@ -157,31 +157,31 @@ namespace ProjetWPF
         /// <param name="state">L'etat dont on cherche les successeurs</param>
         /// <param name="depth">Profondeur de l'arbre a laquelle on se trouve</param>
         /// <returns>Le meilleur etats successeurs</returns>
-        CheckersState MaxValue(CheckersState state, int depth)
+        KeyValuePair<int, CheckersState> MaxValue(CheckersState state, int depth)
         {
             // Si l'etat est un etat terminal de l'arbre on retourne une valeur
-            if (state.Terminal || depth >= m_depthMax) { return state; }
+            if (state.Terminal || depth >= m_depthMax) { return new KeyValuePair<int, CheckersState>(state.Utility, state); }
 
             int utility = int.MinValue;
             CheckersState bestSuccessor = state;
             // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
             foreach (CheckersState nextState in state.Successors()) {
-                int successorUtility = MinValue(nextState, depth + 1).Utility;
+                int successorUtility = MinValue(nextState, depth + 1).Key;
                 if (utility < successorUtility)
                 {
                     utility = successorUtility;
                     bestSuccessor = nextState;
                 }
             }
-            return bestSuccessor;
+            return new KeyValuePair<int, CheckersState>(utility, bestSuccessor);
         }
 
-        CheckersState MaxValue(CheckersState state, int alpha, int beta, int depth)
+        KeyValuePair<int, CheckersState> MaxValue(CheckersState state, int alpha, int beta, int depth)
         {
             // Si l'etat est un etat terminal de l'arbre on retourne une valeur
-            if (state.Terminal || depth >= m_depthMax) { return state; }
+            if (state.Terminal || depth >= m_depthMax) { return new KeyValuePair<int, CheckersState>(state.Utility, state); }
 
-
+            //Debug.WriteLine("Max profondeur : "+depth);
             Random rand = new Random();
             int utility = int.MinValue;
             CheckersState bestSuccessor = state;
@@ -189,11 +189,11 @@ namespace ProjetWPF
             List<CheckersState> successors = state.Successors();
             if(successors.Count == 1 && depth == 0)
             {
-                return successors[0];
+                return new KeyValuePair<int, CheckersState>(successors[0].Utility, successors[0]);
             }
             foreach (CheckersState nextState in successors)
             {
-                int successorUtility = MinValue(nextState, alpha, beta, depth + 1).Utility;
+                int successorUtility = MinValue(nextState, alpha, beta, depth + 1).Key;
                 if (utility < successorUtility)
                 {
                     utility = successorUtility;
@@ -206,11 +206,13 @@ namespace ProjetWPF
                 }
                 if (utility >= beta)
                 {
-                    return bestSuccessor;
+                    //Debug.WriteLine("Fin max profondeur : " + depth + ", utilite : " + utility);
+                    return new KeyValuePair<int, CheckersState>(utility, bestSuccessor);
                 }
                 alpha = Math.Max(alpha, utility);
             }
-            return bestSuccessor;
+            //Debug.WriteLine("Fin max profondeur : " + depth + ", utilite : " + utility);
+            return new KeyValuePair<int, CheckersState>(utility, bestSuccessor);
         }
 
         /// <summary>
@@ -219,29 +221,30 @@ namespace ProjetWPF
         /// <param name="state">L'etat propose</param>
         /// <param name="depth">La profondeur dans l'arbre a laquelle on se trouve</param>
         /// <returns>Le pire etat successeurs</returns>
-        CheckersState MinValue(CheckersState state, int depth)
+        KeyValuePair<int, CheckersState> MinValue(CheckersState state, int depth)
         {   // Si l'etat est un etat terminal de l'arbre on retourne une valeur
-            if (state.Terminal || depth >= m_depthMax) { return state; }
+            if (state.Terminal || depth >= m_depthMax) { return new KeyValuePair<int, CheckersState>(state.Utility, state); }
 
             int utility = int.MaxValue;
             CheckersState bestSuccessor = state;
             // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus petite utilite maximum
             foreach (CheckersState nextState in state.Successors())
             {
-                int successorUtility = MaxValue(nextState, depth + 1).Utility;
+                int successorUtility = MaxValue(nextState, depth + 1).Key;
                 if (utility > successorUtility)
                 {
                     utility = successorUtility;
                     bestSuccessor = nextState;
                 }
             }
-            return bestSuccessor;
+            return new KeyValuePair<int, CheckersState>(utility, bestSuccessor);
         }
 
-        CheckersState MinValue(CheckersState state, int alpha, int beta, int depth)
+        KeyValuePair<int, CheckersState> MinValue(CheckersState state, int alpha, int beta, int depth)
         {   // Si l'etat est un etat terminal de l'arbre on retourne une valeur
-            if (state.Terminal || depth >= m_depthMax) { return state; }
+            if (state.Terminal || depth >= m_depthMax) { return new KeyValuePair<int, CheckersState>(state.Utility, state); }
 
+            //Debug.WriteLine("Min profondeur : " + depth);
             Random rand = new Random();
             int utility = int.MaxValue;
             CheckersState bestSuccessor = state;
@@ -249,11 +252,11 @@ namespace ProjetWPF
             List<CheckersState> successors = state.Successors();
             if (successors.Count == 1 && depth == 0)
             {
-                return successors[0];
+                return new KeyValuePair<int, CheckersState>(successors[0].Utility, successors[0]);
             }
             foreach (CheckersState nextState in successors)
             {
-                int successorUtility = MaxValue(nextState, alpha, beta, depth + 1).Utility;
+                int successorUtility = MaxValue(nextState, alpha, beta, depth + 1).Key;
                 if (utility > successorUtility)
                 {
                     utility = successorUtility;
@@ -266,11 +269,13 @@ namespace ProjetWPF
                 }
                 if (utility <= alpha)
                 {
-                    return bestSuccessor;
+                    //Debug.WriteLine("Fin min profondeur : " + depth + ", utilite : " + utility);
+                    return new KeyValuePair<int, CheckersState>(utility, bestSuccessor);
                 }
                 beta = Math.Min(utility, beta);
             }
-            return bestSuccessor;
+            //Debug.WriteLine("Fin min profondeur : " + depth + ", utilite : " + utility);
+            return new KeyValuePair<int, CheckersState>(utility, bestSuccessor);
         }
 
     }
