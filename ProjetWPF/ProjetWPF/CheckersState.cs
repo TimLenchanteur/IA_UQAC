@@ -189,7 +189,7 @@ namespace ProjetWPF
                 return int.MaxValue-1;
             }
             // We want queen to be more important than a token so its weigth must at least superior to the weight of a token, 
-            return (int)(10*(blackPawns - whitePawns) + 200 * (blackQueens - whiteQueens));
+            return (int)(10*(blackPawns - whitePawns) + 80 * (blackQueens - whiteQueens));
         }
 
         /*int ComputeUtility()
