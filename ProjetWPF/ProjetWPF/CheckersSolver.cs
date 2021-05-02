@@ -181,12 +181,13 @@ namespace ProjetWPF
             // Si l'etat est un etat terminal de l'arbre on retourne une valeur
             if (state.Terminal || depth >= m_depthMax) { return state; }
 
+
             Random rand = new Random();
             int utility = int.MinValue;
             CheckersState bestSuccessor = state;
             // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
             List<CheckersState> successors = state.Successors();
-            if(successors.Count == 1)
+            if(successors.Count == 1 && depth == 0)
             {
                 return successors[0];
             }
@@ -203,7 +204,7 @@ namespace ProjetWPF
                     int choose = rand.Next(0, 2);
                     bestSuccessor = choose > 0 ? bestSuccessor : nextState;
                 }
-                if (utility > beta)
+                if (utility >= beta)
                 {
                     return bestSuccessor;
                 }
@@ -246,7 +247,7 @@ namespace ProjetWPF
             CheckersState bestSuccessor = state;
             // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus petite utilite maximum
             List<CheckersState> successors = state.Successors();
-            if (successors.Count == 1)
+            if (successors.Count == 1 && depth == 0)
             {
                 return successors[0];
             }
@@ -263,7 +264,7 @@ namespace ProjetWPF
                     int choose = rand.Next(0, 2);
                     bestSuccessor = choose > 0 ? bestSuccessor : nextState;
                 }
-                if (utility > alpha)
+                if (utility <= alpha)
                 {
                     return bestSuccessor;
                 }

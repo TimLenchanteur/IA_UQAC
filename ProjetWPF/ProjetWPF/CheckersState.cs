@@ -106,7 +106,7 @@ namespace ProjetWPF
         /// <returns>L'utilite associe a l'etat</returns>
         int ComputeUtility() {
             // Heuristique de base
-            int blackPawns = 0;
+            /*int blackPawns = 0;
             int blackQueens = 0;
             float avgAdvance = 0;
             int whitePawns = 0;
@@ -145,37 +145,41 @@ namespace ProjetWPF
             {
                 return int.MaxValue;
             }
-            return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);
+            return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);*/
 
             // Heuristique 2
-            /*float blackPawns = 0;
+            float blackPawns = 0;
             float blackQueens = 0;
             float whitePawns = 0;
             float whiteQueens = 0;
+            float averagePos = 0;
             foreach (Token t in m_board.BlackTokens)
             {
-                float positionWeight = Math.Abs(t.Position.Y)/2.5f;
                 if (t is Queen)
                 {
                     blackQueens += 1;
                 }
                 else
                 {
-                    blackPawns += 1 * positionWeight;
+                    blackPawns += 1;
+                    averagePos += t.Position.Y;
                 }
             }
+            blackPawns += averagePos / blackPawns;
+            averagePos = 0;
             foreach (Token t in m_board.WhiteTokens)
             {
-                float positionWeight = Math.Abs(t.Position.Y - 9f)/2.5f;
                 if (t is Queen)
                 {
                     whiteQueens += 1;
                 }
                 else
                 {
-                    whitePawns += 1 * positionWeight;
+                    whitePawns += 1;
+                    averagePos += (int)Math.Abs(t.Position.Y - 9f);
                 }
             }
+            whitePawns += averagePos / whitePawns;
             if (m_board.BlackCount == 0)
             {
                 return int.MinValue+1;
@@ -185,7 +189,7 @@ namespace ProjetWPF
                 return int.MaxValue-1;
             }
             // We want queen to be more important than a token so its weigth must at least superior to the weight of a token, 
-            return (int)(10*(blackPawns - whitePawns) + 60 * (blackQueens - whiteQueens));*/
+            return (int)(10*(blackPawns - whitePawns) + 200 * (blackQueens - whiteQueens));
         }
 
         /*int ComputeUtility()
