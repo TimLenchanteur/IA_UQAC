@@ -105,6 +105,9 @@ namespace ProjetWPF
         /// </summary>
         /// <returns>L'utilite associe a l'etat</returns>
         int ComputeUtility() {
+
+            return m_board.BlackCount - m_board.WhiteCount;
+
             // Heuristique de base
             /*int blackPawns = 0;
             int blackQueens = 0;
@@ -148,7 +151,7 @@ namespace ProjetWPF
             return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);*/
 
             // Heuristique 2
-            float blackPawns = 0;
+            /*float blackPawns = 0;
             float blackQueens = 0;
             float whitePawns = 0;
             float whiteQueens = 0;
@@ -189,14 +192,76 @@ namespace ProjetWPF
                 return int.MaxValue-1;
             }
             // We want queen to be more important than a token so its weigth must at least superior to the weight of a token, 
-            return (int)(10*(blackPawns - whitePawns) + 80 * (blackQueens - whiteQueens));
+            return (int)(10*(blackPawns - whitePawns) + 80 * (blackQueens - whiteQueens));*/
+
+            /*float whiteAttackPawns = 0;
+            float blackAttackPawns = 0;
+            float centerWhitePawns = 0;
+            float centerBlackPawns = 0;
+            float whiteDefenderPawns = 0;
+            float blackDefenderPawns = 0;
+            float whiteQueens = 0;
+            float blackQueens = 0;
+            foreach (Token t in m_board.BlackTokens)
+            {
+                if (t is Queen)
+                {
+                    blackQueens += 1;
+                }
+                else
+                {
+                    int position = t.Position.Y;
+                    if (position < 4) {
+                        blackDefenderPawns += 1;
+                    }
+                    else if (position < 7) {
+                        centerBlackPawns += 1;
+                    }
+                    else {
+                        blackAttackPawns += 1;
+                    }
+                }
+            }
+            foreach (Token t in m_board.WhiteTokens)
+            {
+                if (t is Queen)
+                {
+                    whiteQueens += 1;
+                }
+                else
+                {
+                    int position = (int)Math.Abs(t.Position.Y - 9f);
+                    if (position < 4)
+                    {
+                        whiteDefenderPawns += 1;
+                    }
+                    else if (position < 7)
+                    {
+                        centerWhitePawns += 1;
+                    }
+                    else
+                    {
+                        whiteAttackPawns += 1;
+                    }
+                }
+            }
+            if (m_board.BlackCount == 0)
+            {
+                return int.MinValue + 1;
+            }
+            else if (m_board.WhiteCount == 0)
+            {
+                return int.MaxValue - 1;
+            }
+            int defenderWeight = 1; int centerWeight = 2; int attackWeight = 2; int queenWeight = 10;
+            if (m_board.BlackCount + m_board.WhiteCount < 20) {
+                defenderWeight = 2; centerWeight = 1; attackWeight = 2; queenWeight = 15;
+            }
+
+            // We want queen to be more important than a token so its weigth must at least superior to the weight of a token, 
+            return (int)(defenderWeight * (blackDefenderPawns - whiteDefenderPawns) + centerWeight * (centerBlackPawns - centerBlackPawns) 
+                + attackWeight*(blackAttackPawns-whiteAttackPawns) + queenWeight*(blackQueens-whiteQueens));*/
+
         }
-
-        /*int ComputeUtility()
-        {
-            // Heuristique de base
-            return m_board.BlackCount - m_board.WhiteCount;
-
-        }*/
     }
 }

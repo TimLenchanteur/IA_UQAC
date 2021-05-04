@@ -199,7 +199,11 @@ namespace ProjetWPF
                         m_playerTurn = true;
                         // Cette fonction est assez couteuse, il faudrait l'appeler un minimum de fois
                         m_playerPossibleMove = m_board.PrioritaryTokens(currentPlayer);
-                        if (m_playerPossibleMove.Count == 0) lastPlayerWon = true;
+                        if (m_playerPossibleMove.Count == 0)
+                        {
+                            lastPlayerWon = true;
+                            break;
+                        }
                         m_sequenceEngaged = new List<TokenMoveSequence>();
                         while (m_playerTurn && !m_stopGame)
                         {
