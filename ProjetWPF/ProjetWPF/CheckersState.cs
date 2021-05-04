@@ -106,12 +106,11 @@ namespace ProjetWPF
         /// <returns>L'utilite associe a l'etat</returns>
         int ComputeUtility() {
 
-            return m_board.BlackCount - m_board.WhiteCount;
+            //return m_board.BlackCount - m_board.WhiteCount;
 
             // Heuristique de base
-            /*int blackPawns = 0;
+            int blackPawns = 0;
             int blackQueens = 0;
-            float avgAdvance = 0;
             int whitePawns = 0;
             int whiteQueens = 0;
             foreach(Token t in m_board.BlackTokens)
@@ -124,7 +123,6 @@ namespace ProjetWPF
                 {
                     blackPawns += 1;
                 }
-                avgAdvance += t.Position.Y;
             }
             foreach (Token t in m_board.WhiteTokens)
             {
@@ -136,10 +134,7 @@ namespace ProjetWPF
                 {
                     whitePawns += 1;
                 }
-                avgAdvance += t.Position.Y;
             }
-            avgAdvance /= -(m_board.BlackCount + m_board.WhiteCount);
-            avgAdvance += 4.5f;
             if(m_board.BlackCount == 0)
             {
                 return int.MinValue;
@@ -148,7 +143,7 @@ namespace ProjetWPF
             {
                 return int.MaxValue;
             }
-            return (int)(10 * (blackPawns - whitePawns) + 100 * (blackQueens - whiteQueens) + avgAdvance);*/
+            return (int)(1 * (blackPawns - whitePawns) + 5 * (blackQueens - whiteQueens));
 
             // Heuristique 2
             /*float blackPawns = 0;

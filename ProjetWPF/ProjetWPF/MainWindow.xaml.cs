@@ -343,7 +343,7 @@ namespace ProjetWPF
                     else
                     {
                         // Si on a pas deja commence une sequence de mouvement
-                        if (m_sequenceEngaged.Count == 0)
+                        if (m_sequenceEngaged != null && m_sequenceEngaged.Count == 0)
                         {
                             // Select the token and mark the possible destinations with a color
                             m_selectedToken = m_board.Tokens[Grid.GetRow((UIElement)element), Grid.GetColumn((UIElement)element)];
