@@ -182,7 +182,6 @@ namespace ProjetWPF
             if (state.Terminal || depth >= m_depthMax) { return new KeyValuePair<int, CheckersState>(state.Utility, state); }
 
             //Debug.WriteLine("Max profondeur : "+depth);
-            Random rand = new Random();
             int utility = int.MinValue;
             CheckersState bestSuccessor = state;
             // Pour tous les successeurs de l'etat on recupere le successeur qui renvoie la plus grande utilite minimum
@@ -199,11 +198,11 @@ namespace ProjetWPF
                     utility = successorUtility;
                     bestSuccessor = nextState;
                 }
-                else if (utility == successorUtility)
+                /*else if (utility == successorUtility)
                 {
                     int choose = rand.Next(0, 2);
                     bestSuccessor = choose > 0 ? bestSuccessor : nextState;
-                }
+                }*/
                 if (utility >= beta)
                 {
                     //Debug.WriteLine("Fin max profondeur : " + depth + ", utilite : " + utility);
@@ -245,7 +244,6 @@ namespace ProjetWPF
             if (state.Terminal || depth >= m_depthMax) { return new KeyValuePair<int, CheckersState>(state.Utility, state); }
 
             //Debug.WriteLine("Min profondeur : " + depth);
-            Random rand = new Random();
             int utility = int.MaxValue;
             CheckersState bestSuccessor = state;
             // Pour tout les successeurs de l'etat on recupere le successeur qui renvoie la plus petite utilite maximum
@@ -262,11 +260,11 @@ namespace ProjetWPF
                     utility = successorUtility;
                     bestSuccessor = nextState;
                 }
-                else if (utility == successorUtility)
+                /*else if (utility == successorUtility)
                 {
                     int choose = rand.Next(0, 2);
                     bestSuccessor = choose > 0 ? bestSuccessor : nextState;
-                }
+                }*/
                 if (utility <= alpha)
                 {
                     //Debug.WriteLine("Fin min profondeur : " + depth + ", utilite : " + utility);
