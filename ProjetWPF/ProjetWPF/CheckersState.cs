@@ -22,7 +22,7 @@ namespace ProjetWPF
         // L'utilite associe a cet etat pour l'agent
         int m_utility;
         public int Utility {
-            get => m_utility;
+            get => ComputeUtility();
         }
 
         // Action qui a permis d'atteindre cet etat
@@ -42,7 +42,7 @@ namespace ProjetWPF
             m_action = null;
             m_playerColor = playerColor;
             m_board = new Board(board);
-            m_utility = ComputeUtility();
+            //m_utility = ComputeUtility();
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace ProjetWPF
             // On change la couleur du joueur
             if (playerColor == Token.TokenColor.Black) m_playerColor = Token.TokenColor.White;
             else if (playerColor == Token.TokenColor.White) m_playerColor = Token.TokenColor.Black;
-            m_utility = ComputeUtility();
+            //m_utility = ComputeUtility();
         }
 
         /// <summary>
